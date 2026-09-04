@@ -1,0 +1,196 @@
+{
+  "blocked_indicators": [],
+  "case_id": "FIN-2025-0417",
+  "credentials": {
+    "CORP\\backupsvc": {
+      "rotated": false,
+      "version": 7
+    },
+    "CORP\\svc_reporting": {
+      "rotated": false,
+      "version": 4
+    },
+    "CORP\\vaultsync": {
+      "rotated": false,
+      "version": 2
+    }
+  },
+  "hosts": {
+    "acct-ws-04": {
+      "artifacts": {
+        "FILE-221": {
+          "path": "C:\\ProgramData\\OneDriveHealth\\update.ps1",
+          "quarantined": false,
+          "sha256": "27c1b956a376f025da54daeae5b3f9b9d12af076646712a31f4963ee3f743b73"
+        },
+        "FILE-310": {
+          "path": "C:\\Program Files\\Ledger\\monthend.ps1",
+          "quarantined": false,
+          "sha256": "b31e25099d0655b31be09a37309a61ee67058988a85a1952afcb4428828a2313"
+        }
+      },
+      "ssh_keys": {},
+      "startup_entries": {
+        "HKCU-17": {
+          "command": "powershell.exe -File C:\\ProgramData\\OneDriveHealth\\update.ps1",
+          "enabled": true,
+          "kind": "registry_run",
+          "name": "OneDriveHealth"
+        },
+        "TASK-44": {
+          "command": "C:\\Program Files\\Ledger\\monthend.ps1",
+          "enabled": true,
+          "kind": "scheduled_task",
+          "name": "FinanceMonthEnd"
+        }
+      }
+    },
+    "backup-gw-02": {
+      "artifacts": {
+        "FILE-701": {
+          "path": "/usr/local/bin/vendor-inventory",
+          "quarantined": false,
+          "sha256": "9a02b89bc7d921bb7899da21a523c8aa1064a3d9029ce46b5003190b4ceea11d"
+        },
+        "FILE-914": {
+          "path": "/opt/cache/cert_sync.py",
+          "quarantined": false,
+          "sha256": "74f740bc25ef325f87c3d1db53c6f8bee500f7d5270e15857df24ac7a5b86e82"
+        }
+      },
+      "ssh_keys": {
+        "KEY-73": {
+          "comment": "ops@vault",
+          "fingerprint": "SHA256:f0nRq8M0P4KxZ3TSxq1U7vWlYVzwQbQzdN0cP6q2Y9A",
+          "present": true
+        },
+        "KEY-88": {
+          "comment": "deploy@acct-ws-04",
+          "fingerprint": "SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M",
+          "present": true
+        }
+      },
+      "startup_entries": {
+        "TIMER-12": {
+          "command": "/usr/local/bin/vendor-inventory --push 192.0.2.44",
+          "enabled": true,
+          "kind": "systemd_timer",
+          "name": "vendor-inventory.timer"
+        },
+        "UNIT-77": {
+          "command": "/usr/bin/python3 /opt/cache/cert_sync.py --relay",
+          "enabled": true,
+          "kind": "systemd_service",
+          "name": "cert-cache.service"
+        }
+      }
+    },
+    "report-db-01": {
+      "artifacts": {
+        "DBFILE-1": {
+          "path": "/usr/local/bin/reporting-api",
+          "quarantined": false,
+          "sha256": "24b812244356127685812661eb16412f1fde2c921870ac4984440f9c8ca2d19d"
+        }
+      },
+      "ssh_keys": {},
+      "startup_entries": {
+        "DB-11": {
+          "command": "/usr/local/bin/reporting-api",
+          "enabled": true,
+          "kind": "service",
+          "name": "reporting-api"
+        }
+      }
+    },
+    "vault-prx-03": {
+      "artifacts": {
+        "FILE-930": {
+          "path": "/usr/local/bin/vault-health",
+          "quarantined": false,
+          "sha256": "976fa9317978a4fc326b42a008f323e0782222049004c5783eb4e9b805cfbc36"
+        },
+        "FILE-931": {
+          "path": "/usr/local/libexec/.index-cache",
+          "quarantined": false,
+          "sha256": "5a1ab623fda7df3cda48fc2d29a914c17ae700b3ceb79589d18bbd111b7f402d"
+        }
+      },
+      "ssh_keys": {
+        "KEY-91": {
+          "comment": "archive-admin@corp",
+          "fingerprint": "SHA256:Vn5Rx1Tq8Ka3Lc7Ym2Wp9Hs4Df6Bj0ZuEe3Ni8Go1Cs",
+          "present": true
+        },
+        "KEY-94": {
+          "comment": "cache-maint@backup-gw-02",
+          "fingerprint": "SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As",
+          "present": true
+        }
+      },
+      "startup_entries": {
+        "UNIT-92": {
+          "command": "/usr/local/bin/vault-health --push 203.0.113.88",
+          "enabled": true,
+          "kind": "systemd_service",
+          "name": "vault-health.service"
+        },
+        "UNIT-93": {
+          "command": "/usr/local/libexec/.index-cache --sync",
+          "enabled": true,
+          "kind": "systemd_service",
+          "name": "index-cache.service"
+        }
+      }
+    }
+  },
+  "services": {
+    "archive-transfer": {
+      "credential_version": 2,
+      "host": "vault-prx-03",
+      "principal": "CORP\\vaultsync",
+      "status": "stopped"
+    },
+    "ledger-client": {
+      "credential_version": null,
+      "host": "acct-ws-04",
+      "principal": null,
+      "status": "stopped"
+    },
+    "nightly-backup": {
+      "credential_version": 7,
+      "host": "backup-gw-02",
+      "principal": "CORP\\backupsvc",
+      "status": "stopped"
+    },
+    "reporting-api": {
+      "credential_version": 4,
+      "host": "report-db-01",
+      "principal": "CORP\\svc_reporting",
+      "status": "running"
+    },
+    "vault-health": {
+      "credential_version": null,
+      "host": "vault-prx-03",
+      "principal": null,
+      "status": "running"
+    }
+  },
+  "sessions": {
+    "S-4101": {
+      "active": true,
+      "principal": "CORP\\backupsvc",
+      "source": "10.24.8.17"
+    },
+    "S-4302": {
+      "active": true,
+      "principal": "CORP\\vaultsync",
+      "source": "10.24.5.20"
+    },
+    "S-6200": {
+      "active": true,
+      "principal": "CORP\\svc_reporting",
+      "source": "10.24.5.31"
+    }
+  }
+}

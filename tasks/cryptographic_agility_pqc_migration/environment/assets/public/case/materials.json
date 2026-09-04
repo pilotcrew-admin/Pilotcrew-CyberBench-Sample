@@ -1,0 +1,414 @@
+{
+  "case_id": "helios-2027-02",
+  "materials": [
+    {
+      "algorithms": [
+        "RSA_2048_SHA256"
+      ],
+      "approved": "transition_only",
+      "disposition": "retire_at_completion",
+      "expires": "2027-06-30",
+      "id": "tls-root-2019",
+      "role": "trust_anchor",
+      "source": "legacy-ca",
+      "status": "active",
+      "surface": "tls:telemetry-api"
+    },
+    {
+      "algorithms": [
+        "RSA_2048_SHA256"
+      ],
+      "approved": "transition_only",
+      "disposition": "retire_at_completion",
+      "expires": "2027-05-31",
+      "id": "tls-api-2024",
+      "issuer": "tls-root-2019",
+      "role": "server_credential",
+      "source": "legacy-ca",
+      "status": "active",
+      "surface": "tls:telemetry-api"
+    },
+    {
+      "algorithms": [
+        "ECDSA_P384_SHA384"
+      ],
+      "approved": "final",
+      "expires": "2037-01-31",
+      "id": "tls-root-2027",
+      "role": "trust_anchor",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "tls:telemetry-api",
+      "trust_domain": "prod.telemetry.helios"
+    },
+    {
+      "algorithms": [
+        "ECDSA_P384_SHA384"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-a",
+      "dns_names": [
+        "telemetry-api.helios"
+      ],
+      "expires": "2028-02-01",
+      "id": "tls-api-2027",
+      "issuer": "tls-root-2027",
+      "key_usage": [
+        "serverAuth"
+      ],
+      "role": "server_credential",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "tls:telemetry-api"
+    },
+    {
+      "algorithms": [
+        "ML_DSA_65"
+      ],
+      "approved": "lab_only",
+      "expires": "2028-02-01",
+      "id": "tls-root-lab",
+      "role": "trust_anchor",
+      "source": "engineering-lab",
+      "status": "candidate",
+      "surface": "tls:telemetry-api"
+    },
+    {
+      "algorithms": [
+        "ML_DSA_65"
+      ],
+      "approved": "lab_only",
+      "expires": "2028-02-01",
+      "id": "tls-api-pq-lab",
+      "issuer": "tls-root-lab",
+      "role": "server_credential",
+      "source": "engineering-lab",
+      "status": "candidate",
+      "surface": "tls:telemetry-api"
+    },
+    {
+      "algorithms": [
+        "RSA_PKCS1_SHA256"
+      ],
+      "approved": "transition_only",
+      "disposition": "retire_at_completion",
+      "id": "sign-release-rsa",
+      "role": "release_signer",
+      "source": "hsm-prod-1",
+      "status": "active",
+      "surface": "signing:device-update"
+    },
+    {
+      "algorithms": [
+        "ED25519"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-a",
+      "id": "sign-release-ed",
+      "independence_domain": "hsm-west",
+      "role": "release_signer",
+      "signing_context": "helios-release-v2",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "signing:device-update"
+    },
+    {
+      "algorithms": [
+        "ML_DSA_65"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-b",
+      "id": "sign-release-pq",
+      "independence_domain": "hsm-east",
+      "role": "release_signer",
+      "signing_context": "helios-release-v2",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "signing:device-update"
+    },
+    {
+      "algorithms": [
+        "ML_DSA_44"
+      ],
+      "approved": "lab_only",
+      "id": "sign-release-pq-lab",
+      "role": "release_signer",
+      "signing_context": "helios-test",
+      "source": "engineering-lab",
+      "status": "candidate",
+      "surface": "signing:device-update"
+    },
+    {
+      "algorithms": [
+        "SSH_RSA_SHA1",
+        "RSA_SHA2_256"
+      ],
+      "approved": "transition_only",
+      "disposition": "retire_at_completion",
+      "id": "ssh-host-rsa1024",
+      "role": "host_key",
+      "source": "bastion-local",
+      "status": "active",
+      "surface": "ssh:ops-bastion"
+    },
+    {
+      "algorithms": [
+        "RSA_SHA2_256"
+      ],
+      "approved": "transition_only",
+      "disposition": "retire_at_completion",
+      "expires": "2027-04-30",
+      "id": "ssh-user-ca-rsa",
+      "role": "user_ca",
+      "source": "legacy-ca",
+      "status": "active",
+      "surface": "ssh:ops-bastion"
+    },
+    {
+      "algorithms": [
+        "SSH_ED25519"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-a",
+      "host_identity": "ops-bastion.helios",
+      "id": "ssh-host-ed25519",
+      "role": "host_key",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "ssh:ops-bastion"
+    },
+    {
+      "algorithms": [
+        "SSH_ED25519"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-b",
+      "id": "ssh-user-ca-ed",
+      "principal_scopes": [
+        "prod-admin",
+        "automation"
+      ],
+      "role": "user_ca",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "ssh:ops-bastion"
+    },
+    {
+      "algorithms": [
+        "ECDSA_P256_SHA256"
+      ],
+      "approved": "lab_only",
+      "id": "ssh-host-p256-lab",
+      "role": "host_key",
+      "source": "engineering-lab",
+      "status": "candidate",
+      "surface": "ssh:ops-bastion"
+    },
+    {
+      "algorithms": [
+        "RSA_2048_OAEP_SHA256"
+      ],
+      "approved": "transition_only",
+      "disposition": "retire_at_completion",
+      "id": "archive-wrap-rsa",
+      "role": "wrapping_key",
+      "source": "legacy-kms",
+      "status": "active",
+      "surface": "archive:compliance"
+    },
+    {
+      "algorithms": [
+        "X25519_MLKEM768"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-b",
+      "id": "archive-wrap-hybrid",
+      "restore_profiles": [
+        "restore-2.0"
+      ],
+      "rewrap_share_hex": "0de9b83a7871c4ce50cac326c398d153fbb164062ddcdad70dd71517e129dd63",
+      "role": "wrapping_key",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "archive:compliance"
+    },
+    {
+      "algorithms": [
+        "MLKEM768"
+      ],
+      "approved": "lab_only",
+      "id": "archive-wrap-pq-lab",
+      "rewrap_share_hex": "5cadc745aa41abf0f3335f67df7c1d993e9fa9dd4b840280c4c32564ed70e528",
+      "role": "wrapping_key",
+      "source": "engineering-lab",
+      "status": "candidate",
+      "surface": "archive:compliance"
+    },
+    {
+      "algorithms": [
+        "ECDSA_P384_SHA384"
+      ],
+      "approved": "final",
+      "expires": "2037-01-31",
+      "id": "tls-root-2027-analytics",
+      "role": "trust_anchor",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "tls:telemetry-api",
+      "trust_domain": "analytics.helios"
+    },
+    {
+      "algorithms": [
+        "ECDSA_P384_SHA384"
+      ],
+      "approved": "final",
+      "dns_names": [
+        "analytics-api.helios"
+      ],
+      "expires": "2028-02-01",
+      "id": "tls-api-2027-analytics",
+      "issuer": "tls-root-2027-analytics",
+      "key_usage": [
+        "serverAuth"
+      ],
+      "role": "server_credential",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "tls:telemetry-api"
+    },
+    {
+      "algorithms": [
+        "ML_DSA_65"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-a",
+      "id": "sign-release-pq-backup",
+      "independence_domain": "hsm-west",
+      "role": "release_signer",
+      "signing_context": "helios-release-v2",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "signing:device-update"
+    },
+    {
+      "algorithms": [
+        "SSH_ED25519"
+      ],
+      "approved": "final",
+      "host_identity": "dr-bastion.helios",
+      "id": "ssh-host-ed25519-dr",
+      "role": "host_key",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "ssh:ops-bastion"
+    },
+    {
+      "algorithms": [
+        "SSH_ED25519"
+      ],
+      "approved": "final",
+      "id": "ssh-user-ca-ed-vendor",
+      "principal_scopes": [
+        "vendor-maintenance"
+      ],
+      "role": "user_ca",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "ssh:ops-bastion"
+    },
+    {
+      "algorithms": [
+        "X25519_MLKEM768"
+      ],
+      "approved": "final",
+      "id": "archive-wrap-hybrid-edge",
+      "restore_profiles": [
+        "restore-2.1-edge"
+      ],
+      "rewrap_share_hex": "0eceb8847fb8e2a578901162515200d10ce8aabe6d47a817911651bda0272521",
+      "role": "wrapping_key",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "archive:compliance"
+    },
+    {
+      "algorithms": [
+        "ECDSA_P384_SHA384"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-b",
+      "dns_names": [
+        "telemetry-api.helios"
+      ],
+      "expires": "2028-02-01",
+      "id": "tls-api-2027-b",
+      "issuer": "tls-root-2027",
+      "key_usage": [
+        "serverAuth"
+      ],
+      "role": "server_credential",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "tls:telemetry-api"
+    },
+    {
+      "algorithms": [
+        "ML_DSA_65"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-c",
+      "id": "sign-release-pq-c",
+      "independence_domain": "hsm-north",
+      "role": "release_signer",
+      "signing_context": "helios-release-v2",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "signing:device-update"
+    },
+    {
+      "algorithms": [
+        "SSH_ED25519"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-c",
+      "host_identity": "ops-bastion.helios",
+      "id": "ssh-host-ed25519-c",
+      "role": "host_key",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "ssh:ops-bastion"
+    },
+    {
+      "algorithms": [
+        "SSH_ED25519"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-c",
+      "id": "ssh-user-ca-ed-c",
+      "principal_scopes": [
+        "prod-admin",
+        "automation"
+      ],
+      "role": "user_ca",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "ssh:ops-bastion"
+    },
+    {
+      "algorithms": [
+        "X25519_MLKEM768"
+      ],
+      "approved": "final",
+      "custody_domain": "vault-c",
+      "id": "archive-wrap-hybrid-c",
+      "restore_profiles": [
+        "restore-2.0"
+      ],
+      "rewrap_share_hex": "ca2d8248db41d1ecca726f1f51bcf3cc2f48ca096351f7744c8cec3a67f423a2",
+      "role": "wrapping_key",
+      "source": "offline-vault",
+      "status": "candidate",
+      "surface": "archive:compliance"
+    }
+  ]
+}

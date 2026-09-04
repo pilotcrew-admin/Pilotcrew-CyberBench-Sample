@@ -1,0 +1,568 @@
+{
+  "$id": "helios-crypto-migration-v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "actions": {
+      "items": {
+        "oneOf": [
+          {
+            "additionalProperties": true,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "material": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "const": "contain_signer"
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "material"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": true,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "material": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "const": "stage_material"
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "material"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": true,
+            "properties": {
+              "batch": {
+                "properties": {
+                  "max_per_failure_domain": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_total": {
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "max_total",
+                  "max_per_failure_domain"
+                ],
+                "type": "object"
+              },
+              "consumer": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "failure_domains": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "on_interrupt": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "const": "upgrade_consumer"
+              },
+              "package": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "ring": {
+                "enum": [
+                  "canary",
+                  "fleet"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "consumer",
+              "package",
+              "ring",
+              "failure_domains",
+              "batch",
+              "on_interrupt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": true,
+            "properties": {
+              "consumer": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "expected_version": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "const": "upgrade_gate"
+              },
+              "package": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "recovery_steps": {
+                "items": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "decision": {
+                      "enum": [
+                        "retry_same_image",
+                        "resume_commit",
+                        "rollback_then_retry",
+                        "reimage_then_retry"
+                      ],
+                      "type": "string"
+                    },
+                    "evidence": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "fault_point": {
+                      "enum": [
+                        "before_write",
+                        "during_write",
+                        "after_write_before_commit"
+                      ],
+                      "type": "string"
+                    },
+                    "receipt": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "work_units": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "fault_point",
+                    "evidence",
+                    "decision",
+                    "work_units",
+                    "receipt"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 3,
+                "minItems": 3,
+                "type": "array"
+              },
+              "ring": {
+                "enum": [
+                  "canary",
+                  "fleet"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "consumer",
+              "ring",
+              "expected_version",
+              "package",
+              "recovery_steps"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": true,
+            "properties": {
+              "consumer": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "material": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "const": "distribute_trust"
+              },
+              "ring": {
+                "enum": [
+                  "canary",
+                  "fleet"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "consumer",
+              "ring",
+              "material"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": true,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "material": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "const": "activate_material"
+              },
+              "surface": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "surface",
+              "material"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": true,
+            "properties": {
+              "allowed_materials": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "const": "configure_transition"
+              },
+              "surface": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "surface",
+              "allowed_materials"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": true,
+            "properties": {
+              "consumer": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "const": "workflow_gate"
+              },
+              "profile": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "ring": {
+                "enum": [
+                  "canary",
+                  "fleet"
+                ]
+              },
+              "surface": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "surface",
+              "consumer",
+              "ring",
+              "profile"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": true,
+            "properties": {
+              "archive": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "data_cipher": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "mode": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "new_envelope_hex": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "op": {
+                "const": "migrate_archive"
+              },
+              "restore_proof": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "wrap_material": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "archive",
+              "data_cipher",
+              "wrap_material",
+              "mode",
+              "new_envelope_hex",
+              "restore_proof"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": true,
+            "properties": {
+              "archive": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "consumers": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "expected_digest": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "const": "archive_gate"
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "archive",
+              "consumers",
+              "expected_digest"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": true,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "const": "set_final_policy"
+              },
+              "surface": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "surface"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": true,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "material": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "const": "retire_material"
+              }
+            },
+            "required": [
+              "id",
+              "op",
+              "material"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "case_id": {
+      "const": "helios-2027-02"
+    },
+    "dependencies": {
+      "items": {
+        "properties": {
+          "consumer": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "effective_algorithms": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "evidence": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "materials": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "surface": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "surface",
+          "consumer",
+          "effective_algorithms",
+          "materials",
+          "evidence"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "final_policies": {
+      "minProperties": 4,
+      "type": "object"
+    },
+    "findings": {
+      "properties": {
+        "compromised_material": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "retire_material": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "compromised_material",
+        "retire_material"
+      ],
+      "type": "object"
+    },
+    "format_version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "format_version",
+    "case_id",
+    "findings",
+    "dependencies",
+    "final_policies",
+    "actions"
+  ],
+  "title": "Helios cryptographic migration plan",
+  "type": "object"
+}

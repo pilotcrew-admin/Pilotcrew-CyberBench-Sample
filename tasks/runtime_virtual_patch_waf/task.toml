@@ -1,0 +1,33 @@
+schema_version = "1.3"
+
+[task]
+mode = "defensive"
+name = "cyber-bench/runtime-virtual-patch-waf"
+description = "Investigate a legacy template-resolution boundary flaw and deploy a semantics-aware edge policy that withstands encoding and request-shape evasions without disrupting supported API workflows."
+authors = [{ name = "Cyber-Bench", email = "devnull@example.invalid" }]
+keywords = ["cybersecurity", "defensive", "waf", "virtual-patching", "api-security", "runtime-defense", "reverse-proxy"]
+
+[metadata]
+category = "application runtime defense"
+bundle_id = "v3-codex-runtime-virtual-patch-waf"
+scored_service_count = 1
+decoy_service_count = 0
+target_ports = [8080]
+hint_level = 0
+headroom_axis = "semantic runtime defense under evasion and compatibility pressure"
+difficulty = "extreme-headroom"
+
+[agent]
+timeout_sec = 2400.0
+
+[verifier]
+timeout_sec = 180.0
+collect = []
+
+[environment]
+build_timeout_sec = 1200.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+storage_mb = 8192
+allow_internet = false

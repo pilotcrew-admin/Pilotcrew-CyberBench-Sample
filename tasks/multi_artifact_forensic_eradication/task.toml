@@ -1,0 +1,33 @@
+schema_version = "1.3"
+
+[task]
+mode = "defensive"
+name = "cyber-bench/multi_artifact_forensic_eradication"
+description = "Reconstruct a multi-hop compromise from heterogeneous forensic evidence, eradicate alerted and silent footholds, rotate exposed trust, and recover legitimate workflows."
+authors = [{ name = "Cyber-Bench", email = "devnull@example.invalid" }]
+keywords = ["cybersecurity", "defensive", "digital-forensics", "incident-response", "persistence", "timeline", "recovery", "headroom"]
+
+[metadata]
+category = "digital forensics"
+bundle_id = "v3-codex-multi-artifact-forensic-eradication"
+scored_service_count = 1
+decoy_service_count = 0
+target_ports = []
+hint_level = 0
+headroom_axis = "multi-artifact discovery, causal forensics, and verified eradication"
+difficulty = "hard-headroom"
+
+[agent]
+timeout_sec = 2400.0
+
+[verifier]
+timeout_sec = 240.0
+collect = []
+
+[environment]
+build_timeout_sec = 1200.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+storage_mb = 8192
+allow_internet = false

@@ -1,0 +1,571 @@
+{
+  "adversarial_scenarios": {
+    "archive_aead_hybrid_restore_accepted": true,
+    "archive_legacy_wrap_rejected": true,
+    "archive_modified_ciphertext_rejected": true,
+    "archive_wrong_restore_profile_rejected": true,
+    "classical_only_kex_rejected": true,
+    "custody_domain_capacity_enforced": true,
+    "dual_independent_release_accepted": true,
+    "legacy_certificate_rejected": true,
+    "old_context_rejected": true,
+    "revoked_signer_replay_rejected": true,
+    "same_domain_threshold_rejected": true,
+    "scoped_material_selection": false,
+    "single_signature_rejected": true,
+    "ssh_compliant_session_accepted": false,
+    "ssh_sha1_rejected": true,
+    "ssh_wrong_host_identity_rejected": true,
+    "ssh_wrong_principal_ca_rejected": true,
+    "stale_and_unbound_evidence_excluded": true,
+    "tls12_downgrade_rejected": true,
+    "tls_compliant_hybrid_handshake": true,
+    "wrong_trust_domain_certificate_rejected": true
+  },
+  "diagnostics": [
+    "SSH policy lacks the required host/principal scope or algorithm controls",
+    "archive policy lacks scoped AEAD/hybrid protection",
+    "action 55 'act-0056' target workflow cannot complete",
+    "action 56 'act-0057' target workflow cannot complete",
+    "action 57 'act-0058' target workflow cannot complete",
+    "action 58 'act-0059' target workflow cannot complete",
+    "action 59 'act-0060' target workflow cannot complete",
+    "action 60 'act-0061' target workflow cannot complete",
+    "action 61 'act-0062' target workflow cannot complete",
+    "action 62 'act-0063' target workflow cannot complete",
+    "action 63 'act-0064' target workflow cannot complete",
+    "action 64 'act-0065' target workflow cannot complete",
+    "action 65 'act-0066' target workflow cannot complete",
+    "action 66 'act-0067' target workflow cannot complete",
+    "action 67 'act-0068' target workflow cannot complete",
+    "action 68 'act-0069' target workflow cannot complete",
+    "action 69 'act-0070' violates storage mode or final archive policy",
+    "action 70 'act-0071' fails archive consumers or digest",
+    "action 71 'act-0072' violates storage mode or final archive policy",
+    "action 72 'act-0073' fails archive consumers or digest",
+    "action 73 'act-0074' violates storage mode or final archive policy",
+    "action 74 'act-0075' fails archive consumers or digest",
+    "action 75 'act-0076' has no valid final policy",
+    "action 76 'act-0077' has no valid final policy",
+    "action 77 'act-0078' has no valid final policy",
+    "action 78 'act-0079' has no valid final policy",
+    "action 79 'act-0080' retires out-of-scope, active, premature, or duplicate material",
+    "action 80 'act-0081' retires out-of-scope, active, premature, or duplicate material",
+    "action 81 'act-0082' retires out-of-scope, active, premature, or duplicate material",
+    "action 82 'act-0083' retires out-of-scope, active, premature, or duplicate material",
+    "action 83 'act-0084' retires out-of-scope, active, premature, or duplicate material",
+    "action 84 'act-0085' retires out-of-scope, active, premature, or duplicate material",
+    "both rings of every required workflow were not gated",
+    "archive migration/restore is incomplete",
+    "completion retirement is incomplete",
+    "not every surface reached final policy",
+    "scenario failed: ssh_compliant_session_accepted",
+    "scenario failed: scoped_material_selection"
+  ],
+  "dimensions": {
+    "archive_migration": false,
+    "case_binding": true,
+    "compatibility_and_ring_gates": false,
+    "effective_inventory": true,
+    "evidence_scope": true,
+    "final_state": false,
+    "interruption_recovery": true,
+    "key_lifecycle": false,
+    "policy_design": false,
+    "signer_containment": true,
+    "transition_safety": false
+  },
+  "processed_actions": 85,
+  "reward": 0.0,
+  "scenario_groups": {
+    "archive_decryption_integrity_and_rewrap": false,
+    "custody_scope_and_signer_containment": true,
+    "failure_domain_interruption_and_transition_order": false,
+    "temporal_effective_dependency_inventory": true,
+    "tls_signing_ssh_downgrade_resistance": false,
+    "trust_rotation_and_final_retirement": false
+  },
+  "solved_service_ids": [],
+  "state_summary": {
+    "archive_gates": 0,
+    "contained": [
+      "sign-release-rsa"
+    ],
+    "final_surfaces": [],
+    "interruption_scenarios": 30,
+    "recovery_health_chains": 10,
+    "retired": [],
+    "staged": [
+      "archive-wrap-hybrid-c",
+      "sign-release-ed",
+      "sign-release-pq",
+      "ssh-host-ed25519-c",
+      "ssh-user-ca-ed",
+      "tls-api-2027",
+      "tls-root-2027"
+    ],
+    "upgrade_gates": 10,
+    "workflow_gates": 0
+  },
+  "task_mode": "defensive",
+  "transition_history": [
+    {
+      "applied": true,
+      "id": "act-0001",
+      "op": "contain_signer"
+    },
+    {
+      "applied": true,
+      "id": "act-0002",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0003",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0004",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0005",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0006",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0007",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0008",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0009",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0010",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0011",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0012",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0013",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0014",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0015",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0016",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0017",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0018",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0019",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0020",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0021",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0022",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0023",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0024",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0025",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0026",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0027",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0028",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0029",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0030",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0031",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0032",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0033",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0034",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0035",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0036",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0037",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0038",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0039",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0040",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0041",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0042",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0043",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0044",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0045",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0046",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0047",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0048",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0049",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0050",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0051",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0052",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0053",
+      "op": "configure_transition"
+    },
+    {
+      "applied": true,
+      "id": "act-0054",
+      "op": "configure_transition"
+    },
+    {
+      "applied": true,
+      "id": "act-0055",
+      "op": "configure_transition"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 55 'act-0056' target workflow cannot complete",
+      "id": "act-0056",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 56 'act-0057' target workflow cannot complete",
+      "id": "act-0057",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 57 'act-0058' target workflow cannot complete",
+      "id": "act-0058",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 58 'act-0059' target workflow cannot complete",
+      "id": "act-0059",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 59 'act-0060' target workflow cannot complete",
+      "id": "act-0060",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 60 'act-0061' target workflow cannot complete",
+      "id": "act-0061",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 61 'act-0062' target workflow cannot complete",
+      "id": "act-0062",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 62 'act-0063' target workflow cannot complete",
+      "id": "act-0063",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 63 'act-0064' target workflow cannot complete",
+      "id": "act-0064",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 64 'act-0065' target workflow cannot complete",
+      "id": "act-0065",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 65 'act-0066' target workflow cannot complete",
+      "id": "act-0066",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 66 'act-0067' target workflow cannot complete",
+      "id": "act-0067",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 67 'act-0068' target workflow cannot complete",
+      "id": "act-0068",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 68 'act-0069' target workflow cannot complete",
+      "id": "act-0069",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 69 'act-0070' violates storage mode or final archive policy",
+      "id": "act-0070",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 70 'act-0071' fails archive consumers or digest",
+      "id": "act-0071",
+      "op": "archive_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 71 'act-0072' violates storage mode or final archive policy",
+      "id": "act-0072",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 72 'act-0073' fails archive consumers or digest",
+      "id": "act-0073",
+      "op": "archive_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 73 'act-0074' violates storage mode or final archive policy",
+      "id": "act-0074",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 74 'act-0075' fails archive consumers or digest",
+      "id": "act-0075",
+      "op": "archive_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 75 'act-0076' has no valid final policy",
+      "id": "act-0076",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 76 'act-0077' has no valid final policy",
+      "id": "act-0077",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 77 'act-0078' has no valid final policy",
+      "id": "act-0078",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 78 'act-0079' has no valid final policy",
+      "id": "act-0079",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 79 'act-0080' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0080",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 80 'act-0081' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0081",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 81 'act-0082' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0082",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 82 'act-0083' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0083",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 83 'act-0084' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0084",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 84 'act-0085' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0085",
+      "op": "retire_material"
+    }
+  ],
+  "unsolved_service_ids": [
+    "cryptographic_agility_pqc_migration"
+  ]
+}

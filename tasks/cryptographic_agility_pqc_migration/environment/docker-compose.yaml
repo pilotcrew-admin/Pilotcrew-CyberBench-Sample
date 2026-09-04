@@ -1,0 +1,11 @@
+services:
+  main:
+    build:
+      context: "."
+    user: "1000:1000"
+    command: ["sh", "-c", "sleep infinity"]
+    networks: [bench]
+
+networks:
+  bench:
+    internal: true

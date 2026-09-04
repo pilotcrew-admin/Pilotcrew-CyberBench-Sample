@@ -1,0 +1,24 @@
+{
+  "problems": [
+    "[lateral[0]] citation locator too short in linux/backup-gw-02-auth.log",
+    "[lateral[1]] citation locator too short in linux/vault-prx-03-auth.log",
+    "[persistence[1]] service finding lacks filesystem plus runtime/socket support",
+    "[persistence[2]] key finding lacks captured key plus approved/auth support",
+    "[persistence[3]] vault service finding lacks filesystem plus runtime/socket support",
+    "[persistence[4]] vault key finding lacks captured key plus approved/auth support",
+    "[timeline[2]] timestamp is outside its supporting evidence interval",
+    "[timeline] each lifecycle stage and each distinct lateral hop require supported events; got {'initial_execution': 1, 'credential_access': 1, 'lateral_access': 1, 'persistence_activation': 2}",
+    "[indicators] trusted hostile indicator set is incomplete: ['5a1ab623fda7df3cda48fc2d29a914c17ae700b3ceb79589d18bbd111b7f402d']"
+  ],
+  "reward": 0.0,
+  "subscores": {
+    "eradication_and_containment": 1,
+    "indicators": 0,
+    "initial_access": 1,
+    "lateral_movement": 0,
+    "persistence": 0,
+    "scope": 1,
+    "service_recovery": 1,
+    "timeline": 0
+  }
+}

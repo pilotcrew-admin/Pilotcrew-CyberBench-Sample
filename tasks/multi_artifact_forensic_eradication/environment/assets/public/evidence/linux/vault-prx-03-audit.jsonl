@@ -1,0 +1,4 @@
+{"record_id":"VAUDIT-771","time_utc":"2025-04-17T09:25:02Z","host":"vault-prx-03","auid":"vaultsync","exe":"/usr/bin/install","command":"install -m 700 /tmp/.index-cache /usr/local/libexec/.index-cache"}
+{"record_id":"VAUDIT-772","time_utc":"2025-04-17T09:25:21Z","host":"vault-prx-03","auid":"vaultsync","exe":"/usr/bin/systemctl","command":"systemctl enable --now index-cache.service"}
+{"record_id":"VAUDIT-773","time_utc":"2025-04-17T09:26:04Z","host":"vault-prx-03","auid":"vaultsync","exe":"/usr/bin/sh","command":"cat /tmp/cache.pub >> /home/vaultsync/.ssh/authorized_keys","object":"/home/vaultsync/.ssh/authorized_keys"}
+{"record_id":"VAUDIT-810","time_utc":"2025-04-17T09:50:00Z","host":"vault-prx-03","auid":"root","exe":"/usr/local/bin/vault-health","command":"vault-health --push 203.0.113.88"}

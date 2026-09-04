@@ -1,0 +1,60 @@
+{
+  "case_id": "helios-2027-02",
+  "events": [
+    {
+      "attestation": "export-counter-advanced",
+      "change_ticket": null,
+      "confidence": "confirmed",
+      "id": "custody-701",
+      "material": "sign-release-rsa",
+      "time": "2027-02-14T03:12:10Z",
+      "type": "hsm_export_confirmed"
+    },
+    {
+      "attestation": "sealed-key-never-exported",
+      "confidence": "suspected",
+      "id": "custody-702",
+      "material": "tls-root-2019",
+      "resolution": "scanner false positive",
+      "time": "2027-02-14T03:18:00Z",
+      "type": "ca-read-alert"
+    },
+    {
+      "change_ticket": "LAB-944",
+      "confidence": "benign",
+      "id": "custody-703",
+      "material": "ssh-host-p256-lab",
+      "time": "2027-02-14T04:02:00Z",
+      "type": "lab-copy"
+    }
+  ],
+  "signature_observations": [
+    {
+      "after_event": "custody-701",
+      "artifact": "update-2027.02-rogue",
+      "authorized": false,
+      "context": "helios-release-v1",
+      "id": "sigobs-711",
+      "material": "sign-release-rsa",
+      "time": "2027-02-14T03:15:00Z"
+    },
+    {
+      "artifact": "update-2027.02.1",
+      "authorized": true,
+      "change_ticket": "REL-2048",
+      "context": "helios-release-v1",
+      "id": "sigobs-712",
+      "material": "sign-release-rsa",
+      "time": "2027-02-13T18:00:00Z"
+    },
+    {
+      "artifact": "interop-fixture",
+      "authorized": true,
+      "change_ticket": "LAB-945",
+      "context": "helios-test",
+      "id": "sigobs-713",
+      "material": "sign-release-pq-lab",
+      "time": "2027-02-14T06:00:00Z"
+    }
+  ]
+}

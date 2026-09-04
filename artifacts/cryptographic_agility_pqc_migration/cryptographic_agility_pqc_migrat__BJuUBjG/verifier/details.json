@@ -1,0 +1,610 @@
+{
+  "adversarial_scenarios": {
+    "archive_aead_hybrid_restore_accepted": true,
+    "archive_legacy_wrap_rejected": true,
+    "archive_modified_ciphertext_rejected": true,
+    "archive_wrong_restore_profile_rejected": false,
+    "classical_only_kex_rejected": true,
+    "custody_domain_capacity_enforced": false,
+    "dual_independent_release_accepted": true,
+    "legacy_certificate_rejected": true,
+    "old_context_rejected": true,
+    "revoked_signer_replay_rejected": true,
+    "same_domain_threshold_rejected": true,
+    "scoped_material_selection": false,
+    "single_signature_rejected": true,
+    "ssh_compliant_session_accepted": true,
+    "ssh_sha1_rejected": true,
+    "ssh_wrong_host_identity_rejected": true,
+    "ssh_wrong_principal_ca_rejected": true,
+    "stale_and_unbound_evidence_excluded": true,
+    "tls12_downgrade_rejected": true,
+    "tls_compliant_hybrid_handshake": true,
+    "wrong_trust_domain_certificate_rejected": true
+  },
+  "diagnostics": [
+    "archive policy lacks scoped AEAD/hybrid protection",
+    "combined final private keys exceed a custody-domain capacity",
+    "action 9 'act-10' has stale evidence, an unsafe recovery decision, or an invalid stateful receipt chain",
+    "action 13 'act-14' has stale evidence, an unsafe recovery decision, or an invalid stateful receipt chain",
+    "action 16 'act-17' has stale evidence, an unsafe recovery decision, or an invalid stateful receipt chain",
+    "action 22 'act-23' has stale evidence, an unsafe recovery decision, or an invalid stateful receipt chain",
+    "action 26 'act-27' has stale evidence, an unsafe recovery decision, or an invalid stateful receipt chain",
+    "action 27 'act-28' precedes its canary upgrade gate",
+    "action 28 'act-29' does not match the actual applied ring upgrade",
+    "action 29 'act-30' is unsupported by the installed ring",
+    "action 31 'act-32' precedes its canary upgrade gate",
+    "action 32 'act-33' does not match the actual applied ring upgrade",
+    "action 34 'act-35' precedes its canary upgrade gate",
+    "action 35 'act-36' does not match the actual applied ring upgrade",
+    "action 37 'act-38' is unsupported by the installed ring",
+    "action 40 'act-41' precedes its canary upgrade gate",
+    "action 41 'act-42' does not match the actual applied ring upgrade",
+    "action 42 'act-43' is unsupported by the installed ring",
+    "action 44 'act-45' precedes its canary upgrade gate",
+    "action 45 'act-46' does not match the actual applied ring upgrade",
+    "action 55 'act-56' precedes its valid recovery-health chain",
+    "action 56 'act-57' target workflow cannot complete",
+    "action 57 'act-58' precedes its valid recovery-health chain",
+    "action 58 'act-59' precedes its valid recovery-health chain",
+    "action 59 'act-60' target workflow cannot complete",
+    "action 60 'act-61' precedes its valid recovery-health chain",
+    "action 61 'act-62' target workflow cannot complete",
+    "action 62 'act-63' target workflow cannot complete",
+    "action 63 'act-64' target workflow cannot complete",
+    "action 64 'act-65' target workflow cannot complete",
+    "action 65 'act-66' target workflow cannot complete",
+    "action 66 'act-67' target workflow cannot complete",
+    "action 67 'act-68' target workflow cannot complete",
+    "action 68 'act-69' target workflow cannot complete",
+    "action 69 'act-70' strands a required restore ring",
+    "action 70 'act-71' fails archive consumers or digest",
+    "action 71 'act-72' strands a required restore ring",
+    "action 72 'act-73' fails archive consumers or digest",
+    "action 73 'act-74' strands a required restore ring",
+    "action 74 'act-75' fails archive consumers or digest",
+    "action 75 'act-76' has no valid final policy",
+    "action 76 'act-77' has no valid final policy",
+    "action 77 'act-78' has no valid final policy",
+    "action 78 'act-79' has no valid final policy",
+    "action 79 'act-80' retires out-of-scope, active, premature, or duplicate material",
+    "action 80 'act-81' retires out-of-scope, active, premature, or duplicate material",
+    "action 81 'act-82' retires out-of-scope, active, premature, or duplicate material",
+    "action 82 'act-83' retires out-of-scope, active, premature, or duplicate material",
+    "action 83 'act-84' retires out-of-scope, active, premature, or duplicate material",
+    "action 84 'act-85' retires out-of-scope, active, premature, or duplicate material",
+    "canary/fleet upgrade gates are incomplete or unnecessary gates were added",
+    "both rings of every required workflow were not gated",
+    "effective post-fault states were not safely recovered into complete health chains",
+    "archive migration/restore is incomplete",
+    "completion retirement is incomplete",
+    "not every surface reached final policy",
+    "scenario failed: archive_wrong_restore_profile_rejected",
+    "scenario failed: scoped_material_selection",
+    "scenario failed: custody_domain_capacity_enforced"
+  ],
+  "dimensions": {
+    "archive_migration": false,
+    "case_binding": true,
+    "compatibility_and_ring_gates": false,
+    "effective_inventory": true,
+    "evidence_scope": true,
+    "final_state": false,
+    "interruption_recovery": false,
+    "key_lifecycle": false,
+    "policy_design": false,
+    "signer_containment": true,
+    "transition_safety": false
+  },
+  "processed_actions": 85,
+  "reward": 0.0,
+  "scenario_groups": {
+    "archive_decryption_integrity_and_rewrap": false,
+    "custody_scope_and_signer_containment": true,
+    "failure_domain_interruption_and_transition_order": false,
+    "temporal_effective_dependency_inventory": true,
+    "tls_signing_ssh_downgrade_resistance": false,
+    "trust_rotation_and_final_retirement": false
+  },
+  "solved_service_ids": [],
+  "state_summary": {
+    "archive_gates": 0,
+    "contained": [
+      "sign-release-rsa"
+    ],
+    "final_surfaces": [],
+    "interruption_scenarios": 0,
+    "recovery_health_chains": 0,
+    "retired": [],
+    "staged": [
+      "archive-wrap-hybrid-edge",
+      "sign-release-ed",
+      "sign-release-pq",
+      "ssh-host-ed25519-c",
+      "ssh-user-ca-ed",
+      "tls-api-2027",
+      "tls-root-2027"
+    ],
+    "upgrade_gates": 0,
+    "workflow_gates": 0
+  },
+  "task_mode": "defensive",
+  "transition_history": [
+    {
+      "applied": true,
+      "id": "act-1",
+      "op": "contain_signer"
+    },
+    {
+      "applied": true,
+      "id": "act-2",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-3",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-4",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-5",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-6",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-7",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-8",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-9",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 9 'act-10' has stale evidence, an unsafe recovery decision, or an invalid stateful receipt chain",
+      "id": "act-10",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-11",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-12",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-13",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 13 'act-14' has stale evidence, an unsafe recovery decision, or an invalid stateful receipt chain",
+      "id": "act-14",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-15",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-16",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 16 'act-17' has stale evidence, an unsafe recovery decision, or an invalid stateful receipt chain",
+      "id": "act-17",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-18",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-19",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-20",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-21",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-22",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 22 'act-23' has stale evidence, an unsafe recovery decision, or an invalid stateful receipt chain",
+      "id": "act-23",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-24",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-25",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-26",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 26 'act-27' has stale evidence, an unsafe recovery decision, or an invalid stateful receipt chain",
+      "id": "act-27",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 27 'act-28' precedes its canary upgrade gate",
+      "id": "act-28",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 28 'act-29' does not match the actual applied ring upgrade",
+      "id": "act-29",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 29 'act-30' is unsupported by the installed ring",
+      "id": "act-30",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-31",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 31 'act-32' precedes its canary upgrade gate",
+      "id": "act-32",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 32 'act-33' does not match the actual applied ring upgrade",
+      "id": "act-33",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-34",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 34 'act-35' precedes its canary upgrade gate",
+      "id": "act-35",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 35 'act-36' does not match the actual applied ring upgrade",
+      "id": "act-36",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-37",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 37 'act-38' is unsupported by the installed ring",
+      "id": "act-38",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-39",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-40",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 40 'act-41' precedes its canary upgrade gate",
+      "id": "act-41",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 41 'act-42' does not match the actual applied ring upgrade",
+      "id": "act-42",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 42 'act-43' is unsupported by the installed ring",
+      "id": "act-43",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-44",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 44 'act-45' precedes its canary upgrade gate",
+      "id": "act-45",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 45 'act-46' does not match the actual applied ring upgrade",
+      "id": "act-46",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-47",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-48",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-49",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-50",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-51",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-52",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-53",
+      "op": "configure_transition"
+    },
+    {
+      "applied": true,
+      "id": "act-54",
+      "op": "configure_transition"
+    },
+    {
+      "applied": true,
+      "id": "act-55",
+      "op": "configure_transition"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 55 'act-56' precedes its valid recovery-health chain",
+      "id": "act-56",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 56 'act-57' target workflow cannot complete",
+      "id": "act-57",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 57 'act-58' precedes its valid recovery-health chain",
+      "id": "act-58",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 58 'act-59' precedes its valid recovery-health chain",
+      "id": "act-59",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 59 'act-60' target workflow cannot complete",
+      "id": "act-60",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 60 'act-61' precedes its valid recovery-health chain",
+      "id": "act-61",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 61 'act-62' target workflow cannot complete",
+      "id": "act-62",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 62 'act-63' target workflow cannot complete",
+      "id": "act-63",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 63 'act-64' target workflow cannot complete",
+      "id": "act-64",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 64 'act-65' target workflow cannot complete",
+      "id": "act-65",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 65 'act-66' target workflow cannot complete",
+      "id": "act-66",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 66 'act-67' target workflow cannot complete",
+      "id": "act-67",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 67 'act-68' target workflow cannot complete",
+      "id": "act-68",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 68 'act-69' target workflow cannot complete",
+      "id": "act-69",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 69 'act-70' strands a required restore ring",
+      "id": "act-70",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 70 'act-71' fails archive consumers or digest",
+      "id": "act-71",
+      "op": "archive_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 71 'act-72' strands a required restore ring",
+      "id": "act-72",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 72 'act-73' fails archive consumers or digest",
+      "id": "act-73",
+      "op": "archive_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 73 'act-74' strands a required restore ring",
+      "id": "act-74",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 74 'act-75' fails archive consumers or digest",
+      "id": "act-75",
+      "op": "archive_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 75 'act-76' has no valid final policy",
+      "id": "act-76",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 76 'act-77' has no valid final policy",
+      "id": "act-77",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 77 'act-78' has no valid final policy",
+      "id": "act-78",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 78 'act-79' has no valid final policy",
+      "id": "act-79",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 79 'act-80' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-80",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 80 'act-81' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-81",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 81 'act-82' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-82",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 82 'act-83' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-83",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 83 'act-84' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-84",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 84 'act-85' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-85",
+      "op": "retire_material"
+    }
+  ],
+  "unsolved_service_ids": [
+    "cryptographic_agility_pqc_migration"
+  ]
+}

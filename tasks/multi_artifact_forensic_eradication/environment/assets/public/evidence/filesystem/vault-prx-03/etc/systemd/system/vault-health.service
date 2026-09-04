@@ -1,0 +1,6 @@
+[Unit]
+Description=Approved archive health exporter
+[Service]
+ExecStart=/usr/local/bin/vault-health --push 203.0.113.88
+[Install]
+WantedBy=multi-user.target

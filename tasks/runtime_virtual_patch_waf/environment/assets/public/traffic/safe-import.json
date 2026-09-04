@@ -1,0 +1,19 @@
+{
+  "method": "POST",
+  "target": "/v1/templates/import",
+  "headers": [
+    [
+      "Authorization",
+      "Bearer lab-user"
+    ],
+    [
+      "X-Request-ID",
+      "req-015"
+    ],
+    [
+      "Content-Type",
+      "multipart/form-data; boundary=northstar-demo"
+    ]
+  ],
+  "body": "--northstar-demo\r\nContent-Disposition: form-data; name=\"filename\"\r\n\r\n../../quarter.tpl\r\n--northstar-demo\r\nContent-Disposition: form-data; name=\"template\"\r\n\r\nHello {{ ../../customer.name }}\r\n--northstar-demo--\r\n"
+}

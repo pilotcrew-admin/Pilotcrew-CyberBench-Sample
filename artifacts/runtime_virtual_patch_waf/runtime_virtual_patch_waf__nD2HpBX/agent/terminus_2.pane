@@ -1,0 +1,1080 @@
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ asciinema rec --stdin /logs/agent/recording.cast
+[?2004lbash: asciinema: command not found
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ clear
+[?2004l[H[J[3J[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ ls -laR /app/docs/ /app/traffic/
+[?2004l/app/docs/:
+total 32
+drwxrwxr-x 2 analyst analyst 4096 Aug 20 03:55 [0m[01;34m.[0m
+drwxr-xr-x 1 analyst analyst 4096 Aug 20 05:10 [01;34m..[0m
+-rw-rw-r-- 1 analyst analyst 1959 Aug 19 23:52 README.md
+-rw-rw-r-- 1 analyst analyst 1718 Aug 19 23:52 operations.md
+-rw-rw-r-- 1 analyst analyst 7296 Aug 19 23:52 policy-language.md
+-rw-rw-r-- 1 analyst analyst 6340 Aug 19 23:52 protocol.md
+
+/app/traffic/:
+total 36
+drwxrwxr-x 2 analyst analyst 4096 Aug 19 23:52 [01;34m.[0m
+drwxr-xr-x 1 analyst analyst 4096 Aug 20 05:10 [01;34m..[0m
+-rw-rw-r-- 1 analyst analyst  292 Aug 19 23:52 direct-boundary.json
+-rw-rw-r-- 1 analyst analyst  241 Aug 19 23:52 encoded-query.json
+-rw-rw-r-- 1 analyst analyst  267 Aug 19 23:52 malformed-render.json
+-rw-rw-r-- 1 analyst analyst 7057 Aug 19 23:52 representative.jsonl
+-rw-rw-r-- 1 analyst analyst  523 Aug 19 23:52 safe-import.json
+-rw-rw-r-- 1 analyst analyst  369 Aug 19 23:52 safe-within-root.json
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat /app/docs/README.md
+[?2004l# Northstar compatibility lab
+
+Read `protocol.md`, `policy-language.md`, and `operations.md`. Captured request
+envelopes live in `/app/traffic/representative.jsonl`; several individual requests are
+included for convenient inspection.
+
+The service at `127.0.0.1:8080` is safe: before a policy exists, a boundary-crossing
+request returns an `outside_template_root` description rather than touching a file. Once
+`/app/edge-policy.json` exists and validates, the service evaluates it on each request.
+Policy changes are picked up without a restart.
+
+The frozen application model is available only as a black-box compatibility service. It
+accepts one request observation at a time through these workbench commands; its backend
+implementation is not installed in `/app`.
+
+```
+waflab check POLICY
+waflab inspect REQUEST.json
+waflab probe POLICY REQUEST.json
+waflab replay POLICY [CAPTURE.jsonl]
+```
+
+`inspect` shows the effective route, discovered locator carriers, normalized locator view,
+and legacy resolver classification for the supplied envelope. Frozen request adapters
+come from independent compatibility generations, so do not assume an observation from one
+carrier defines a global resolver pipeline. Controlled comparisons—hold the value fixed
+while changing a carrier, or change one encoding layer, compatibility character,
+separator, edge space, or route spelling at a time—produce deterministic signatures that
+can be collected with ordinary shell or Python scripts. Pair a security observation with
+an extra-normalization or within-root neighbor before grouping carriers.
+
+`probe` shows the edge action, structured audit record, deterministic work, and (when
+allowed) the same upstream classification. A JSONL capture entry has `id`, `request`, and
+expected edge `decision` (`allow`, `block`, or `reject`). The capture is only a starting
+sample; exact adapter grouping and transform sequences remain black-box facts recoverable
+through `inspect`.
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat /app/docs/operations.md
+[?2004l# Deployment SLO and acceptance notes
+
+Northstar is frozen, not disposable. The virtual patch is accepted only if it protects all
+three locator-bearing operations while maintaining the surrounding API contract.
+
+* **Availability:** safe interactive, batch, validation, integration, import, search, and
+  event requests must continue. Blanket route/method/media/auth denial is unacceptable.
+* **Input handling:** JSON suffix types, media-type parameters, multipart framing, arrays,
+  duplicate inputs, and canonical routes follow `protocol.md`. Malformed protected input
+  must terminate at the edge with a bounded 4xx.
+* **Capacity:** imports up to exactly 1 MiB are contractual. The WAF body ceiling may be at
+  most 2 MiB. Parser and policy bounds are specified in `policy-language.md`.
+* **Work:** the deterministic 180-unit/request ceiling is enforced by the runtime. A rule
+  inspects at most 16 values, matching the maximum batch size; over-budget or over-count
+  shapes fail safely. The local replay prints maximum work. The grader also executes the
+  full corpus under a generous wall-clock guard to catch unexpected evaluation stalls.
+* **Audit:** every security denial and safety rejection must be attributable by request,
+  stable rule, effective route, carrier/field where applicable, and reason. Values and
+  bodies are sensitive and must be redacted.
+
+The published capture is representative and intentionally not exhaustive. In particular,
+passing it with raw substring filters—or copying one observed adapter pipeline to every
+carrier—does not establish equivalence with the documented legacy resolver. Use
+`waflab inspect` on per-carrier malicious and benign variants while developing the policy.
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat /app/docs/protocol.md
+[?2004l# Northstar Render 4.7 behavioral protocol
+
+The lab reproduces the behavior relevant to the freeze-era deployment. It models a
+vulnerable resolution decision but substitutes a descriptive result for every filesystem
+operation. The source of the generic EdgeShield policy engine is available in `/app`; the
+frozen application is deliberately a black box that can be queried with `waflab inspect`.
+
+## Request envelope
+
+`waflab` consumes one JSON object with `method`, `target`, `headers`, and a body. `headers`
+may be an object or a list of `[name, value]` pairs (the latter preserves duplicates).
+Use either a UTF-8 `body` string or standard-base64 `body_b64`. The HTTP lab accepts the
+same request as ordinary HTTP on port 8080. Header names and media-type tokens are
+case-insensitive; parameters such as `charset` and multipart `boundary` are supported.
+JSON suffix media types (`application/*+json`) use JSON parsing.
+
+Authentication is representative, not a security shortcut: render clients normally send
+`Authorization: Bearer ...`. The compatibility integration additionally sends
+`X-Integration-Mode: legacy` and carries its locator in `X-Legacy-Template`. The backend
+recognizes that header as a locator only while the integration-mode value is `legacy`
+(case-insensitive). Outside that mode it is ignored compatibility metadata and must not
+cause a denial. An authenticated integration request is still untrusted for the locator
+boundary.
+
+## Locator-bearing operations
+
+These are business-protocol fields, not EdgeShield rule fragments:
+
+| operation | method and effective route | application locator inputs |
+|---|---|---|
+| interactive | `POST /v1/render` | query `template` or `view`; JSON member `template` or nested `options.template`; form field `template` or `options.template`; multipart field `template_locator`; the conditional integration header described above |
+| batch | `POST /v1/render/batch` | for every member of the JSON `jobs` array, either `template` or nested `options.template` |
+| validation | `PUT /v1/templates/validate` | query/form `locator` or JSON member `locator` |
+
+Duplicates and multiple locator inputs for one interactive request, validation request,
+or individual batch item are invalid ambiguity. The application rejects them, so the edge
+may reject them, but it must never inspect only a convenient occurrence and pass another
+to the resolver. A batch has at most 16 items and each item has exactly one locator. Empty
+locators are ordinary application validation errors.
+
+The dispatcher compares an effective route. Observed routing behavior decodes an
+unreserved percent-escaped route byte, treats repeated slashes and a trailing slash as the
+same route, and resolves ordinary `.`/`..` route segments. A raw encoded slash is not a
+route separator. `waflab inspect` reports the effective route for any proposed control.
+
+## Investigating locator resolution
+
+Northstar accumulated independent generations of request adapters before their values
+reach the common resolver. Release notes name observable feature families—URL-escaped
+handoffs, Unicode compatibility characters from office clients, Windows separators, and
+edge whitespace—but do not reliably say which adapter generation a carrier reaches, how
+many handoffs remain, or the order in which its compatibility stages run. Media parsing
+still happens first. In particular, a result learned from one operation or carrier is a
+hypothesis to test elsewhere, not evidence of one global pipeline.
+
+Recover the behavior with controlled black-box differentials. Start with the same ordinary
+relative value in every documented carrier and confirm `source` and `field`. Then vary one
+resolver-visible encoding layer, compatibility punctuation, separator, or edge-space
+feature at a time. Pair features whose transforms may not commute and change only the
+carrier for a cross-adapter control. `waflab inspect` returns the effective route, consumed
+carrier, exact normalized locator, and boundary classification, so ordinary scripts can
+record a signature per carrier and cluster only signatures that actually agree. Keep an
+outside-root member and a within-root or extra-encoding neighbor for every inferred
+signature.
+
+Count resolver-visible encoding layers after media parsing: query and form parsing can
+consume a wire layer before compatibility processing, whereas JSON string parsing does
+not. When comparing carriers, percent-encode the complete chosen query/form value once for
+transport so the value reported to the adapter is controlled. Applying more edge
+normalization than the selected frozen adapter is also a compatibility defect when the
+legacy result remains an ordinary within-root locator. The captures contain a few starting
+differentials, not a profile grouping, transform recipe, or canonical truth table.
+
+After its compatibility processing, an absent scheme and the case-insensitive `asset:`
+scheme resolve relative to the configured `templates` root. Other leading schemes select
+a non-template resolver. A leading slash, UNC or drive path, embedded NUL, or a `..`
+segment that underflows the virtual root crosses the boundary. A `..` that merely cancels
+an earlier ordinary segment remains inside and is supported. Dots inside a segment are
+literal, as are Unicode characters that the application does not convert into a delimiter.
+
+EdgeShield's `locator_outside` predicate contains only the final root-boundary algorithm;
+it performs no hidden decoding or character normalization. A defender therefore has to
+use observations to align the rule's explicit transforms with the application view.
+
+## Neighboring compatibility surface
+
+`POST /v1/templates/import` accepts multipart bodies up to 1 MiB. Its `template` field is
+template **content**, and filenames are metadata; neither is a locator. `GET /v1/search`
+uses `template` as a literal search term. `POST /v1/events` carries opaque integration
+JSON. Blocking traversal-looking text on these operations is collateral damage.
+
+Interactive and batch bodies are limited to 256 KiB; validation bodies to 64 KiB. The
+edge may use one global body ceiling so long as the 1 MiB import contract remains usable;
+backend route limits still apply after the edge. Requests that cannot be parsed must get a
+bounded 4xx response, never an allow-to-resolver decision or a 5xx.
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat /app/docs/policy-language.md
+[?2004l# EdgeShield policy language, version 1
+
+A policy is a JSON object. `waflab check` performs the same schema and budget checks used
+by the lab edge. Unknown fields and unsupported operators are errors rather than ignored
+configuration.
+
+## Top level
+
+The following is an unrelated small-policy example, not a Northstar deployment profile.
+
+```json
+{
+  "schema_version": 1,
+  "mode": "enforce",
+  "limits": {
+    "max_body_bytes": 131072,
+    "max_fields": 64,
+    "max_json_depth": 16,
+    "max_values_per_rule": 8
+  },
+  "failure_handling": {
+    "parse_error": "reject",
+    "decode_error": "reject",
+    "oversize": "reject",
+    "status": 422
+  },
+  "audit": {
+    "enabled": true,
+    "event": "edge.example",
+    "fields": ["request_id", "rule_id", "method", "route", "reason"],
+    "redact_values": true
+  },
+  "rules": []
+}
+```
+
+An optional top-level `metadata` object is ignored at runtime. Enforcement is the only
+mode accepted for deployment. Operational bounds are:
+
+- `max_body_bytes`: 1,048,576 through 2,097,152 bytes;
+- `max_fields`: 32 through 256;
+- `max_json_depth`: 12 through 32;
+- `max_values_per_rule`: 1 through 16 extracted values (16 preserves the contractual batch maximum);
+- no more than 12 rules, 32 selectors, eight transforms per rule, or 32 KiB of
+  policy JSON;
+- `equals.value` and `contains.needle` are nonempty UTF-8 text capped at 4,096 bytes.
+
+The runtime and independent grader cap deterministic evaluation work at 180 units per
+request. A method/route comparison costs one unit; extracting a value and each transform
+or predicate costs one. Before transforms run, a rule that extracts more than
+`max_values_per_rule` is safely rejected. A policy that would exceed 180 is also safely
+rejected instead of continuing unbounded work. This avoids timing noise while representing
+the production latency budget. Exact route/selector rules are normally far below the cap.
+
+Failure actions apply on a canonical protected method/route (a route matched by at least
+one rule). `reject` returns the configured 4xx status without invoking the resolver.
+Oversize protection is global and runs on raw body length before supported media is
+parsed. Field counts are cumulative across query and body carriers. An unsupported media
+type is left for the application, while malformed syntax in a supported body format is a
+parse error.
+
+## Rules
+
+This generic document-state rule illustrates syntax only.
+
+```json
+{
+  "id": "deny-retired-document-state",
+  "priority": 250,
+  "match": {
+    "methods": ["PATCH"],
+    "routes": ["/documents/state"]
+  },
+  "selectors": [
+    {"location": "json", "pointers": ["/requested_state"]}
+  ],
+  "transforms": ["trim_ascii", "lowercase"],
+  "predicate": {"op": "equals", "value": "retired", "case_sensitive": true},
+  "action": {"type": "block", "status": 409}
+}
+```
+
+Rules run by ascending unique `priority` and stop at the first block. IDs are
+unique; priorities are unique integers from 0 through 10,000. Methods are uppercase tokens. Routes are exact **canonical** paths. A match must
+name at least one method and route; globs are not used for routes. The optional `headers`
+array has at most four `{"name":..., "equals":..., "case_sensitive":...}` conditions.
+All conditions must match one occurrence of the named header. Header names are always
+case-insensitive; the value comparison follows `case_sensitive`.
+
+Selectors return every matching scalar string, including duplicate members:
+
+- `query`, `form`, and `multipart` selectors use nonempty `names` arrays and preserve all
+  occurrences;
+- `header` uses `names`, compared case-insensitively;
+- `json` uses nonempty RFC-6901-like `pointers`. `~0` and `~1` escapes are supported. `*`
+  selects every array element or every member at that level. Duplicate JSON members are
+  preserved for inspection.
+
+A selector never changes a value merely because it came from a particular carrier.
+Normal media parsing (query/form percent decoding, JSON string decoding, or multipart
+framing) happens before the rule transform list.
+
+Supported transforms are `percent_decode`, `unicode_nfkc`, `backslash_to_slash`,
+`trim_ascii`, and `lowercase`. They run in listed order and may be repeated. A strict
+percent decoder rejects malformed escapes or invalid UTF-8 according to
+`failure_handling.decode_error`.
+
+Transform capability is predicate-specific. `locator_outside` may use all five transforms,
+including repeated `percent_decode`, because its purpose is to reproduce a resolver's
+canonicalization boundary. `contains` and `equals` permit only `lowercase`, `trim_ascii`,
+`backslash_to_slash`, and `unicode_nfkc`; decoder transforms such as `percent_decode` are
+configuration errors for comparison predicates. When a comparison rule uses
+`unicode_nfkc`, its `needle` or `value` must itself already be NFKC-normalized. The direct
+comparison text, after the listed transforms, must still satisfy its own predicate;
+`waflab check` reports the specific rule and comparison member otherwise. The 4,096-byte
+cap applies to the configured `needle` or `value`, not to a transformed request value,
+which Unicode case conversion can expand. If a comparison rule uses a `header` selector,
+the configured comparison text must also be directly representable as a legal HTTP header
+value. These restrictions keep every accepted comparison directly testable rather than
+requiring an unbounded encoded or compatibility-normalization preimage.
+
+EdgeShield v1 accepts only these supported predicates:
+
+- `{"op":"locator_outside","allowed_schemes":[...]}`: true for NUL, absolute,
+  drive/UNC, dot-underflow, or a scheme not in the case-insensitive allowed set. Each
+  allowed-scheme entry must contain 1 through 64 ASCII characters and match the URI scheme
+  grammar `^[A-Za-z][A-Za-z0-9+.-]*$`. Entries are canonicalized to lowercase for
+  case-insensitive duplicate and effective-scheme checks; Unicode spellings are rejected.
+  The predicate does not perform hidden decoding or character normalization.
+- `{"op":"contains","needle":"text","case_sensitive":true}`. The needle is capped at
+  4,096 UTF-8 bytes.
+- `{"op":"equals","value":"text","case_sensitive":true}`. The value is capped at
+  4,096 UTF-8 bytes.
+
+Regular-expression predicates are not part of EdgeShield v1. `waflab check` rejects every
+`regex` predicate with an actionable error directing the author to
+`locator_outside`, `contains`, or `equals`.
+
+Only `{"type":"block","status":403}`-style actions are supported: `status` may be any
+integer from 400 through 499. An empty selector match does nothing. This is a deny-on-
+violation language; requests that trigger no rule continue to the application.
+
+## Audit contract
+
+Every policy block and edge rejection creates an in-memory structured audit object.
+`event` must be a useful category of at least four non-whitespace characters. `fields` may select from `request_id`,
+`rule_id`, `method`, `route`, `source`, `field`, and `reason`. A deployment-quality policy
+includes all seven so an operator can correlate a denial and locate the enforcing rule.
+If `X-Request-ID` is absent, the edge creates a deterministic opaque `edge-...` correlation ID.
+`redact_values` must be true. Raw locator values, headers, and bodies are not available as audit fields. `waflab probe` shows the audit object.
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat /app/traffic/direct-boundary.json
+[?2004l{
+  "method": "POST",
+  "target": "/v1/render",
+  "headers": [
+    [
+      "Authorization",
+      "Bearer lab-user"
+    ],
+    [
+      "X-Request-ID",
+      "req-001"
+    ],
+    [
+      "Content-Type",
+      "application/json"
+    ]
+  ],
+  "body": "{\"template\": \"../../system/config\"}"
+}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat /app/traffic/representative.jsonl | head -n 3
+[?2004l{"id":"m-json-parent","decision":"block","request":{"method":"POST","target":"/v1/render","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-001"],["Content-Type","application/json"]],"body":"{\"template\": \"../../system/config\"}"},"note":"direct virtual-root underflow"}
+{"id":"m-query-double","decision":"block","request":{"method":"POST","target":"/v1/render?template=%25252e%25252e%25252fprivate%25252fkey","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-002"]],"body":""},"note":"nested media and resolver decoding"}
+{"id":"m-json-backslash","decision":"block","request":{"method":"POST","target":"/v1/render","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-003"],["Content-Type","application/vnd.northstar+json; charset=utf-8"]],"body":"{\"options\": {\"template\": \"..\\\\..\\\\private\\\\key\"}}"},"note":"nested vendor JSON and alternate separator"}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat /app/docs/protocol.md | grep -C 3 'X-Integration-Mode: legacy'
+[?2004l
+Authentication is representative, not a security shortcut: render clients normally send
+`Authorization: Bearer ...`. The compatibility integration additionally sends
+`X-Integration-Mode: legacy` and carries its locator in `X-Legacy-Template`. The backend
+recognizes that header as a locator only while the integration-mode value is `legacy`
+(case-insensitive). Outside that mode it is ignored compatibility metadata and must not
+cause a denial. An authenticated integration request is still untrusted for the locator
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ /app/waflab inspect /app/traffic/direct-boundary.json
+[?2004l{
+  "route": "/v1/render",
+  "outcome": "outside_template_root",
+  "locators": [
+    {
+      "source": "json",
+      "field": "/template",
+      "normalized": "../../system/config",
+      "outside_root": true
+    }
+  ]
+}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ /app/waflab inspect /app/traffic/encoded-query.json
+[?2004l{
+  "route": "/v1/render",
+  "outcome": "outside_template_root",
+  "locators": [
+    {
+      "source": "query",
+      "field": "template",
+      "normalized": "../private/key",
+      "outside_root": true
+    }
+  ]
+}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ /app/waflab inspect /app/traffic/safe-within-root.json
+[?2004l{
+  "route": "/v1/render",
+  "outcome": "rendered_within_root",
+  "locators": [
+    {
+      "source": "json",
+      "field": "/template",
+      "normalized": "reports/2025/../../shared/legal",
+      "outside_root": false
+    }
+  ]
+}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ /app/waflab inspect /app/traffic/malformed-render.json
+[?2004l{
+  "route": "/v1/render",
+  "outcome": "malformed",
+  "detail": "Expecting value: line 1 column 13 (char 12)",
+  "locators": []
+}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat /app/traffic/representative.jsonl | grep 'decision":"block' | head -n 10
+[?2004l{"id":"m-json-parent","decision":"block","request":{"method":"POST","target":"/v1/render","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-001"],["Content-Type","application/json"]],"body":"{\"template\": \"../../system/config\"}"},"note":"direct virtual-root underflow"}
+{"id":"m-query-double","decision":"block","request":{"method":"POST","target":"/v1/render?template=%25252e%25252e%25252fprivate%25252fkey","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-002"]],"body":""},"note":"nested media and resolver decoding"}
+{"id":"m-json-backslash","decision":"block","request":{"method":"POST","target":"/v1/render","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-003"],["Content-Type","application/vnd.northstar+json; charset=utf-8"]],"body":"{\"options\": {\"template\": \"..\\\\..\\\\private\\\\key\"}}"},"note":"nested vendor JSON and alternate separator"}
+{"id":"m-json-unicode","decision":"block","request":{"method":"POST","target":"/v1/render","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-004"],["Content-Type","application/json"]],"body":"{\"template\": \"．．／．．／private\"}"},"note":"NFKC delimiter form"}
+{"id":"m-integration-scheme","decision":"block","request":{"method":"POST","target":"/v1/render","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-005"],["X-Integration-Mode","legacy"],["X-Legacy-Template","  FiLe:/etc/hosts  "]],"body":""},"note":"legacy integration locator scheme"}
+{"id":"m-batch-member","decision":"block","request":{"method":"POST","target":"/v1/render/batch","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-006"],["Content-Type","application/json"]],"body":"{\"jobs\": [{\"template\": \"shared/a\"}, {\"options\": {\"template\": \"a/../../../private\"}}]}"},"note":"unsafe nonfirst batch member"}
+{"id":"m-validate-form","decision":"block","request":{"method":"PUT","target":"/v1/templates/validate","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-007"],["Content-Type","application/x-www-form-urlencoded"]],"body":"locator=%25252e%25252e%25252fadmin"},"note":"form parser plus resolver decoding"}
+{"id":"m-route-canonical","decision":"block","request":{"method":"POST","target":"/v1/x/../%72ender","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-008"],["Content-Type","application/json"]],"body":"{\"template\": \"/absolute/path\"}"},"note":"effective route differs from raw route"}
+{"id":"m-duplicate-json","decision":"block","request":{"method":"POST","target":"/v1/render","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-009"],["Content-Type","application/json"]],"body":"{\"template\":\"shared/base\",\"template\":\"../private\"}"},"note":"all duplicate members remain inspectable"}
+{"id":"d-adapter-url-generation","request":{"method":"POST","target":"/v1/render?template=%25%45%46%25%42%43%25%38%45%25%45%46%25%42%43%25%38%45%25%45%46%25%42%43%25%38%46%25%36%31%25%36%34%25%36%31%25%37%30%25%37%34%25%36%35%25%37%32%25%32%44%25%36%34%25%36%39%25%36%36%25%36%36%25%36%35%25%37%32%25%36%35%25%36%45%25%37%34%25%36%39%25%36%31%25%36%43","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-020"]],"body":""},"decision":"block"}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat << 'EOF' > /app/build_policy.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> import sys
+[?2004l[?2004h> 
+[?2004l[?2004h> policy = {
+[?2004l[?2004h>   "schema_version": 1,
+[?2004l[?2004h>   "mode": "enforce",
+[?2004l[?2004h>   "limits": {
+[?2004l[?2004h>     "max_body_bytes": 2097152,
+[?2004l[?2004h>     "max_fields": 256,
+[?2004l[?2004h>     "max_json_depth": 32,
+[?2004l[?2004h>     "max_values_per_rule": 16
+[?2004l[?2004h>   },
+[?2004l[?2004h>   "failure_handling": {
+[?2004l[?2004h>     "parse_error": "reject",
+[?2004l[?2004h>     "decode_error": "reject",
+[?2004l[?2004h>     "oversize": "reject",
+[?2004l[?2004h>     "status": 400
+[?2004l[?2004h>   },
+[?2004l[?2004h>   "audit": {
+[?2004l[?2004h>     "enabled": True,
+[?2004l[?2004h>     "event": "edge.denial",
+[?2004l[?2004h>     "fields": ["request_id", "rule_id", "method", "route", "source", "field", "reason"],
+[?2004l[?2004h>     "redact_values": True
+[?2004l[?2004h>   },
+[?2004l[?2004h>   "rules": [
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "rule-interactive-json",
+[?2004l[?2004h>       "priority": 10,
+[?2004l[?2004h>       "match": {"methods": ["POST"], "routes": ["/v1/render"]},
+[?2004l[?2004h>       "selectors": [{"location": "json", "pointers": ["/template", "/options/template"]}],
+[?2004l[?2004h>       "transforms": ["trim_ascii", "percent_decode", "percent_decode", "unicode_nfkc", "backslash_to_slash"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "rule-interactive-query-form",
+[?2004l[?2004h>       "priority": 20,
+[?2004l[?2004h>       "match": {"methods": ["POST"], "routes": ["/v1/render"]},
+[?2004l[?2004h>       "selectors": [
+[?2004l[?2004h>         {"location": "query", "names": ["template", "view"]},
+[?2004l[?2004h>         {"location": "form", "names": ["template", "options.template"]},
+[?2004l[?2004h>         {"location": "multipart", "names": ["template_locator"]}
+[?2004l[?2004h>       ],
+[?2004l[?2004h>       "transforms": ["trim_ascii", "percent_decode", "percent_decode", "unicode_nfkc", "backslash_to_slash"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "rule-interactive-header",
+[?2004l[?2004h>       "priority": 30,
+[?2004l[?2004h>       "match": {
+[?2004l[?2004h>         "methods": ["POST"],
+[?2004l[?2004h>         "routes": ["/v1/render"],
+[?2004l[?2004h>         "headers": [{"name": "X-Integration-Mode", "equals": "legacy", "case_sensitive": False}]
+[?2004l[?2004h>       },
+[?2004l[?2004h>       "selectors": [{"location": "header", "names": ["X-Legacy-Template"]}],
+[?2004l[?2004h>       "transforms": ["trim_ascii", "percent_decode", "percent_decode", "unicode_nfkc", "backslash_to_slash"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "rule-batch-json",
+[?2004l[?2004h>       "priority": 40,
+[?2004l[?2004h>       "match": {"methods": ["POST"], "routes": ["/v1/render/batch"]},
+[?2004l[?2004h>       "selectors": [{"location": "json", "pointers": ["/jobs/*/template", "/jobs/*/options/template"]}],
+[?2004l[?2004h>       "transforms": ["trim_ascii", "percent_decode", "percent_decode", "unicode_nfkc", "backslash_to_slash"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "rule-validation-json",
+[?2004l[?2004h>       "priority": 50,
+[?2004l[?2004h>       "match": {"methods": ["PUT"], "routes": ["/v1/templates/validate"]},
+[?2004l[?2004h>       "selectors": [{"location": "json", "pointers": ["/locator"]}],
+[?2004l[?2004h>       "transforms": ["trim_ascii", "percent_decode", "percent_decode", "unicode_nfkc", "backslash_to_slash"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "rule-validation-query-form",
+[?2004l[?2004h>       "priority": 60,
+[?2004l[?2004h>       "match": {"methods": ["PUT"], "routes": ["/v1/templates/validate"]},
+[?2004l[?2004h>       "selectors": [
+[?2004l[?2004h>         {"location": "query", "names": ["locator"]},
+[?2004l[?2004h>         {"location": "form", "names": ["locator"]}
+[?2004l[?2004h>       ],
+[?2004l[?2004h>       "transforms": ["trim_ascii", "percent_decode", "percent_decode", "unicode_nfkc", "backslash_to_slash"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     }
+[?2004l[?2004h>   ]
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> with open('/app/edge-policy.json', 'w') as f:
+[?2004l[?2004h>     json.dump(policy, f, indent=2)
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ python3 /app/build_policy.py
+[?2004l[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ /app/waflab check /app/edge-policy.json
+[?2004l{
+  "valid": true,
+  "supported_predicates": [
+    "locator_outside",
+    "contains",
+    "equals"
+  ],
+  "error_count": 0,
+  "errors": [],
+  "summary": "valid enforcement policy with 6 rule(s)"
+}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ /app/waflab replay /app/edge-policy.json /app/traffic/representative.jsonl
+[?2004l{
+  "passed": 20,
+  "failed": 1,
+  "max_work": 23,
+  "cases": [
+    {
+      "id": "m-json-parent",
+      "expected": "block",
+      "actual": "block",
+      "work": 16,
+      "ok": true
+    },
+    {
+      "id": "m-query-double",
+      "expected": "block",
+      "actual": "block",
+      "work": 19,
+      "ok": true
+    },
+    {
+      "id": "m-json-backslash",
+      "expected": "block",
+      "actual": "block",
+      "work": 16,
+      "ok": true
+    },
+    {
+      "id": "m-json-unicode",
+      "expected": "block",
+      "actual": "block",
+      "work": 16,
+      "ok": true
+    },
+    {
+      "id": "m-integration-scheme",
+      "expected": "block",
+      "actual": "block",
+      "work": 20,
+      "ok": true
+    },
+    {
+      "id": "m-batch-member",
+      "expected": "block",
+      "actual": "block",
+      "work": 23,
+      "ok": true
+    },
+    {
+      "id": "m-validate-form",
+      "expected": "block",
+      "actual": "block",
+      "work": 18,
+      "ok": true
+    },
+    {
+      "id": "m-route-canonical",
+      "expected": "block",
+      "actual": "block",
+      "work": 16,
+      "ok": true
+    },
+    {
+      "id": "m-duplicate-json",
+      "expected": "block",
+      "actual": "block",
+      "work": 23,
+      "ok": true
+    },
+    {
+      "id": "b-within-root",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 19,
+      "ok": true
+    },
+    {
+      "id": "b-asset",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 19,
+      "ok": true
+    },
+    {
+      "id": "b-dotted-name",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 19,
+      "ok": true
+    },
+    {
+      "id": "b-batch-complex",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 23,
+      "ok": true
+    },
+    {
+      "id": "b-integration",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 20,
+      "ok": true
+    },
+    {
+      "id": "b-import-lookalike",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 8,
+      "ok": true
+    },
+    {
+      "id": "b-search-lookalike",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 8,
+      "ok": true
+    },
+    {
+      "id": "b-events-opaque",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 8,
+      "ok": true
+    },
+    {
+      "id": "b-ignored-legacy-header",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 19,
+      "ok": true
+    },
+    {
+      "id": "x-malformed-json",
+      "expected": "reject",
+      "actual": "reject",
+      "work": 8,
+      "ok": true
+    },
+    {
+      "id": "d-adapter-url-generation",
+      "expected": "block",
+      "actual": "block",
+      "work": 19,
+      "ok": true
+    },
+    {
+      "id": "d-adapter-document-generation",
+      "expected": "allow",
+      "actual": "block",
+      "work": 16,
+      "ok": false
+    }
+  ]
+}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat /app/traffic/representative.jsonl | grep 'd-adapter-document-generation'
+[?2004l{"id":"d-adapter-document-generation","request":{"method":"POST","target":"/v1/render","headers":[["Authorization","Bearer lab-user"],["X-Request-ID","req-021"],["Content-Type","application/json"]],"body":"{\"template\": \"%EF%BC%8E%EF%BC%8E%EF%BC%8F%61%64%61%70%74%65%72%2D%64%69%66%66%65%72%65%6E%74%69%61%6C\"}"},"decision":"allow"}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat /app/traffic/representative.jsonl | grep 'd-adapter-document-generation' > /tmp/failed.jsonl
+[?2004l[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ jq .request < /tmp/failed.jsonl > /tmp/failed_req.json
+[?2004l[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ /app/waflab inspect /tmp/failed_req.json
+[?2004l{
+  "route": "/v1/render",
+  "outcome": "rendered_within_root",
+  "locators": [
+    {
+      "source": "json",
+      "field": "/template",
+      "normalized": "．．／adapter-differential",
+      "outside_root": false
+    }
+  ]
+}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat << 'EOF' > /app/test_transforms.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> import subprocess
+[?2004l[?2004h> 
+[?2004l[?2004h> def inspect(req):
+[?2004l[?2004h>     with open('/tmp/req.json', 'w') as f:
+[?2004l[?2004h>          json.dump(req, f)
+[?2004l[?2004h>     result = subprocess.run(['/app/waflab', 'inspect', '/tmp/req.json'], capture_output=True, text=True)
+[?2004l[?2004h>     return json.loads(result.stdout)
+[?2004l[?2004h> 
+[?2004l[?2004h> tests = [
+[?2004l[?2004h>     ("query_single_percent", {"method": "POST", "target": "/v1/render?template=%2e%2e%2fout", "headers": {}, "body": ""}),
+[?2004l[?2004h>     ("query_double_percent", {"method": "POST", "target": "/v1/render?template=%252e%252e%252fout", "headers": {}, "body": ""}),
+[?2004l[?2004h>     ("query_unicode", {"method": "POST", "target": "/v1/render?template=%EF%BC%8E%EF%BC%8E%EF%BC%8Fout", "headers": {}, "body": ""}),
+[?2004l[?2004h>     ("query_double_unicode", {"method": "POST", "target": "/v1/render?template=%25EF%25BC%258E%25EF%25BC%258E%25EF%25BC%258Fout", "headers": {}, "body": ""}), M[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K,
+[?2004l[?2004h>     ("query_backslash", {"method": "POST", "target": "/v1/render?template=..\\out", "headers": {}, "body": ""}),
+[?2004l[?2004h>     ("query_space", {"method": "POST", "target": "/v1/render?template=%20%20..%2fout%20%20", "headers": {}, "body": ""}),
+[?2004l[?2004h> 
+[?2004l[?2004h>     ("json_plain", {"method": "POST", "target": "/v1/render", "headers": {"Content-Type": "application/json"}, "body": '{"template": "../out"}'}),
+[?2004l[?2004h>     ("json_percent", {"method": "POST", "target": "/v1/render", "headers": {"Content-Type": "application/json"}, "body": '{"template": "%2e%2e%2fout"}'}),
+[?2004l[?2004h>     ("json_unicode", {"method": "POST", "target": "/v1/render", "headers": {"Content-Type": "application/json"}, "body": '{"template": "．．／out"}'}),
+[?2004l[?2004h>     ("json_unicode_pct", {"method": "POST", "target": "/v1/render", "headers": {"Content-Type": "application/json"}, "body": '{"template": "%EF%BC%8E%EF%BC%8E%EF%BC%8Fout"}'}),
+[?2004l[?2004h>     ("json_backslash", {"method": "POST", "target": "/v1/render", "headers": {"Content-Type": "application/json"}, "body": '{"template": "..\\\\out"}'}),
+[?2004l[?2004h>     ("json_space", {"method": "POST", "target": "/v1/render", "headers": {"Content-Type": "application/json"}, "body": '{"template": "  ../out  "}'}),
+[?2004l[?2004h> 
+[?2004l[?2004h>     ("header_plain", {"method": "POST", "target": "/v1/render", "headers": {"X-Integration-Mode": "legacy", "X-Legacy-Template": "../out"}, "body": ""}),
+[?2004l[?2004h>     ("header_percent", {"method": "POST", "target": "/v1/render", "headers": {"X-Integration-Mode": "legacy", "X-Legacy-Template": "%2e%2e%2fout"}, "body": ""}),
+[?2004l[?2004h>     ("header_unicode", {"method": "POST", "target": "/v1/render", "headers": {"X-Integration-Mode": "legacy", "X-Legacy-Template": "．．／out"}, "body": ""}), M
+[?2004l[?2004h>     ("header_backslash", {"method": "POST", "target": "/v1/render", "headers": {"X-Integration-Mode": "legacy", "X-Legacy-Template": "..\\out"}, "body": ""}), M[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K,
+[?2004l[?2004h>     ("header_space", {"method": "POST", "target": "/v1/render", "headers": {"X-Integration-Mode": "legacy", "X-Legacy-Template": "  ../out  "}, "body": ""})
+[?2004l[?2004h> ]
+[?2004l[?2004h> 
+[?2004l[?2004h> print(f"{'TEST':20s} {'OUTSIDE':7s} NORMALIZED")
+[?2004l[?2004h> print("-" * 50)
+[?2004l[?2004h> for name, req in tests:
+[?2004l[?2004h>     res = inspect(req)
+[?2004l[?2004h>     if 'locators' in res and len(res['locators']) > 0:
+[?2004l[?2004h>         loc = res['locators'][0]
+[?2004l[?2004h>         print(f"{name:20s} {str(loc['outside_root']):7s} {loc['normalized']}")
+[?2004l[?2004h>     else:
+[?2004l[?2004h>         print(f"{name:20s} {'NO LOCATOR':7s}")
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ python3 /app/test_transforms.py
+[?2004lTEST                 OUTSIDE NORMALIZED
+--------------------------------------------------
+query_single_percent True    ../out
+query_double_percent True    ../out
+query_unicode        True    ../out
+query_double_unicode True    ../out
+query_backslash      True    ../out
+query_space          True    ../out
+json_plain           True    ../out
+json_percent         True    ../out
+json_unicode         True    ../out
+json_unicode_pct     False   ．．／out
+json_backslash       True    ../out
+json_space           True    ../out
+header_plain         True    ../out
+header_percent       True    ../out
+header_unicode       True    ../out
+
+header_backslash     True    ../out
+header_space         True    ../out
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ 
+[?2004l[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ grep 'm-query-double' /app/traffic/representative.jsonl > /tmp/mqd.jsonl && jq .request < /tmp/mqd.jsonl > /tmp/mqd.json && /app/waflab inspect /tmp/mqd.json
+[?2004l{
+  "route": "/v1/render",
+  "outcome": "outside_template_root",
+  "locators": [
+    {
+      "source": "query",
+      "field": "template",
+      "normalized": "../private/key",
+      "outside_root": true
+    }
+  ]
+}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ grep 'd-adapter-url-generation' /app/traffic/representative.jsonl > /tmp/daug.jsonl && jq .request < /tmp/daug.jsonl > /tmp/daug.json && /app/waflab inspect /tmp/daug.json
+[?2004l{
+  "route": "/v1/render",
+  "outcome": "outside_template_root",
+  "locators": [
+    {
+      "source": "query",
+      "field": "template",
+      "normalized": "../adapter-differential",
+      "outside_root": true
+    }
+  ]
+}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat << 'EOF' > /app/test_transforms_2.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> import subprocess
+[?2004l[?2004h> 
+[?2004l[?2004h> def inspect(req):
+[?2004l[?2004h>     with open('/tmp/req2.json', 'w') as f:
+[?2004l[?2004h>          json.dump(req, f)
+[?2004l[?2004h>     result = subprocess.run(['/app/waflab', 'inspect', '/tmp/req2.json'], capture_output=True, text=True)
+[?2004l[?2004h>     return json.loads(result.stdout)
+[?2004l[?2004h> 
+[?2004l[?2004h> tests = [
+[?2004l[?2004h>     ("json_double_pct", {"method": "POST", "target": "/v1/render", "headers": {"Content-Type": "application/json"}, "body": '{"template": "%252e%252e%252fout"}'}),
+[?2004l[?2004h>     ("header_double_pct", {"method": "POST", "target": "/v1/render", "headers": {"X-Integration-Mode": "legacy", "X-Legacy-Template": "%252e%252e%252fout"}, "body": ""}),
+[?2004l[?2004h>     ("header_double_uni", {"method": "POST", "target": "/v1/render", "headers": {"X-Integration-Mode": "legacy", "X-Legacy-Template": "%25EF%25BC%258E%25EF%25BC%258E%25EF%25BC%258Fout"}, "body": ""}),
+[?2004l[?2004h>     ("header_uni_pct", {"method": "POST", "target": "/v1/render", "headers": {"X-Integration-Mode": "legacy", "X-Legacy-Template": "%EF%BC%8E%EF%BC%8E%EF%BC%8Fout"}, "body": ""})
+[?2004l[?2004h> ]
+[?2004l[?2004h> 
+[?2004l[?2004h> print(f"{'TEST':20s} {'OUTSIDE':7s} NORMALIZED")
+[?2004l[?2004h> print("-" * 50)
+[?2004l[?2004h> for name, req in tests:
+[?2004l[?2004h>     res = inspect(req)
+[?2004l[?2004h>     if 'locators' in res and len(res['locators']) > 0:
+[?2004l[?2004h>         loc = res['locators'][0]
+[?2004l[?2004h>         print(f"{name:20s} {str(loc['outside_root']):7s} {loc['normalized']}")
+[?2004l[?2004h>     else:
+[?2004l[?2004h>         print(f"{name:20s} {'NO LOCATOR':7s}")
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ python3 /app/test_transforms_2.py
+[?2004lTEST                 OUTSIDE NORMALIZED
+--------------------------------------------------
+json_double_pct      False   %2e%2e%2fout
+header_double_pct    False   %2e%2e%2fout
+header_double_uni    False   %EF%BC%8E%EF%BC%8E%EF%BC%8Fout
+header_uni_pct       True    ../out
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ 
+[?2004l[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ cat << 'EOF' > /app/build_policy.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> 
+[?2004l[?2004h> policy = {
+[?2004l[?2004h>   "schema_version": 1,
+[?2004l[?2004h>   "mode": "enforce",
+[?2004l[?2004h>   "limits": {
+[?2004l[?2004h>     "max_body_bytes": 2097152,
+[?2004l[?2004h>     "max_fields": 256,
+[?2004l[?2004h>     "max_json_depth": 32,
+[?2004l[?2004h>     "max_values_per_rule": 16
+[?2004l[?2004h>   },
+[?2004l[?2004h>   "failure_handling": {
+[?2004l[?2004h>     "parse_error": "reject",
+[?2004l[?2004h>     "decode_error": "reject",
+[?2004l[?2004h>     "oversize": "reject",
+[?2004l[?2004h>     "status": 400
+[?2004l[?2004h>   },
+[?2004l[?2004h>   "audit": {
+[?2004l[?2004h>     "enabled": True,
+[?2004l[?2004h>     "event": "edge.denial",
+[?2004l[?2004h>     "fields": ["request_id", "rule_id", "method", "route", "source", "field", "reason"],
+[?2004l[?2004h>     "redact_values": True
+[?2004l[?2004h>   },
+[?2004l[?2004h>   "rules": [
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "interactive-json",
+[?2004l[?2004h>       "priority": 10,
+[?2004l[?2004h>       "match": {"methods": ["POST"], "routes": ["/v1/render"]},
+[?2004l[?2004h>       "selectors": [{"location": "json", "pointers": ["/template", "/options/template"]}],
+[?2004l[?2004h>       "transforms": ["unicode_nfkc", "percent_decode", "backslash_to_slash", "trim_ascii"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "interactive-query",
+[?2004l[?2004h>       "priority": 20,
+[?2004l[?2004h>       "match": {"methods": ["POST"], "routes": ["/v1/render"]},
+[?2004l[?2004h>       "selectors": [
+[?2004l[?2004h>         {"location": "query", "names": ["template", "view"]},
+[?2004l[?2004h>         {"location": "form", "names": ["template", "options.template"]},
+[?2004l[?2004h>         {"location": "multipart", "names": ["template_locator"]}
+[?2004l[?2004h>       ],
+[?2004l[?2004h>       "transforms": ["percent_decode", "percent_decode", "unicode_nfkc", "backslash_to_slash", "trim_ascii"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "interactive-header",
+[?2004l[?2004h>       "priority": 30,
+[?2004l[?2004h>       "match": {
+[?2004l[?2004h>         "methods": ["POST"],
+[?2004l[?2004h>         "routes": ["/v1/render"],
+[?2004l[?2004h>         "headers": [{"name": "X-Integration-Mode", "equals": "legacy", "case_sensitive": False}]
+[?2004l[?2004h>       },
+[?2004l[?2004h>       "selectors": [{"location": "header", "names": ["X-Legacy-Template"]}],
+[?2004l[?2004h>       "transforms": ["percent_decode", "unicode_nfkc", "backslash_to_slash", "trim_ascii"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "batch-json",
+[?2004l[?2004h>       "priority": 40,
+[?2004l[?2004h>       "match": {"methods": ["POST"], "routes": ["/v1/render/batch"]},
+[?2004l[?2004h>       "selectors": [{"location": "json", "pointers": ["/jobs/*/template", "/jobs/*/options/template"]}],
+[?2004l[?2004h>       "transforms": ["unicode_nfkc", "percent_decode", "backslash_to_slash", "trim_ascii"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "validation-json",
+[?2004l[?2004h>       "priority": 50,
+[?2004l[?2004h>       "match": {"methods": ["PUT"], "routes": ["/v1/templates/validate"]},
+[?2004l[?2004h>       "selectors": [{"location": "json", "pointers": ["/locator"]}],
+[?2004l[?2004h>       "transforms": ["unicode_nfkc", "percent_decode", "backslash_to_slash", "trim_ascii"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "id": "validation-query",
+[?2004l[?2004h>       "priority": 60,
+[?2004l[?2004h>       "match": {"methods": ["PUT"], "routes": ["/v1/templates/validate"]},
+[?2004l[?2004h>       "selectors": [
+[?2004l[?2004h>         {"location": "query", "names": ["locator"]},
+[?2004l[?2004h>         {"location": "form", "names": ["locator"]}
+[?2004l[?2004h>       ],
+[?2004l[?2004h>       "transforms": ["percent_decode", "percent_decode", "unicode_nfkc", "backslash_to_slash", "trim_ascii"],
+[?2004l[?2004h>       "predicate": {"op": "locator_outside", "allowed_schemes": ["asset"]},
+[?2004l[?2004h>       "action": {"type": "block", "status": 403}
+[?2004l[?2004h>     }
+[?2004l[?2004h>   ]
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> with open('/app/edge-policy.json', 'w') as f:
+[?2004l[?2004h>     json.dump(policy, f, indent=2)
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ python3 /app/build_policy.py && /app/waflab replay /app/edge-policy.json /app/traffic/representative.jsonl
+[?2004l{
+  "passed": 21,
+  "failed": 0,
+  "max_work": 21,
+  "cases": [
+    {
+      "id": "m-json-parent",
+      "expected": "block",
+      "actual": "block",
+      "work": 15,
+      "ok": true
+    },
+    {
+      "id": "m-query-double",
+      "expected": "block",
+      "actual": "block",
+      "work": 19,
+      "ok": true
+    },
+    {
+      "id": "m-json-backslash",
+      "expected": "block",
+      "actual": "block",
+      "work": 15,
+      "ok": true
+    },
+    {
+      "id": "m-json-unicode",
+      "expected": "block",
+      "actual": "block",
+      "work": 15,
+      "ok": true
+    },
+    {
+      "id": "m-integration-scheme",
+      "expected": "block",
+      "actual": "block",
+      "work": 19,
+      "ok": true
+    },
+    {
+      "id": "m-batch-member",
+      "expected": "block",
+      "actual": "block",
+      "work": 21,
+      "ok": true
+    },
+    {
+      "id": "m-validate-form",
+      "expected": "block",
+      "actual": "block",
+      "work": 18,
+      "ok": true
+    },
+    {
+      "id": "m-route-canonical",
+      "expected": "block",
+      "actual": "block",
+      "work": 15,
+      "ok": true
+    },
+    {
+      "id": "m-duplicate-json",
+      "expected": "block",
+      "actual": "block",
+      "work": 21,
+      "ok": true
+    },
+    {
+      "id": "b-within-root",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 18,
+      "ok": true
+    },
+    {
+      "id": "b-asset",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 19,
+      "ok": true
+    },
+    {
+      "id": "b-dotted-name",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 18,
+      "ok": true
+    },
+    {
+      "id": "b-batch-complex",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 21,
+      "ok": true
+    },
+    {
+      "id": "b-integration",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 19,
+      "ok": true
+    },
+    {
+      "id": "b-import-lookalike",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 8,
+      "ok": true
+    },
+    {
+      "id": "b-search-lookalike",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 8,
+      "ok": true
+    },
+    {
+      "id": "b-events-opaque",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 8,
+      "ok": true
+    },
+    {
+      "id": "b-ignored-legacy-header",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 18,
+      "ok": true
+    },
+    {
+      "id": "x-malformed-json",
+      "expected": "reject",
+      "actual": "reject",
+      "work": 8,
+      "ok": true
+    },
+    {
+      "id": "d-adapter-url-generation",
+      "expected": "block",
+      "actual": "block",
+      "work": 19,
+      "ok": true
+    },
+    {
+      "id": "d-adapter-document-generation",
+      "expected": "allow",
+      "actual": "allow",
+      "work": 18,
+      "ok": true
+    }
+  ]
+}
+[?2004h[01;32manalyst@e89c6d0b4ded[00m:[01;34m/app[00m$ 

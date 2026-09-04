@@ -1,0 +1,19 @@
+{
+  "method": "POST",
+  "target": "/v1/render",
+  "headers": [
+    [
+      "Authorization",
+      "Bearer lab-user"
+    ],
+    [
+      "X-Request-ID",
+      "req-010"
+    ],
+    [
+      "Content-Type",
+      "application/json; charset=utf-8"
+    ]
+  ],
+  "body": "{\"template\": \"reports/2025/../../shared/legal\", \"data\": {\"memo\": \"../../ is literal here\"}}"
+}

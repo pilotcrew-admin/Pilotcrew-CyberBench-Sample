@@ -1,0 +1,7 @@
+[Unit]
+Description=Approved vendor inventory schedule
+[Timer]
+OnCalendar=*:0/10
+Unit=vendor-inventory.service
+[Install]
+WantedBy=timers.target

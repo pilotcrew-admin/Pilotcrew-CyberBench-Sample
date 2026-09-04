@@ -1,0 +1,13 @@
+{"consumer": "tls-field-north", "event": "bind", "id": "deploy-001", "subject": "gw-north-17", "time": "2026-11-01T00:00:00Z"}
+{"consumer": "tls-field-south", "event": "bind", "id": "deploy-002", "subject": "gw-south-04", "time": "2026-11-01T00:00:00Z"}
+{"consumer": "tls-batch-export", "event": "bind", "id": "deploy-003", "subject": "export-02", "time": "2026-11-01T00:00:00Z"}
+{"consumer": "sign-plant-alpha", "event": "bind", "id": "deploy-004", "subject": "device-alpha-09", "time": "2026-11-01T00:00:00Z"}
+{"consumer": "sign-plant-beta", "event": "bind", "id": "deploy-005", "subject": "device-beta-03", "time": "2026-11-01T00:00:00Z"}
+{"consumer": "ssh-oncall", "event": "bind", "id": "deploy-006", "subject": "laptop-oncall-07", "time": "2026-11-01T00:00:00Z"}
+{"consumer": "ssh-automation", "event": "bind", "id": "deploy-007", "subject": "runner-12", "time": "2026-11-01T00:00:00Z"}
+{"consumer": "tls-field-north", "event": "bind", "id": "deploy-008", "subject": "gw-retired-02", "time": "2026-10-01T00:00:00Z"}
+{"consumer": "tls-field-north", "event": "unbind", "id": "deploy-009", "subject": "gw-retired-02", "time": "2027-01-15T00:00:00Z"}
+{"consumer": "ssh-oncall", "event": "bind", "id": "deploy-010", "subject": "laptop-retired-02", "time": "2026-10-01T00:00:00Z"}
+{"consumer": "ssh-oncall", "event": "unbind", "id": "deploy-011", "subject": "laptop-retired-02", "time": "2027-01-20T00:00:00Z"}
+{"consumer": "tls-field-south", "event": "bind", "id": "deploy-012", "subject": "probe-lab-pq", "time": "2027-02-10T00:00:00Z"}
+{"consumer": "tls-field-south", "event": "unbind", "id": "deploy-013", "subject": "probe-lab-pq", "time": "2027-02-10T02:00:00Z"}

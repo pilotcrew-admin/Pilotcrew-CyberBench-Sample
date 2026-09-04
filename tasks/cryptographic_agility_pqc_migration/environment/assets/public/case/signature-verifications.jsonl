@@ -1,0 +1,3 @@
+{"algorithms": ["RSA_PKCS1_SHA256"], "context": "helios-release-v1", "id": "verify-198", "materials": ["sign-release-rsa"], "observed_at": "2027-01-12T12:00:00Z", "result": "success", "subject": "device-alpha-09", "surface": "signing:device-update"}
+{"algorithms": ["RSA_PKCS1_SHA256"], "context": "helios-release-v1", "id": "verify-201", "materials": ["sign-release-rsa"], "observed_at": "2027-02-17T09:00:00Z", "result": "success", "subject": "device-alpha-09", "surface": "signing:device-update"}
+{"algorithms": ["RSA_PKCS1_SHA256"], "context": "helios-release-v1", "id": "verify-202", "materials": ["sign-release-rsa"], "observed_at": "2027-02-17T09:01:00Z", "result": "success", "subject": "device-beta-03", "surface": "signing:device-update"}

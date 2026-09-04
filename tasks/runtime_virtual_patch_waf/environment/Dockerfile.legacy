@@ -1,0 +1,9 @@
+FROM python:3.12-slim
+
+RUN useradd --create-home --uid 1001 legacy
+WORKDIR /srv
+COPY --chown=legacy:legacy assets/public/waf_runtime.py /srv/waf_runtime.py
+COPY --chown=legacy:legacy assets/legacy/ /srv/
+USER legacy
+EXPOSE 9090
+CMD ["python3", "/srv/legacy_server.py"]

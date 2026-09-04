@@ -1,0 +1,2 @@
+2025-04-17T09:24:06Z vault-prx-03 sshd[3117]: Accepted publickey for vaultsync from 10.24.5.20 port 49221 ssh2: RSA SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As
+2025-04-17T09:52:00Z vault-prx-03 sshd[3801]: Accepted publickey for archive-admin from 10.24.9.40 port 50118 ssh2: ED25519 SHA256:Vn5Rx1Tq8Ka3Lc7Ym2Wp9Hs4Df6Bj0ZuEe3Ni8Go1Cs

@@ -1,0 +1,2 @@
+{"record_id":"SYSMON-2201","time_utc":"2025-04-17T09:12:15Z","host":"acct-ws-04","event_id":3,"image":"powershell.exe","destination_ip":"198.51.100.77","destination_port":80,"user":"FINANCE\\mrivera"}
+{"record_id":"SYSMON-2208","time_utc":"2025-04-17T09:16:39Z","host":"acct-ws-04","event_id":1,"image":"powershell.exe","command_line":"powershell.exe Get-Content C:\\ProgramData\\Ops\\backup-job.xml; ssh backupsvc@backup-gw-02","user":"FINANCE\\mrivera"}

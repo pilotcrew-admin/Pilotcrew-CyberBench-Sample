@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_8/008/agent_memory_toolchain_integrity"
+    },
+    "trial_name": "agent_memory_toolchain_integrity__4LdfPud",
+    "trials_dir": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_8/008/.task-factory-runtime/jobs/codex_batch_8_008_qualification_r6_20260815_025730_528000",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "openrouter/google/gemini-3.1-pro-preview"
+    },
+    "job_id": "8f01b6fd-d78d-4302-b608-6ac9f288c232"
+}

@@ -1,0 +1,30 @@
+services:
+  main:
+    image: "cyberbench/agent-memory-toolchain-integrity:local"
+    build:
+      context: "."
+    user: "1000:1000"
+    command: ["sh", "-c", "sleep infinity"]
+    depends_on:
+      agent-control:
+        condition: service_healthy
+    networks: [bench]
+
+  agent-control:
+    image: "cyberbench/agent-memory-toolchain-integrity:local"
+    user: "10001:10001"
+    command: ["python3", "/opt/meridian/server.py"]
+    environment:
+      ESTATE_SEED: "${ESTATE_SEED:-meridian-008}"
+      STATE_PATH: "/data/state.json"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/v1/health', timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    expose: ["8080"]
+    networks: [bench]
+
+networks:
+  bench:
+    internal: true

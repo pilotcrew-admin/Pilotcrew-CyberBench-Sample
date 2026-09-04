@@ -1,0 +1,76 @@
+{
+  "archive_objects": [
+    {
+      "archive": "archive-q4-2025",
+      "legacy_envelope_hex": "8f7050144b40dc436d09cd624d14b02ef5e4ee0fef2ab779576d641f4f928282",
+      "object_nonce_hex": "55e9cecd4099a891f2706a2db24f2585"
+    },
+    {
+      "archive": "archive-q1-2026",
+      "legacy_envelope_hex": "25ac368c233c0010229326a924acae685454fe2c55080fc61ba5f4d20a72319c",
+      "object_nonce_hex": "08873a8f57e725c0e54abb411d8fd9f0"
+    },
+    {
+      "archive": "archive-q2-2026",
+      "legacy_envelope_hex": "8f06def6340bcc9166996e2bb3f606f202a14d49a5b896fc4dc3148be2c68079",
+      "object_nonce_hex": "48babcc6fd2912b491786560a9223bbd"
+    }
+  ],
+  "fault_points": [
+    "before_write",
+    "during_write",
+    "after_write_before_commit"
+  ],
+  "format_version": 1,
+  "interruption_capture_cutoff": "2027-02-18T09:00:00Z",
+  "recovery_action_work_units": {
+    "reimage_then_retry": 3,
+    "resume_commit": 0,
+    "retry_same_image": 1,
+    "rollback_then_retry": 2
+  },
+  "recovery_receipt_version": 2,
+  "self_test": {
+    "hmac_sha256": "9d9d2a5b2b9aafe3c22000b7fee86dbda7ea593da0473560e34b94692bb90a0e",
+    "key_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+    "message_utf8": "helios-receipt-self-test"
+  },
+  "upgrade_states": [
+    {
+      "consumer": "tls-field-north",
+      "state_seed_hex": "47dc142e0c13d51d785014913fd963027f4f32bc4c1e0646a8ba06f4ddf7ceca"
+    },
+    {
+      "consumer": "tls-field-south",
+      "state_seed_hex": "61d1cac527c4a6a773b598f67c74d09561b240f623b19cc76b46c2956dce20f3"
+    },
+    {
+      "consumer": "tls-batch-export",
+      "state_seed_hex": "c615a3a7a9a939c3759cda4a915c32ee254a9998a5c628116b6742e792e787e2"
+    },
+    {
+      "consumer": "sign-plant-alpha",
+      "state_seed_hex": "2e31dac96cbb2d12888b730d7b1aa1e95a54507d6a1e1d09b926231ee9af9724"
+    },
+    {
+      "consumer": "sign-plant-beta",
+      "state_seed_hex": "83cea17227e2cb155757cdaa47fee4a0a511e61e9b1a38c5193bdb44cce8d108"
+    },
+    {
+      "consumer": "ssh-oncall",
+      "state_seed_hex": "9e24e27b8fbcb795c818cc44c0b1e61279cd0598bb3bd618362390ac5cc0333f"
+    },
+    {
+      "consumer": "ssh-automation",
+      "state_seed_hex": "803a919ca2a264471e49bed108b8ff901a7d7fb82a7d943799a76c6d85c00649"
+    },
+    {
+      "consumer": "archive-recovery",
+      "state_seed_hex": "28ff3b2a3129d9ca78b30bc8eed9a6dca68e3b770efdeaa4f4e27b29d66dbfc7"
+    },
+    {
+      "consumer": "archive-audit",
+      "state_seed_hex": "430440b792c3af5db554527b98a476e91324b7a327dd4e725968d2df63470bfe"
+    }
+  ]
+}

@@ -1,0 +1,315 @@
+{
+  "packages": [
+    {
+      "approved": true,
+      "channel": "offline-recovery",
+      "from": "gw-4.8",
+      "id": "upgrade-gw-5.4",
+      "image_digest": "sha256:34f4a46b6a117bcb4f7112603414f996d466793ae85ce1276db5bd833d07a59c",
+      "release_time": "2027-01-20T00:00:00Z",
+      "to": "gw-5.4"
+    },
+    {
+      "approved": true,
+      "channel": "offline-recovery",
+      "from": "gw-4.8",
+      "id": "upgrade-gw-north-6.2",
+      "image_digest": "sha256:c24aed2cb47c7fc5f2aa7bf238ef5d67a631b2d2990c7fc395abd557786a2d9e",
+      "release_time": "2027-02-01T00:00:00Z",
+      "to": "gw-6.2"
+    },
+    {
+      "approved": true,
+      "channel": "offline-recovery",
+      "from": "export-2.1",
+      "id": "upgrade-export-2.5",
+      "image_digest": "sha256:af4147ce451407b38e3a3a877d654be4b73018234e4a9a42e38f100ba8593f7e",
+      "release_time": "2027-01-15T00:00:00Z",
+      "to": "export-2.5"
+    },
+    {
+      "approved": true,
+      "channel": "offline-recovery",
+      "from": "export-2.1",
+      "id": "upgrade-export-3.0",
+      "image_digest": "sha256:a2e5b0d320c7ef13995d73a7349c4c5a113f687c6fbca428831012bce3514330",
+      "release_time": "2027-02-02T00:00:00Z",
+      "to": "export-3.0"
+    },
+    {
+      "approved": true,
+      "channel": "offline-recovery",
+      "from": "boot-v2",
+      "id": "upgrade-boot-v2.5",
+      "image_digest": "sha256:3137a0609b1625876805e937957ce617f7adb941aa26dbc0d72a9aa8aa27a4d3",
+      "release_time": "2027-01-20T00:00:00Z",
+      "to": "boot-v2.5"
+    },
+    {
+      "approved": true,
+      "channel": "offline-recovery",
+      "from": "boot-v2",
+      "id": "upgrade-boot-v3",
+      "image_digest": "sha256:40f0b59c0591ab9e967ed49900058a90becea0a29926fc59080f6a0f5ec7701c",
+      "release_time": "2027-02-03T00:00:00Z",
+      "to": "boot-v3"
+    },
+    {
+      "approved": true,
+      "channel": "offline-recovery",
+      "from": "ssh-7.2",
+      "id": "upgrade-ssh-8.4",
+      "image_digest": "sha256:bd2045922d691c350725aacdc694a9522426def4198e638bd33c7d684d6221ce",
+      "release_time": "2027-01-21T00:00:00Z",
+      "to": "ssh-8.4"
+    },
+    {
+      "approved": true,
+      "channel": "offline-recovery",
+      "from": "ssh-7.2",
+      "id": "upgrade-ssh-9.6",
+      "image_digest": "sha256:79529c9d6120e9b25aa4bab4ff8306bb662faeb4eb0e92211891e0d75436f140",
+      "release_time": "2027-02-04T00:00:00Z",
+      "to": "ssh-9.6"
+    },
+    {
+      "approved": true,
+      "channel": "offline-recovery",
+      "from": "restore-1.5",
+      "id": "upgrade-restore-1.8",
+      "image_digest": "sha256:622f2b1dedf7052d9342341a25ec22c37c08e104b1ba9896215e7605a1d62cae",
+      "release_time": "2027-01-22T00:00:00Z",
+      "to": "restore-1.8"
+    },
+    {
+      "approved": true,
+      "channel": "offline-recovery",
+      "from": "restore-1.5",
+      "id": "upgrade-restore-2.0",
+      "image_digest": "sha256:0cc8e0c056dfc70af5ca8b527433828c7310468ffcdf0d30a46369d4364f5d87",
+      "release_time": "2027-02-05T00:00:00Z",
+      "to": "restore-2.0"
+    },
+    {
+      "approved": false,
+      "channel": "engineering-lab",
+      "from": "gw-4.8",
+      "id": "upgrade-gw-lab-7.0",
+      "image_digest": "sha256:fecfd38b23871a14bb3c49d3f11c8b5fa9cc58146c4c5ab8143b91e1a3c29246",
+      "release_time": "2027-02-06T00:00:00Z",
+      "to": "gw-7.0-lab"
+    }
+  ],
+  "versions": {
+    "boot-v2": {
+      "contexts": [
+        "helios-release-v1"
+      ],
+      "domain": "signing",
+      "max_threshold": 1,
+      "signature_algorithms": [
+        "RSA_PKCS1_SHA256",
+        "ED25519"
+      ]
+    },
+    "boot-v2.5": {
+      "contexts": [
+        "helios-release-v1"
+      ],
+      "domain": "signing",
+      "max_threshold": 1,
+      "signature_algorithms": [
+        "RSA_PKCS1_SHA256",
+        "ED25519"
+      ]
+    },
+    "boot-v3": {
+      "contexts": [
+        "helios-release-v2"
+      ],
+      "domain": "signing",
+      "max_threshold": 2,
+      "signature_algorithms": [
+        "ED25519",
+        "ML_DSA_65"
+      ]
+    },
+    "export-2.1": {
+      "domain": "tls",
+      "kex": [
+        "X25519"
+      ],
+      "protocols": [
+        "TLS1.3"
+      ],
+      "server_signatures": [
+        "RSA_2048_SHA256",
+        "ECDSA_P384_SHA384"
+      ],
+      "trust_anchor_algorithms": [
+        "RSA_2048_SHA256",
+        "ECDSA_P384_SHA384"
+      ]
+    },
+    "export-2.5": {
+      "domain": "tls",
+      "kex": [
+        "X25519"
+      ],
+      "protocols": [
+        "TLS1.3"
+      ],
+      "server_signatures": [
+        "RSA_2048_SHA256",
+        "ECDSA_P384_SHA384"
+      ],
+      "trust_anchor_algorithms": [
+        "RSA_2048_SHA256",
+        "ECDSA_P384_SHA384"
+      ]
+    },
+    "export-3.0": {
+      "domain": "tls",
+      "kex": [
+        "X25519",
+        "X25519_MLKEM768"
+      ],
+      "protocols": [
+        "TLS1.3"
+      ],
+      "server_signatures": [
+        "RSA_2048_SHA256",
+        "ECDSA_P384_SHA384"
+      ],
+      "trust_anchor_algorithms": [
+        "RSA_2048_SHA256",
+        "ECDSA_P384_SHA384"
+      ]
+    },
+    "gw-4.8": {
+      "domain": "tls",
+      "kex": [
+        "P256"
+      ],
+      "protocols": [
+        "TLS1.2"
+      ],
+      "server_signatures": [
+        "RSA_2048_SHA256"
+      ],
+      "trust_anchor_algorithms": [
+        "RSA_2048_SHA256"
+      ]
+    },
+    "gw-5.4": {
+      "domain": "tls",
+      "kex": [
+        "P256",
+        "X25519"
+      ],
+      "protocols": [
+        "TLS1.2",
+        "TLS1.3"
+      ],
+      "server_signatures": [
+        "RSA_2048_SHA256",
+        "ECDSA_P384_SHA384"
+      ],
+      "trust_anchor_algorithms": [
+        "RSA_2048_SHA256",
+        "ECDSA_P384_SHA384"
+      ]
+    },
+    "gw-6.2": {
+      "domain": "tls",
+      "kex": [
+        "P256",
+        "X25519",
+        "X25519_MLKEM768"
+      ],
+      "protocols": [
+        "TLS1.2",
+        "TLS1.3"
+      ],
+      "server_signatures": [
+        "RSA_2048_SHA256",
+        "ECDSA_P384_SHA384"
+      ],
+      "trust_anchor_algorithms": [
+        "RSA_2048_SHA256",
+        "ECDSA_P384_SHA384"
+      ]
+    },
+    "restore-1.5": {
+      "data_ciphers": [
+        "AES_256_CBC_HMAC_SHA256"
+      ],
+      "domain": "archive",
+      "wrap_algorithms": [
+        "RSA_2048_OAEP_SHA256"
+      ]
+    },
+    "restore-1.8": {
+      "data_ciphers": [
+        "AES_256_CBC_HMAC_SHA256",
+        "AES_256_GCM"
+      ],
+      "domain": "archive",
+      "wrap_algorithms": [
+        "RSA_2048_OAEP_SHA256"
+      ]
+    },
+    "restore-2.0": {
+      "data_ciphers": [
+        "AES_256_CBC_HMAC_SHA256",
+        "AES_256_GCM"
+      ],
+      "domain": "archive",
+      "wrap_algorithms": [
+        "RSA_2048_OAEP_SHA256",
+        "X25519_MLKEM768"
+      ]
+    },
+    "ssh-7.2": {
+      "domain": "ssh",
+      "host_key_algorithms": [
+        "SSH_RSA_SHA1"
+      ],
+      "user_ca_algorithms": [
+        "RSA_SHA2_256"
+      ]
+    },
+    "ssh-8.4": {
+      "domain": "ssh",
+      "host_key_algorithms": [
+        "RSA_SHA2_256",
+        "SSH_ED25519"
+      ],
+      "user_ca_algorithms": [
+        "RSA_SHA2_256"
+      ]
+    },
+    "ssh-9.3": {
+      "domain": "ssh",
+      "host_key_algorithms": [
+        "RSA_SHA2_256",
+        "SSH_ED25519"
+      ],
+      "user_ca_algorithms": [
+        "RSA_SHA2_256",
+        "SSH_ED25519"
+      ]
+    },
+    "ssh-9.6": {
+      "domain": "ssh",
+      "host_key_algorithms": [
+        "RSA_SHA2_256",
+        "SSH_ED25519"
+      ],
+      "user_ca_algorithms": [
+        "RSA_SHA2_256",
+        "SSH_ED25519"
+      ]
+    }
+  }
+}

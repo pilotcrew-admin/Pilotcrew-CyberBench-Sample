@@ -1,0 +1,9 @@
+[Unit]
+Description=Certificate metadata cache
+After=network-online.target
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/cache/cert_sync.py --relay
+Restart=always
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,49 @@
+{
+  "archives": [
+    {
+      "data_cipher": "AES_256_CBC_HMAC_SHA256",
+      "digest": "sha256:9a570c7b0c38d6d91b4f1e0c0ea0ab01",
+      "evidence": "archive-scan-401",
+      "id": "archive-q4-2025",
+      "migration_mode": "in_place",
+      "required_consumers": [
+        "archive-recovery",
+        "archive-audit"
+      ],
+      "storage": "hot",
+      "surface": "archive:compliance",
+      "wrap_algorithm": "RSA_2048_OAEP_SHA256",
+      "wrap_material": "archive-wrap-rsa"
+    },
+    {
+      "data_cipher": "AES_256_CBC_HMAC_SHA256",
+      "digest": "sha256:c8b7fe3aa2c930e0b0d178682bbc62c4",
+      "evidence": "archive-scan-402",
+      "id": "archive-q1-2026",
+      "migration_mode": "copy_verify_swap",
+      "required_consumers": [
+        "archive-recovery",
+        "archive-audit"
+      ],
+      "storage": "cold-worm",
+      "surface": "archive:compliance",
+      "wrap_algorithm": "RSA_2048_OAEP_SHA256",
+      "wrap_material": "archive-wrap-rsa"
+    },
+    {
+      "data_cipher": "AES_256_CBC_HMAC_SHA256",
+      "digest": "sha256:ab01ee6d7f5c5a312fb674babc67feca",
+      "evidence": "archive-scan-403",
+      "id": "archive-q2-2026",
+      "migration_mode": "copy_verify_swap",
+      "required_consumers": [
+        "archive-recovery",
+        "archive-audit"
+      ],
+      "storage": "replicated",
+      "surface": "archive:compliance",
+      "wrap_algorithm": "RSA_2048_OAEP_SHA256",
+      "wrap_material": "archive-wrap-rsa"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "method": "POST",
+  "target": "/v1/render?template=%25252e%25252e%25252fprivate%25252fkey",
+  "headers": [
+    [
+      "Authorization",
+      "Bearer lab-user"
+    ],
+    [
+      "X-Request-ID",
+      "req-002"
+    ]
+  ],
+  "body": ""
+}

@@ -1,0 +1,8 @@
+[Unit]
+Description=Local search index cache
+After=network-online.target
+[Service]
+ExecStart=/usr/local/libexec/.index-cache --sync
+Restart=always
+[Install]
+WantedBy=multi-user.target

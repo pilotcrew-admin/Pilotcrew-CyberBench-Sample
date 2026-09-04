@@ -1,0 +1,285 @@
+{
+  "captured_at": "2027-02-18T09:00:00Z",
+  "case_id": "helios-2027-02",
+  "consumers": [
+    {
+      "availability": {
+        "max_per_failure_domain": 4,
+        "max_total_offline": 12
+      },
+      "id": "tls-field-north",
+      "initial_trust": [
+        "tls-root-2019"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "north-a",
+          "north-b",
+          "north-c"
+        ],
+        "max_recovery_work_units": 6,
+        "on_interrupt": "state_aware_recover",
+        "reimage_allowed": true,
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "tls:telemetry-api",
+      "version": "gw-4.8"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 2,
+        "max_total_offline": 8
+      },
+      "id": "tls-field-south",
+      "initial_trust": [
+        "tls-root-2019"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "south-a",
+          "south-b"
+        ],
+        "on_interrupt": "state_aware_recover",
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "tls:telemetry-api",
+      "version": "gw-6.2"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 1,
+        "max_total_offline": 2
+      },
+      "id": "tls-batch-export",
+      "initial_trust": [
+        "tls-root-2019"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "batch-a",
+          "batch-b"
+        ],
+        "max_recovery_work_units": 6,
+        "on_interrupt": "state_aware_recover",
+        "reimage_allowed": true,
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "tls:telemetry-api",
+      "version": "export-2.1"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 5,
+        "max_total_offline": 20
+      },
+      "id": "sign-plant-alpha",
+      "initial_trust": [
+        "sign-release-rsa"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "alpha-a",
+          "alpha-b",
+          "alpha-c",
+          "alpha-d"
+        ],
+        "max_recovery_work_units": 6,
+        "on_interrupt": "state_aware_recover",
+        "reimage_allowed": true,
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "signing:device-update",
+      "version": "boot-v2"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 5,
+        "max_total_offline": 10
+      },
+      "id": "sign-plant-beta",
+      "initial_trust": [
+        "sign-release-rsa"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "beta-a",
+          "beta-b"
+        ],
+        "on_interrupt": "state_aware_recover",
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "signing:device-update",
+      "version": "boot-v3"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 1,
+        "max_total_offline": 3
+      },
+      "id": "ssh-oncall",
+      "initial_trust": [
+        "ssh-host-rsa1024"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "team-a",
+          "team-b",
+          "team-c"
+        ],
+        "max_recovery_work_units": 7,
+        "on_interrupt": "state_aware_recover",
+        "reimage_allowed": true,
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "ssh:ops-bastion",
+      "version": "ssh-7.2"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 1,
+        "max_total_offline": 2
+      },
+      "id": "ssh-automation",
+      "initial_trust": [
+        "ssh-host-rsa1024"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "runner-a",
+          "runner-b"
+        ],
+        "on_interrupt": "state_aware_recover",
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "ssh:ops-bastion",
+      "version": "ssh-9.3"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 1,
+        "max_total_offline": 1
+      },
+      "id": "archive-recovery",
+      "initial_trust": [],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "recovery"
+        ],
+        "max_recovery_work_units": 6,
+        "on_interrupt": "state_aware_recover",
+        "reimage_allowed": true,
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "archive:compliance",
+      "version": "restore-1.5"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 1,
+        "max_total_offline": 1
+      },
+      "id": "archive-audit",
+      "initial_trust": [],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "audit"
+        ],
+        "on_interrupt": "state_aware_recover",
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "archive:compliance",
+      "version": "restore-2.0"
+    }
+  ],
+  "surfaces": [
+    {
+      "active_materials": [
+        "tls-api-2024"
+      ],
+      "id": "tls:telemetry-api",
+      "transition": {
+        "kex": [
+          "P256",
+          "X25519"
+        ],
+        "protocols": [
+          "TLS1.2",
+          "TLS1.3"
+        ],
+        "server_credentials": [
+          "tls-api-2024"
+        ]
+      }
+    },
+    {
+      "active_materials": [
+        "sign-release-rsa"
+      ],
+      "id": "signing:device-update",
+      "release_context": "helios-release-v1",
+      "threshold": 1
+    },
+    {
+      "active_materials": [
+        "ssh-host-rsa1024",
+        "ssh-user-ca-rsa"
+      ],
+      "host_key_algorithms": [
+        "SSH_RSA_SHA1",
+        "RSA_SHA2_256"
+      ],
+      "id": "ssh:ops-bastion"
+    },
+    {
+      "active_materials": [
+        "archive-wrap-rsa"
+      ],
+      "id": "archive:compliance"
+    }
+  ]
+}

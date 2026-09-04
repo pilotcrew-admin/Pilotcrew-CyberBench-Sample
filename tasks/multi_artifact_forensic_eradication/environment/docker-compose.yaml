@@ -1,0 +1,10 @@
+services:
+  main:
+    build:
+      context: "."
+    command: ["sh", "-c", "sleep infinity"]
+    networks: [bench]
+
+networks:
+  bench:
+    internal: true

@@ -1,0 +1,174 @@
+{
+    "id": "839e42f7-46c4-49b1-b35d-62bb3aaeb511",
+    "task_name": "cyber-bench/cryptographic-agility-pqc-migration",
+    "trial_name": "cryptographic_agility_pqc_migrat__BJuUBjG",
+    "trial_uri": "file:///home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_9/006/.task-factory-runtime/jobs/codex_batch_9_006_qualification_r12_20260815_225832_004344/cryptographic_agility_pqc_migrat__BJuUBjG",
+    "task_id": {
+        "path": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_9/006/cryptographic_agility_pqc_migration"
+    },
+    "source": null,
+    "task_checksum": "27ea697405ec8f9626775dcba0d38eb2cedb6fd2050bda2924d61d510a5d0e20",
+    "config": {
+        "task": {
+            "path": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_9/006/cryptographic_agility_pqc_migration",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "cryptographic_agility_pqc_migrat__BJuUBjG",
+        "trials_dir": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_9/006/.task-factory-runtime/jobs/codex_batch_9_006_qualification_r12_20260815_225832_004344",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "terminus-2",
+            "import_path": null,
+            "model_name": "openrouter/google/gemini-3.1-pro-preview",
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {},
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "d85f3900-a874-4671-b563-e26f82578074"
+    },
+    "agent_info": {
+        "name": "terminus-2",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "google/gemini-3.1-pro-preview",
+            "provider": "openrouter"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 2050510,
+        "n_cache_tokens": 1154046,
+        "n_output_tokens": 76832,
+        "cost_usd": 2.9457211999999995,
+        "rollout_details": [],
+        "metadata": {
+            "n_episodes": 56,
+            "api_request_times_msec": [
+                4062.785863876343,
+                5866.522550582886,
+                9009.617328643799,
+                6116.254091262817,
+                14515.446424484253,
+                5796.670436859131,
+                5328.300714492798,
+                2982.966661453247,
+                3057.248830795288,
+                3278.306722640991,
+                4068.4597492218018,
+                10714.413404464722,
+                5979.571104049683,
+                6780.558109283447,
+                9960.138320922852,
+                7532.489776611328,
+                9302.086591720581,
+                4439.364433288574,
+                7590.939283370972,
+                6830.651044845581,
+                4292.7985191345215,
+                7296.823024749756,
+                6094.146728515625,
+                4156.125545501709,
+                13531.984329223633,
+                27272.24826812744,
+                10516.281604766846,
+                21301.034688949585,
+                32155.003786087036,
+                30905.476093292236,
+                8713.076829910278,
+                7310.405969619751,
+                77110.84055900574,
+                8792.529106140137,
+                14218.567848205566,
+                32314.63050842285,
+                11463.407516479492,
+                10933.677673339844,
+                36325.54364204407,
+                21171.70238494873,
+                7459.7132205963135,
+                23867.371797561646,
+                24632.513523101807,
+                48883.31961631775,
+                9652.49252319336,
+                21928.711891174316,
+                17242.753982543945,
+                7712.64386177063,
+                24888.776302337646,
+                32363.927602767944,
+                118500.55027008057,
+                17650.778770446777,
+                17725.881338119507,
+                18307.207584381104,
+                7664.687871932983,
+                17855.12113571167
+            ],
+            "summarization_count": 0
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-08-15T22:58:39.815757Z",
+    "finished_at": "2026-08-15T23:16:24.263764Z",
+    "environment_setup": {
+        "started_at": "2026-08-15T22:58:39.955322Z",
+        "finished_at": "2026-08-15T22:58:46.271345Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-08-15T22:58:46.271421Z",
+        "finished_at": "2026-08-15T22:59:25.796837Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-08-15T22:59:25.796999Z",
+        "finished_at": "2026-08-15T23:16:09.847534Z"
+    },
+    "verifier": {
+        "started_at": "2026-08-15T23:16:10.443961Z",
+        "finished_at": "2026-08-15T23:16:11.050852Z"
+    },
+    "step_results": null
+}

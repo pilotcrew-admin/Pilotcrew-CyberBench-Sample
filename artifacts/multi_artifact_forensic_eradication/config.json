@@ -1,0 +1,17 @@
+{
+    "job_name": "codex_batch_8_007_qualification_r9_20260815_041504_824227",
+    "jobs_dir": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_8/007/.task-factory-runtime/jobs",
+    "n_attempts": 3,
+    "n_concurrent_trials": 3,
+    "agents": [
+        {
+            "name": "terminus-2",
+            "model_name": "openrouter/google/gemini-3.1-pro-preview"
+        }
+    ],
+    "tasks": [
+        {
+            "path": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_8/007/multi_artifact_forensic_eradication"
+        }
+    ]
+}

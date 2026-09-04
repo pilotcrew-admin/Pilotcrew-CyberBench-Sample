@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "/home/ubuntu/Cyber-Bench/tasksets/v3/incoming/codex/batch_9/009/runtime_virtual_patch_waf"
+    },
+    "trial_name": "runtime_virtual_patch_waf__nD2HpBX",
+    "trials_dir": "/home/ubuntu/Cyber-Bench/tasksets/v3/incoming/codex/batch_9/009/.task-factory-runtime/jobs/codex_batch_9_009_runtime_virtual_patch_waf_qualification_r1_20260820_051029_055962",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "openrouter/google/gemini-3.1-pro-preview"
+    },
+    "job_id": "088c2ae2-d0c5-40e6-9351-57ca59e57b3e"
+}

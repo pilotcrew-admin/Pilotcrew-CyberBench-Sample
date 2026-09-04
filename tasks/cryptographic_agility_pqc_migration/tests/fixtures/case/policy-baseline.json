@@ -1,0 +1,85 @@
+{
+  "approved_sources": [
+    "offline-vault"
+  ],
+  "case_id": "helios-2027-02",
+  "completion_deadline": "2027-03-31T23:59:59Z",
+  "global_constraints": {
+    "counted_private_roles": [
+      "server_credential",
+      "release_signer",
+      "host_key",
+      "user_ca",
+      "wrapping_key"
+    ],
+    "max_final_private_keys_per_custody_domain": 2
+  },
+  "lifecycle": {
+    "all_required_consumers_must_pass_target_gate": true,
+    "archive_restore_consumers": [
+      "archive-recovery",
+      "archive-audit"
+    ],
+    "final_material_source": "offline-vault",
+    "retire_disposition": "retire_at_completion"
+  },
+  "surfaces": {
+    "archive:compliance": {
+      "data_cipher": "AES_256_GCM",
+      "require_aead": true,
+      "require_hybrid_wrap": true,
+      "required_restore_profiles": [
+        "restore-2.0"
+      ],
+      "wrap_algorithm": "X25519_MLKEM768"
+    },
+    "signing:device-update": {
+      "allowed_signature_algorithms": [
+        "ED25519",
+        "ML_DSA_65"
+      ],
+      "reject_revoked": true,
+      "require_distinct_independence_domains": true,
+      "required_independent_algorithms": [
+        "ED25519",
+        "ML_DSA_65"
+      ],
+      "signing_context": "helios-release-v2",
+      "threshold": 2
+    },
+    "ssh:ops-bastion": {
+      "allowed_host_key_algorithms": [
+        "SSH_ED25519"
+      ],
+      "allowed_user_ca_algorithms": [
+        "SSH_ED25519"
+      ],
+      "host_identity": "ops-bastion.helios",
+      "reject_sha1": true,
+      "required_principal_scopes": [
+        "prod-admin",
+        "automation"
+      ],
+      "strict_host_identity": true
+    },
+    "tls:telemetry-api": {
+      "allowed_server_signatures": [
+        "ECDSA_P384_SHA384"
+      ],
+      "minimum_protocol": "TLS1.3",
+      "reject_downgrade": true,
+      "require_hybrid_kex": true,
+      "required_kex": [
+        "X25519_MLKEM768"
+      ],
+      "required_key_usage": [
+        "serverAuth"
+      ],
+      "server_dns_name": "telemetry-api.helios",
+      "trust_anchor_algorithms": [
+        "ECDSA_P384_SHA384"
+      ],
+      "trust_domain": "prod.telemetry.helios"
+    }
+  }
+}

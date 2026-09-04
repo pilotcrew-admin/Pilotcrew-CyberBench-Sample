@@ -1,0 +1,3 @@
+#!/bin/sh
+# approved monitoring client
+exec /usr/bin/curl -fsS https://203.0.113.88/health

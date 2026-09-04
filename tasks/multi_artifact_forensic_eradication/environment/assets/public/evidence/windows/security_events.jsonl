@@ -1,0 +1,3 @@
+{"record_id":"WINSEC-8810","time_utc":"2025-04-17T09:16:41Z","host":"acct-ws-04","event_id":4648,"subject":"FINANCE\\mrivera","target_server":"backup-gw-02","target_account":"CORP\\backupsvc","process":"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe","source_ip":"10.24.8.17"}
+{"record_id":"WINSEC-8811","time_utc":"2025-04-17T09:17:06Z","host":"acct-ws-04","event_id":5140,"subject":"CORP\\backupsvc","share":"\\\\backup-gw-02\\ops$","source_ip":"10.24.8.17"}
+{"record_id":"WINSEC-8820","time_utc":"2025-04-17T09:31:00Z","host":"acct-ws-04","event_id":4624,"subject":"FINANCE\\mrivera","logon_type":2,"source_ip":"127.0.0.1"}

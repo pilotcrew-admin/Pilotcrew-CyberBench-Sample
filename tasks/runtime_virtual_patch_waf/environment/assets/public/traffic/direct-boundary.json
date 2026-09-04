@@ -1,0 +1,19 @@
+{
+  "method": "POST",
+  "target": "/v1/render",
+  "headers": [
+    [
+      "Authorization",
+      "Bearer lab-user"
+    ],
+    [
+      "X-Request-ID",
+      "req-001"
+    ],
+    [
+      "Content-Type",
+      "application/json"
+    ]
+  ],
+  "body": "{\"template\": \"../../system/config\"}"
+}

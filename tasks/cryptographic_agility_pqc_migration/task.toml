@@ -1,0 +1,33 @@
+schema_version = "1.3"
+
+[task]
+mode = "defensive"
+name = "cyber-bench/cryptographic-agility-pqc-migration"
+description = "Inventory and migrate a mixed TLS, release-signing, SSH, and encrypted-archive estate to an approved hybrid post-quantum policy without breaking required consumers."
+authors = [{ name = "Cyber-Bench", email = "devnull@example.invalid" }]
+keywords = ["cybersecurity", "defensive", "cryptography", "crypto-agility", "post-quantum", "tls", "signing", "ssh", "key-lifecycle"]
+
+[metadata]
+category = "cryptographic infrastructure defense"
+bundle_id = "v3-codex-cryptographic-agility-pqc-migration"
+scored_service_count = 1
+decoy_service_count = 0
+target_ports = []
+hint_level = 0
+headroom_axis = "cryptographic dependency migration, downgrade resistance, and interoperability"
+difficulty = "extreme-headroom"
+
+[agent]
+timeout_sec = 2400.0
+
+[verifier]
+timeout_sec = 240.0
+collect = []
+
+[environment]
+build_timeout_sec = 1200.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+storage_mb = 8192
+allow_internet = false

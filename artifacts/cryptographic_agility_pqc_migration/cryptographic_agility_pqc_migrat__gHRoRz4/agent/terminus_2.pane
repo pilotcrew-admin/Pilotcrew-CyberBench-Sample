@@ -1,0 +1,1744 @@
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/app[00m$ asciinema rec --stdin /logs/agent/recording.cast
+[?2004lbash: asciinema: command not found
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/app[00m$ clear
+[?2004l[H[J[3J[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/app[00m$ cd /opt/crypto-case/
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ ls -la
+[?2004ltotal 40
+dr-xr-xr-x 1 analyst analyst  4096 Aug 15 21:57 [0m[01;34m.[0m
+drwxr-xr-x 1 root    root     4096 Aug 15 21:57 [01;34m..[0m
+-r--r--r-- 1 analyst analyst  2397 Aug 15 21:53 README.md
+dr-xr-xr-x 1 analyst analyst  4096 Aug 15 21:52 [01;34mcase[0m
+dr-xr-xr-x 1 analyst analyst  4096 Aug 15 21:57 [01;34mdocs[0m
+-r--r--r-- 1 analyst analyst 14504 Aug 15 21:53 plan.schema.json
+dr-xr-xr-x 1 analyst analyst  4096 Aug 15 21:57 [01;34mtools[0m
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat README.md
+[?2004l# Helios cryptographic-agility case bundle
+
+Identifiers and algorithm labels are case-sensitive. The captured time and migration
+completion deadline are recorded in the case files. Everything required is offline.
+
+## Evidence and inventory
+
+- `case/estate.json` — current services, consumer versions, trust, availability caps,
+  rollout rings, and failure domains.
+- `case/deployment-events.jsonl` — time-ordered subject-to-consumer binding lifecycle.
+- `case/materials.json` — current and candidate keys, credentials, issuers, sources,
+  lifecycle disposition, approval scope, identity scope, and cryptographic properties.
+- `case/compatibility.json` — version capabilities and authorized offline upgrade choices.
+- `case/tls-negotiations.jsonl`, `signature-verifications.jsonl`, and
+  `ssh-sessions.jsonl` — current, stale, retired-subject, and failed runtime observations.
+- `case/archives.json` — stored-object protection, integrity digests, readers, and allowed
+  storage migration modes.
+- `case/incident-evidence.json` — custody evidence, confirmed and cleared leads, and
+  signed-artifact observations.
+- `case/execution-fixtures.json` — captured archive envelopes/nonces, upgrade state seeds,
+  fault order, recovery work costs, and a neutral receipt self-test vector.
+- `case/interruption-observations.jsonl` — temporal post-fault states for diagnosis,
+  including stale, failed-collection, and post-capture distractions.
+- `case/policy-baseline.json` — normative completion controls.
+
+## Contracts
+
+- `docs/evidence-semantics.md` explains how to scope effective dependencies and incidents.
+- `docs/plan-schema.md` defines every submitted field and action.
+- `docs/migration-contract.md` defines replay, compatibility, availability, gates,
+  lifecycle, and final-policy behavior.
+- `docs/receipt-contract.md` defines byte-exact archive and interruption execution
+  receipts using standard SHA-256 and HMAC-SHA256.
+- `plan.schema.json` is a structural schema; semantic assessment is stricter.
+
+Useful commands:
+
+```sh
+agilityctl evidence
+agilityctl lint /app/submission/migration-plan.json
+agilityctl rehearse /app/submission/migration-plan.json
+```
+
+The rehearsal checks representative referential and ordering constraints. It does not
+select material, solve the cross-surface custody allocation, construct the inventory, or
+prove all downgrade and replay scenarios.
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat docs/evidence-semantics.md
+[?2004l# Evidence semantics
+
+Runtime successes, not configured preference lists, establish captured effective
+cryptographic dependencies. Runtime rows name subjects rather than cohorts. Reconstruct
+the estate at `estate.json.captured_at` by replaying `deployment-events.jsonl` in timestamp
+order: `bind` makes the subject an active member of the named consumer cohort and `unbind`
+removes that exact binding. Ignore events after capture.
+
+For each still-active subject in a required TLS, signing, or SSH consumer, select the
+latest successful runtime observation at or before capture. Older successes for that same
+subject, successes for subjects later unbound, failed probes, and observations from a
+subject with no active binding are context rather than current dependencies. Aggregate
+selected observations by consumer into one dependency row: union their algorithms and
+materials and cite every selected observation ID in `evidence`. A required consumer with
+multiple active subjects may therefore cite more than one observation. Times are UTC and
+identifiers are case-sensitive.
+
+Each archive record is also one effective dependency row: use the archive ID as
+`consumer`, its two protection algorithms, its wrapping material, and its `evidence` ID.
+Sorting is not significant; sets are. Do not infer dependencies from a material merely
+because it exists in a catalog.
+
+A custody event scopes compromise only when `confidence` is `confirmed` and its type
+establishes material export or an unauthorized signing session. A suspected event with a
+clearing attestation and an authorized copy are not compromise. An unauthorized artifact
+corroborates the exposed signing path but does not make unrelated trust roots or candidate
+material compromised.
+
+`materials.json` field `disposition: retire_at_completion` is the authoritative lifecycle
+scope. Transition-only material may remain usable during a safe bridge unless it is
+confirmed compromised; it must not remain at completion.
+
+`approved: final` and an approved source are necessary, not sufficient, for candidate
+selection. Join every final policy constraint to material metadata: TLS trust domain,
+server identity, issuer, and key usage; signing context, algorithm coverage, and
+independence domains; SSH host identity and user-CA principal scopes; and archive restore
+profiles. Plausible final-approved material for a different trust/restore scope must not
+be deployed merely because its algorithm is modern.
+
+Several correctly scoped private-key choices remain interchangeable locally. Apply
+`policy-baseline.json.global_constraints` to the combined final selections across all
+surfaces. Count each selected material whose role is listed, group it by `custody_domain`,
+and keep every domain at or below the published maximum. This is a blast-radius control,
+not a preference for one canonical set; any scope-correct combination within the domain
+capacity is valid.
+
+Interruption evidence is a second temporal join rather than part of `dependencies`. For
+each consumer/ring/package/fault tuple, use only `result: captured` rows at or before the
+published interruption cutoff and select the latest `(observed_at, id)`. Validate the
+compact-canonical state digest before applying the recovery precedence and stateful chain
+in `receipt-contract.md`. Older captured states, collection failures, and post-cutoff
+repairs cannot justify a recovery branch.
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat docs/plan-schema.md
+[?2004l# Migration plan schema
+
+Submit one JSON object with `format_version: 1`, `case_id`, `findings`, `dependencies`,
+`final_policies`, and a non-empty ordered `actions` array. Unknown descriptive fields are
+ignored. Action IDs must be unique non-empty strings. `case_id` must match the captured
+estate.
+
+## Findings and dependencies
+
+`findings` contains `compromised_material` and `retire_material`, both arrays of material
+IDs. `dependencies` is an array of:
+
+```json
+{"surface":"surface-id", "consumer":"consumer-or-archive-id",
+ "effective_algorithms":["label"], "materials":["material-id"],
+ "evidence":["observation-id"]}
+```
+
+Supply exactly the current effective dependencies reconstructed by the evidence contract.
+Array order does not matter; values are compared as sets.
+
+## Final policies
+
+`final_policies` maps all four surface IDs to objects:
+
+- TLS: `minimum_protocol`, `allowed_kex`, `allowed_server_credentials`,
+  `trusted_roots`, `reject_downgrade`.
+- signing: `required_signers`, `allowed_algorithms`, `threshold`, `context`,
+  `reject_revoked`.
+- SSH: `allowed_host_keys`, `allowed_user_cas`, `allowed_signature_algorithms`,
+  `strict_host_identity`, `reject_sha1`.
+- archive: `data_cipher`, `wrap_algorithm`, `wrap_material`, `require_aead`.
+
+Policies are evaluated behaviorally against the baseline, material scope metadata, and
+compatibility catalog; object/list order is not significant.
+
+## Actions
+
+Every action has `id` and `op`, plus these required fields:
+
+- `contain_signer`: `material`
+- `stage_material`: `material`
+- `upgrade_consumer`: `consumer`, `package`, `ring` (`canary` or `fleet`),
+  `failure_domains`, `batch`, and `on_interrupt`
+- `upgrade_gate`: `consumer`, `ring`, `package`, `expected_version`, and
+  `recovery_steps` in public fault-point order. Each step has `fault_point`, `evidence`,
+  `decision`, `work_units`, and `receipt` as defined by `receipt-contract.md`.
+- `distribute_trust`: `consumer`, `ring`, `material`
+- `activate_material`: `surface`, `material`
+- `configure_transition`: `surface`, `allowed_materials`
+- `workflow_gate`: `surface`, `consumer`, `ring`, `profile` (the assessed target is
+  `target`)
+- `migrate_archive`: `archive`, `data_cipher`, `wrap_material`, `mode`,
+  `new_envelope_hex`, and `restore_proof`
+- `archive_gate`: `archive`, `consumers`, `expected_digest`
+- `set_final_policy`: `surface`
+- `retire_material`: `material`
+
+`failure_domains`, `allowed_materials`, and `consumers` are non-empty ID arrays. `batch`
+has positive integer `max_total` and `max_per_failure_domain`. Step evidence/decisions must
+come from the effective captured state, work units are non-negative integers, and receipt
+strings use lowercase 64-character hexadecimal. The state chain is recomputed under
+`receipt-contract.md`; format-only or copied values are not accepted. Upgrade actions
+cover every failure domain in the named consumer ring as a set; the documented rollout
+contract defines safe interruption, work-budget, gate, and canary-before-fleet behavior.
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat docs/migration-contract.md
+[?2004l# Migration replay and security contract
+
+The verifier starts from `case/estate.json` and replays submitted actions in order. An
+action with an unsatisfied precondition is rejected without mutating state. The result
+must preserve required workflow availability throughout and satisfy every final policy.
+
+## Candidate and upgrade selection
+
+Final approval is scoped. Use `policy-baseline.json` together with material metadata;
+approval or algorithm strength alone does not make a material valid for a different trust
+domain, DNS identity, signing independence domain, SSH host/principal scope, or archive
+restore profile. After forming locally valid choices, enforce the global custody-domain
+capacity across all selected private-key roles. Multiple combinations are valid; the
+transition and final policy must use one capacity-safe combination consistently.
+
+A consumer's captured `version` applies to both rollout rings. Determine whether it
+supports its surface target from `compatibility.json`. If it does not, choose an approved
+`offline-recovery` package whose `from` matches that ring's installed version and whose
+`to` capabilities satisfy the complete target. The catalog includes approved partial
+upgrades that improve one property but do not satisfy the final workflow.
+
+`upgrade_consumer` names one ring and every published failure domain for that consumer.
+For `canary`, `batch.max_per_failure_domain` must not exceed
+`rollout.canary_max_per_failure_domain`, and `batch.max_total` may not exceed that value
+times the number of named domains. Fleet batches use the two normal availability caps.
+`on_interrupt` must match the published `state_aware_recover` strategy. The simulator
+injects failure before write, during write, and after write before commit; the captured
+states do not all admit the same safe remediation.
+
+An `upgrade_gate` proves the installed version after diagnosing the interruption
+schedules. It names the actual package and includes ordered evidence-bound recovery steps.
+The temporal selection, decision precedence, work budget, and stateful byte construction
+in `receipt-contract.md` bind the resulting health chain to the captured states, canary
+parent, consumer, ring, package image, target version, and chosen recovery branches. A
+fleet upgrade is forbidden until that consumer's valid canary recovery chain has passed;
+an upgraded ring cannot pass a target workflow without its own chain. A consumer that
+already supports the target needs no upgrade action or upgrade gate.
+
+## Material, trust, and transitions
+
+Confirmed exposed signing material must be contained before any replacement mutation.
+Containment freezes new signing by that key; already authorized releases and offline
+recovery packages remain installable. `stage_material` accepts only final-approved
+material from an approved source and never grants trust by itself; final policy gates also
+check its documented identity/scope constraints.
+
+Trust is ring-local. `distribute_trust` installs staged material only after that ring's
+version can parse the material's role and algorithm. TLS roots go to TLS consumers,
+release identities to signing consumers, and SSH host identities to SSH clients. Archive
+wrapping keys and server-side SSH user CAs are staged/activated rather than distributed.
+
+Activating a server credential, host key, user CA, signing key, or archive wrapping key
+adds it alongside transition material. Before the first target workflow gate on each TLS,
+signing, and SSH surface, execute `configure_transition`. It may name only active material
+for its surface and must preserve a usable path for every required consumer ring. A
+confirmed compromised signer is never a permissible signing transition path.
+
+## Workflow gates and archives
+
+A `workflow_gate` with profile `target` exercises the submitted final policy against the
+named consumer ring's installed version and trust. It proves a compatible TLS handshake,
+two-signature release verification, or SSH host/user trust exchange. Both canary and fleet
+of every required TLS, signing, and SSH consumer must pass before that surface's final
+policy is installed.
+
+`migrate_archive` decrypts/authenticates the captured object, preserves its published
+plaintext digest, and protects it with the named final cipher and staged wrapping key. It
+includes the deterministic `new_envelope_hex` and `restore_proof` constructed from the
+captured envelope/nonce and selected material as specified in `receipt-contract.md`; copied
+or modified receipts do not establish migration. Its `mode` must equal the archive's
+storage contract: hot objects allow `in_place`; WORM and replicated objects require
+`copy_verify_swap`, retaining the old readable copy until verification. Both rings of
+every required restore consumer must support the protection layers. `archive_gate` names
+all required restore consumers and the published digest. Every archive must pass before
+archive policy cutover.
+
+## Completion and adversarial behavior
+
+`set_final_policy` enforces the corresponding object from `final_policies` and removes
+transition fallback. At that point all required consumer rings must remain functional.
+Hybrid means both the named classical and post-quantum components. Signing threshold
+identities must cover the required independent algorithms, come from distinct required
+independence domains, and bind the new context. Strict SSH identity does not accept a
+different valid host key. AEAD archives authenticate before releasing plaintext.
+
+The assessment supplies stale and unbound evidence, conditionally scoped candidates,
+partial upgrades, interrupted canary/fleet writes, downgrade offers, TLS certificate
+substitution, single or repeated signature bundles, revoked-key replay, SSH SHA-1 and
+wrong-host attempts, archive-wrap stripping, modified ciphertext, and compliant traffic.
+Final policies must reject adversarial variants without blocking required benign flows.
+
+A material may be retired only after every surface or stored object has stopped depending
+on it, the relevant final policy is active, and required gates have passed. Completion
+requires exactly the catalog material marked `retire_at_completion`.
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat docs/receipt-contract.md
+[?2004l# Deterministic execution-receipt contract
+
+The migration artifact includes receipts from the supplied faithful offline archive and
+interruption simulators. These are substantive evidence that the selected material and
+recovery path were executed; they are not arbitrary report hashes. All text is UTF-8,
+`NUL` is the single byte `0x00`, `||` is byte concatenation, SHA-256/HMAC-SHA256 have their
+standard meanings, and encoded outputs are lowercase 64-character hexadecimal. Python's
+stdlib `hashlib` and `hmac` are sufficient. `case/execution-fixtures.json.self_test`
+provides a neutral HMAC test vector for encoding validation.
+
+## Archive rewrap and restore
+
+For a `migrate_archive` action, find its object fixture and selected wrapping material.
+Let:
+
+```text
+context = UTF8(archive_id NUL data_cipher NUL wrap_material NUL published_digest)
+message = HEX(legacy_envelope_hex) || HEX(object_nonce_hex) || context
+new_envelope = HMAC-SHA256(key=HEX(material.rewrap_share_hex), message=message)
+restore_proof = HMAC-SHA256(
+    key=HEX(new_envelope), message=UTF8("restore-v1") || NUL || context)
+```
+
+Put the two hex results in the action as `new_envelope_hex` and `restore_proof`. The
+simulator binds them to the selected target wrapper, cipher, object identity, and published
+plaintext digest. Any modified envelope, nonce, material, cipher, object ID, digest, or
+proof must fail before plaintext is released.
+
+## Interrupted upgrade recovery
+
+`case/interruption-observations.jsonl` contains captured and distracting interruption
+states. For every tuple `(consumer, ring, package, fault_point)`, select the row with
+`result == "captured"` having the latest `(observed_at, id)` at or before
+`execution-fixtures.json.interruption_capture_cutoff`. Ignore collection failures and
+post-cutoff rows. Verify its `state_digest` as:
+
+```text
+SHA256(UTF8(JSON(state, sort_keys=true, separators=(",", ":"))))
+```
+
+where `JSON` is compact JSON with lower-case JSON booleans/null and no ASCII escaping for
+these ASCII-only states. Diagnose each selected state using the first matching rule:
+
+1. `write_phase == "not_started"` -> `retry_same_image`.
+2. `write_phase == "complete_uncommitted"`, `journal_integrity == "valid"`,
+   `new_image_integrity == "verified"`, and `resume_token == "valid"` -> `resume_commit`.
+3. `rollback_snapshot == "verified"` -> `rollback_then_retry`.
+4. `image_cache == "verified"` and the consumer permits reimage -> `reimage_then_retry`.
+5. Otherwise the captured state is unrecoverable and the gate cannot pass.
+
+Work units for each decision are public in
+`execution-fixtures.json.recovery_action_work_units`. Their gate sum may not exceed the
+consumer's `max_recovery_work_units`. Each `upgrade_gate` names the actual package and
+contains `recovery_steps` in the exact public `fault_points` order. Every step has
+`fault_point`, selected `evidence` ID, `decision`, `work_units`, and `receipt`.
+
+Receipts are stateful. Let:
+
+```text
+base_context = UTF8(consumer NUL ring NUL package NUL expected_version NUL image_digest)
+base_key = SHA256(HEX(state_seed_hex) || base_context)
+```
+
+For the canary gate, initialize:
+
+```text
+parent = SHA256(UTF8("captured-v2") || NUL || HEX(state_seed_hex))
+```
+
+For the fleet gate, `parent` is instead `HEX(final canary receipt)` for the same consumer
+and package. Then, for each selected step in `fault_points` order:
+
+```text
+message = UTF8("recover-v2") || NUL || parent || NUL ||
+          UTF8(fault_point) || NUL || UTF8(evidence_id) || NUL ||
+          HEX(state_digest) || NUL || UTF8(decision) || NUL ||
+          UTF8(decimal_work_units)
+receipt = HMAC-SHA256(key=base_key, message=message)
+parent = HEX(receipt)
+```
+
+The final parent is the ring's recovery-health chain. A fleet upgrade is ineligible until
+the matching canary chain is valid, and later target workflow gates are ineligible until
+their upgraded ring has a valid chain. Thus stale evidence, a copied decision/receipt,
+wrong recovery branch, excess work, or a changed consumer/ring/package/version/image/fault
+prevents later rollout rather than merely failing a standalone string check.
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/inspect_case.py
+[?2004l[?2004h> import json, glob, os
+[?2004l[?2004h> for f in sorted(glob.glob('/opt/crypto-case/case/*')):
+[?2004l[?2004h>     print(f'--- {os.path.basename(f)} ---')
+[?2004l[?2004h>     if f.endswith('.json'):
+[?2004l[?2004h>         with open(f) as fp: d = json.load(fp)
+[?2004l[?2004h>         if isinstance(d, dict): print(list(d.keys()))
+[?2004l[?2004h>         elif isinstance(d, list): print('list of length', len(d))
+[?2004l[?2004h>     elif f.endswith('.jsonl'):
+[?2004l[?2004h>         with open(f) as fp: lines = fp.readlines()
+[?2004l[?2004h>         print(len(lines), 'lines, first line keys:', list(json.loads(lines[0]).keys()) if lines else [])
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/inspect_case.py
+[?2004l--- archives.json ---
+['archives']
+--- compatibility.json ---
+['packages', 'versions']
+--- deployment-events.jsonl ---
+13 lines, first line keys: ['consumer', 'event', 'id', 'subject', 'time']
+--- estate.json ---
+['captured_at', 'case_id', 'consumers', 'surfaces']
+--- execution-fixtures.json ---
+['archive_objects', 'fault_points', 'format_version', 'interruption_capture_cutoff', 'recovery_action_work_units', 'recovery_receipt_version', 'self_test', 'upgrade_states']
+--- incident-evidence.json ---
+['case_id', 'events', 'signature_observations']
+--- interruption-observations.jsonl ---
+95 lines, first line keys: ['consumer', 'fault_point', 'id', 'observed_at', 'package', 'result', 'ring', 'state', 'state_digest']
+--- materials.json ---
+['case_id', 'materials']
+--- policy-baseline.json ---
+['approved_sources', 'case_id', 'completion_deadline', 'global_constraints', 'lifecycle', 'surfaces']
+--- signature-verifications.jsonl ---
+3 lines, first line keys: ['algorithms', 'context', 'id', 'materials', 'observed_at', 'result', 'subject', 'surface']
+--- ssh-sessions.jsonl ---
+3 lines, first line keys: ['algorithms', 'id', 'materials', 'observed_at', 'result', 'subject', 'surface']
+--- tls-negotiations.jsonl ---
+6 lines, first line keys: ['algorithms', 'id', 'materials', 'observed_at', 'protocol', 'result', 'subject', 'surface']
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat /opt/crypto-case/case/estate.json
+[?2004l{
+  "captured_at": "2027-02-18T09:00:00Z",
+  "case_id": "helios-2027-02",
+  "consumers": [
+    {
+      "availability": {
+        "max_per_failure_domain": 4,
+        "max_total_offline": 12
+      },
+      "id": "tls-field-north",
+      "initial_trust": [
+        "tls-root-2019"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "north-a",
+          "north-b",
+          "north-c"
+        ],
+        "max_recovery_work_units": 6,
+        "on_interrupt": "state_aware_recover",
+        "reimage_allowed": true,
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "tls:telemetry-api",
+      "version": "gw-4.8"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 2,
+        "max_total_offline": 8
+      },
+      "id": "tls-field-south",
+      "initial_trust": [
+        "tls-root-2019"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "south-a",
+          "south-b"
+        ],
+        "on_interrupt": "state_aware_recover",
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "tls:telemetry-api",
+      "version": "gw-6.2"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 1,
+        "max_total_offline": 2
+      },
+      "id": "tls-batch-export",
+      "initial_trust": [
+        "tls-root-2019"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "batch-a",
+          "batch-b"
+        ],
+        "max_recovery_work_units": 6,
+        "on_interrupt": "state_aware_recover",
+        "reimage_allowed": true,
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "tls:telemetry-api",
+      "version": "export-2.1"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 5,
+        "max_total_offline": 20
+      },
+      "id": "sign-plant-alpha",
+      "initial_trust": [
+        "sign-release-rsa"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "alpha-a",
+          "alpha-b",
+          "alpha-c",
+          "alpha-d"
+        ],
+        "max_recovery_work_units": 6,
+        "on_interrupt": "state_aware_recover",
+        "reimage_allowed": true,
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "signing:device-update",
+      "version": "boot-v2"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 5,
+        "max_total_offline": 10
+      },
+      "id": "sign-plant-beta",
+      "initial_trust": [
+        "sign-release-rsa"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "beta-a",
+          "beta-b"
+        ],
+        "on_interrupt": "state_aware_recover",
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "signing:device-update",
+      "version": "boot-v3"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 1,
+        "max_total_offline": 3
+      },
+      "id": "ssh-oncall",
+      "initial_trust": [
+        "ssh-host-rsa1024"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "team-a",
+          "team-b",
+          "team-c"
+        ],
+        "max_recovery_work_units": 7,
+        "on_interrupt": "state_aware_recover",
+        "reimage_allowed": true,
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "ssh:ops-bastion",
+      "version": "ssh-7.2"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 1,
+        "max_total_offline": 2
+      },
+      "id": "ssh-automation",
+      "initial_trust": [
+        "ssh-host-rsa1024"
+      ],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "runner-a",
+          "runner-b"
+        ],
+        "on_interrupt": "state_aware_recover",
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "ssh:ops-bastion",
+      "version": "ssh-9.3"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 1,
+        "max_total_offline": 1
+      },
+      "id": "archive-recovery",
+      "initial_trust": [],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "recovery"
+        ],
+        "max_recovery_work_units": 6,
+        "on_interrupt": "state_aware_recover",
+        "reimage_allowed": true,
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "archive:compliance",
+      "version": "restore-1.5"
+    },
+    {
+      "availability": {
+        "max_per_failure_domain": 1,
+        "max_total_offline": 1
+      },
+      "id": "archive-audit",
+      "initial_trust": [],
+      "required": true,
+      "rollout": {
+        "canary_max_per_failure_domain": 1,
+        "failure_domains": [
+          "audit"
+        ],
+        "on_interrupt": "state_aware_recover",
+        "rings": [
+          "canary",
+          "fleet"
+        ]
+      },
+      "surface": "archive:compliance",
+      "version": "restore-2.0"
+    }
+  ],
+  "surfaces": [
+    {
+      "active_materials": [
+        "tls-api-2024"
+      ],
+      "id": "tls:telemetry-api",
+      "transition": {
+        "kex": [
+          "P256",
+          "X25519"
+        ],
+        "protocols": [
+          "TLS1.2",
+          "TLS1.3"
+        ],
+        "server_credentials": [
+          "tls-api-2024"
+        ]
+      }
+    },
+    {
+      "active_materials": [
+        "sign-release-rsa"
+      ],
+      "id": "signing:device-update",
+      "release_context": "helios-release-v1",
+      "threshold": 1
+    },
+    {
+      "active_materials": [
+        "ssh-host-rsa1024",
+        "ssh-user-ca-rsa"
+      ],
+      "host_key_algorithms": [
+        "SSH_RSA_SHA1",
+        "RSA_SHA2_256"
+      ],
+      "id": "ssh:ops-bastion"
+    },
+    {
+      "active_materials": [
+        "archive-wrap-rsa"
+      ],
+      "id": "archive:compliance"
+    }
+  ]
+}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat /opt/crypto-case/case/incident-evidence.json
+[?2004l{
+  "case_id": "helios-2027-02",
+  "events": [
+    {
+      "attestation": "export-counter-advanced",
+      "change_ticket": null,
+      "confidence": "confirmed",
+      "id": "custody-701",
+      "material": "sign-release-rsa",
+      "time": "2027-02-14T03:12:10Z",
+      "type": "hsm_export_confirmed"
+    },
+    {
+      "attestation": "sealed-key-never-exported",
+      "confidence": "suspected",
+      "id": "custody-702",
+      "material": "tls-root-2019",
+      "resolution": "scanner false positive",
+      "time": "2027-02-14T03:18:00Z",
+      "type": "ca-read-alert"
+    },
+    {
+      "change_ticket": "LAB-944",
+      "confidence": "benign",
+      "id": "custody-703",
+      "material": "ssh-host-p256-lab",
+      "time": "2027-02-14T04:02:00Z",
+      "type": "lab-copy"
+    }
+  ],
+  "signature_observations": [
+    {
+      "after_event": "custody-701",
+      "artifact": "update-2027.02-rogue",
+      "authorized": false,
+      "context": "helios-release-v1",
+      "id": "sigobs-711",
+      "material": "sign-release-rsa",
+      "time": "2027-02-14T03:15:00Z"
+    },
+    {
+      "artifact": "update-2027.02.1",
+      "authorized": true,
+      "change_ticket": "REL-2048",
+      "context": "helios-release-v1",
+      "id": "sigobs-712",
+      "material": "sign-release-rsa",
+      "time": "2027-02-13T18:00:00Z"
+    },
+    {
+      "artifact": "interop-fixture",
+      "authorized": true,
+      "change_ticket": "LAB-945",
+      "context": "helios-test",
+      "id": "sigobs-713",
+      "material": "sign-release-pq-lab",
+      "time": "2027-02-14T06:00:00Z"
+    }
+  ]
+}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat /opt/crypto-case/case/policy-baseline.json
+[?2004l{
+  "approved_sources": [
+    "offline-vault"
+  ],
+  "case_id": "helios-2027-02",
+  "completion_deadline": "2027-03-31T23:59:59Z",
+  "global_constraints": {
+    "counted_private_roles": [
+      "server_credential",
+      "release_signer",
+      "host_key",
+      "user_ca",
+      "wrapping_key"
+    ],
+    "max_final_private_keys_per_custody_domain": 2
+  },
+  "lifecycle": {
+    "all_required_consumers_must_pass_target_gate": true,
+    "archive_restore_consumers": [
+      "archive-recovery",
+      "archive-audit"
+    ],
+    "final_material_source": "offline-vault",
+    "retire_disposition": "retire_at_completion"
+  },
+  "surfaces": {
+    "archive:compliance": {
+      "data_cipher": "AES_256_GCM",
+      "require_aead": true,
+      "require_hybrid_wrap": true,
+      "required_restore_profiles": [
+        "restore-2.0"
+      ],
+      "wrap_algorithm": "X25519_MLKEM768"
+    },
+    "signing:device-update": {
+      "allowed_signature_algorithms": [
+        "ED25519",
+        "ML_DSA_65"
+      ],
+      "reject_revoked": true,
+      "require_distinct_independence_domains": true,
+      "required_independent_algorithms": [
+        "ED25519",
+        "ML_DSA_65"
+      ],
+      "signing_context": "helios-release-v2",
+      "threshold": 2
+    },
+    "ssh:ops-bastion": {
+      "allowed_host_key_algorithms": [
+        "SSH_ED25519"
+      ],
+      "allowed_user_ca_algorithms": [
+        "SSH_ED25519"
+      ],
+      "host_identity": "ops-bastion.helios",
+      "reject_sha1": true,
+      "required_principal_scopes": [
+        "prod-admin",
+        "automation"
+      ],
+      "strict_host_identity": true
+    },
+    "tls:telemetry-api": {
+      "allowed_server_signatures": [
+        "ECDSA_P384_SHA384"
+      ],
+      "minimum_protocol": "TLS1.3",
+      "reject_downgrade": true,
+      "require_hybrid_kex": true,
+      "required_kex": [
+        "X25519_MLKEM768"
+      ],
+      "required_key_usage": [
+        "serverAuth"
+      ],
+      "server_dns_name": "telemetry-api.helios",
+      "trust_anchor_algorithms": [
+        "ECDSA_P384_SHA384"
+      ],
+      "trust_domain": "prod.telemetry.helios"
+    }
+  }
+}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/solve_deps.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> 
+[?2004l[?2004h> def load_json(f): return json.load(open(f'/opt/crypto-case/case/{f}'))
+[?2004l[?2004h> def load_jsonl(f): return [json.loads(l) for l in open(f'/opt/crypto-case/case/{f}')]
+[?2004l[?2004h> 
+[?2004l[?2004h> estate = load_json('estate.json')
+[?2004l[?2004h> events = load_jsonl('deployment-events.jsonl')
+[?2004l[?2004h> materials = load_json('materials.json')['materials']
+[?2004l[?2004h> incidents = load_json('incident-evidence.json')
+[?2004l[?2004h> archives = load_json('archives.json')['archives']
+[?2004l[?2004h> 
+[?2004l[?2004h> captured_at = estate['captured_at']
+[?2004l[?2004h> 
+[?2004l[?2004h> # 1. Findings
+[?2004l[?2004h> compromised = [e['material'] for e in incidents['events'] if e['confidence'] == 'confirmed' and e['type'] in ('hsm_export_confirmed',)]
+[?2004l[?2004h> retire = [m['id'] for m in materials if m.get('lifecycle', {}).get('disposition') == 'retire_at_completion']
+[?2004l[?2004h> 
+[?2004l[?2004h> # 2. Dependencies
+[?2004l[?2004h> bindings = {}
+[?2004l[?2004h> for ev in sorted(events, key=lambda x: x['time']): 
+[?2004l[?2004h>     if ev['time'] > captured_at: break
+[?2004l[?2004h>     c, s = ev['consumer'], ev['subject']
+[?2004l[?2004h>     if ev['event'] == 'bind':
+[?2004l[?2004h>         bindings.setdefault(c, set()).add(s)
+[?2004l[?2004h>     elif ev['event'] == 'unbind':
+[?2004l[?2004h>         if c in bindings and s in bindings[c]:
+[?2004l[?2004h>             bindings[c].remove(s)
+[?2004l[?2004h> 
+[?2004l[?2004h> req_consumers = {c['id']: c for c in estate['consumers'] if c['required']}
+[?2004l[?2004h> 
+[?2004l[?2004h> obs = load_jsonl('tls-negotiations.jsonl') + load_jsonl('signature-verifications.jsonl') + load_jsonl('ssh-sessions.jsonl')
+[?2004l[?2004h> obs = [o for o in obs if o.get('observed_at', '') <= captured_at and o.get('result') == 'success']
+[?2004l[?2004h> obs.sort(key=lambda x: x['observed_at'], reverse=True)
+[?2004l[?2004h> 
+[?2004l[?2004h> deps = []
+[?2004l[?2004h> for c_id, c in req_consumers.items():
+[?2004l[?2004h>     if c['surface'].startswith('archive'): continue
+[?2004l[?2004h>     active_subjects = bindings.get(c_id, set())
+[?2004l[?2004h>     c_obs = []
+[?2004l[?2004h>     for s in active_subjects:
+[?2004l[?2004h>         for o in obs:
+[?2004l[?2004h>             if o['subject'] == s:
+[?2004l[?2004h>                 c_obs.append(o)
+[?2004l[?2004h>                 break
+[?2004l[?2004h>     if c_obs:
+[?2004l[?2004h>         eff_alg = set()
+[?2004l[?2004h>         eff_mat = set()
+[?2004l[?2004h>         ev_ids = set()
+[?2004l[?2004h>         for o in c_obs:
+[?2004l[?2004h>             eff_alg.update(o.get('algorithms', []))
+[?2004l[?2004h>             eff_mat.update(o.get('materials', []))
+[?2004l[?2004h>             ev_ids.add(o['id'])
+[?2004l[?2004h>         deps.append({
+[?2004l[?2004h>             'surface': c['surface'],
+[?2004l[?2004h>             'consumer': c_id,
+[?2004l[?2004h>             'effective_algorithms': sorted(list(eff_alg)),
+[?2004l[?2004h>             'materials': sorted(list(eff_mat)),
+[?2004l[?2004h>             'evidence': sorted(list(ev_ids))
+[?2004l[?2004h>         })
+[?2004l[?2004h> 
+[?2004l[?2004h> for a in archives:
+[?2004l[?2004h>     deps.append({
+[?2004l[?2004h>         'surface': 'archive:compliance',
+[?2004l[?2004h>         'consumer': a['id'],
+[?2004l[?2004h>         'effective_algorithms': sorted([a['data_cipher'], a['wrap_algorithm']]),
+[?2004l[?2004h>         'materials': sorted([a['wrap_material']]),
+[?2004l[?2004h>         'evidence': sorted([a['evidence']])
+[?2004l[?2004h>     })
+[?2004l[?2004h> 
+[?2004l[?2004h> print(json.dumps({'findings': {'compromised_material': compromised, 'retire_material': retire}, 'dependencies': deps}, indent=2))
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/solve_deps.py > /app/deps.json
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat /app/deps.json
+[?2004l{
+  "findings": {
+    "compromised_material": [
+      "sign-release-rsa"
+    ],
+    "retire_material": []
+  },
+  "dependencies": [
+    {
+      "surface": "tls:telemetry-api",
+      "consumer": "tls-field-north",
+      "effective_algorithms": [
+        "P256",
+        "RSA_2048_SHA256",
+        "TLS1.2"
+      ],
+      "materials": [
+        "tls-api-2024",
+        "tls-root-2019"
+      ],
+      "evidence": [
+        "tls-neg-101"
+      ]
+    },
+    {
+      "surface": "tls:telemetry-api",
+      "consumer": "tls-field-south",
+      "effective_algorithms": [
+        "RSA_2048_SHA256",
+        "TLS1.3",
+        "X25519"
+      ],
+      "materials": [
+        "tls-api-2024",
+        "tls-root-2019"
+      ],
+      "evidence": [
+        "tls-neg-102"
+      ]
+    },
+    {
+      "surface": "tls:telemetry-api",
+      "consumer": "tls-batch-export",
+      "effective_algorithms": [
+        "RSA_2048_SHA256",
+        "TLS1.3",
+        "X25519"
+      ],
+      "materials": [
+        "tls-api-2024",
+        "tls-root-2019"
+      ],
+      "evidence": [
+        "tls-neg-103"
+      ]
+    },
+    {
+      "surface": "signing:device-update",
+      "consumer": "sign-plant-alpha",
+      "effective_algorithms": [
+        "RSA_PKCS1_SHA256"
+      ],
+      "materials": [
+        "sign-release-rsa"
+      ],
+      "evidence": [
+        "verify-201"
+      ]
+    },
+    {
+      "surface": "signing:device-update",
+      "consumer": "sign-plant-beta",
+      "effective_algorithms": [
+        "RSA_PKCS1_SHA256"
+      ],
+      "materials": [
+        "sign-release-rsa"
+      ],
+      "evidence": [
+        "verify-202"
+      ]
+    },
+    {
+      "surface": "ssh:ops-bastion",
+      "consumer": "ssh-oncall",
+      "effective_algorithms": [
+        "SSH_RSA_SHA1"
+      ],
+      "materials": [
+        "ssh-host-rsa1024",
+        "ssh-user-ca-rsa"
+      ],
+      "evidence": [
+        "ssh-neg-301"
+      ]
+    },
+    {
+      "surface": "ssh:ops-bastion",
+      "consumer": "ssh-automation",
+      "effective_algorithms": [
+        "RSA_SHA2_256"
+      ],
+      "materials": [
+        "ssh-host-rsa1024",
+        "ssh-user-ca-rsa"
+      ],
+      "evidence": [
+        "ssh-neg-302"
+      ]
+    },
+    {
+      "surface": "archive:compliance",
+      "consumer": "archive-q4-2025",
+      "effective_algorithms": [
+        "AES_256_CBC_HMAC_SHA256",
+        "RSA_2048_OAEP_SHA256"
+      ],
+      "materials": [
+        "archive-wrap-rsa"
+      ],
+      "evidence": [
+        "archive-scan-401"
+      ]
+    },
+    {
+      "surface": "archive:compliance",
+      "consumer": "archive-q1-2026",
+      "effective_algorithms": [
+        "AES_256_CBC_HMAC_SHA256",
+        "RSA_2048_OAEP_SHA256"
+      ],
+      "materials": [
+        "archive-wrap-rsa"
+      ],
+      "evidence": [
+        "archive-scan-402"
+      ]
+    },
+    {
+      "surface": "archive:compliance",
+      "consumer": "archive-q2-2026",
+      "effective_algorithms": [
+        "AES_256_CBC_HMAC_SHA256",
+        "RSA_2048_OAEP_SHA256"
+      ],
+      "materials": [
+        "archive-wrap-rsa"
+      ],
+      "evidence": [
+        "archive-scan-403"
+      ]
+    }
+  ]
+}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/inspect_details.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> 
+[?2004l[?2004h> def load(f): return json.load(open(f'/opt/crypto-case/case/{f}'))
+[?2004l[?2004h> 
+[?2004l[?2004h> mats = load('materials.json')['materials']
+[?2004l[?2004h> print('--- Materials ---')
+[?2004l[?2004h> for m in mats:
+[?2004l[?2004h>     print(m['id'], ' disposition:', m.get('lifecycle', {}).get('disposition'), ' approved:', m.get('approval', {}).get('status'), ' role:', m.get('role'))
+[?2004l[?2004h>     
+[?2004l[?2004h> compat = load('compatibility.json')
+[?2004l[?2004h> print('\n--- Compatibility ---')
+[?2004l[?2004h> for pkg in compat['packages']:
+[?2004l[?2004h>     print(pkg['id'], 'from:', pkg['from_version'], 'to:', pkg['to_version'])
+[?2004l[?2004h> 
+[?2004l[?2004h> fix = load('execution-fixtures.json')
+[?2004l[?2004h> print('\n--- Recovery Work Units ---')
+[?2004l[?2004h> print(fix['recovery_action_work_units'])
+[?2004l[?2004h> print('\n--- Interruption Cutoff ---')
+[?2004l[?2004h> print(fix['interruption_capture_cutoff'])
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/inspect_details.py
+[?2004l--- Materials ---
+tls-root-2019  disposition: None  approved: None  role: trust_anchor
+tls-api-2024  disposition: None  approved: None  role: server_credential
+tls-root-2027  disposition: None  approved: None  role: trust_anchor
+tls-api-2027  disposition: None  approved: None  role: server_credential
+tls-root-lab  disposition: None  approved: None  role: trust_anchor
+tls-api-pq-lab  disposition: None  approved: None  role: server_credential
+sign-release-rsa  disposition: None  approved: None  role: release_signer
+sign-release-ed  disposition: None  approved: None  role: release_signer
+sign-release-pq  disposition: None  approved: None  role: release_signer
+sign-release-pq-lab  disposition: None  approved: None  role: release_signer
+ssh-host-rsa1024  disposition: None  approved: None  role: host_key
+ssh-user-ca-rsa  disposition: None  approved: None  role: user_ca
+ssh-host-ed25519  disposition: None  approved: None  role: host_key
+ssh-user-ca-ed  disposition: None  approved: None  role: user_ca
+ssh-host-p256-lab  disposition: None  approved: None  role: host_key
+archive-wrap-rsa  disposition: None  approved: None  role: wrapping_key
+archive-wrap-hybrid  disposition: None  approved: None  role: wrapping_key
+archive-wrap-pq-lab  disposition: None  approved: None  role: wrapping_key
+tls-root-2027-analytics  disposition: None  approved: None  role: trust_anchor
+tls-api-2027-analytics  disposition: None  approved: None  role: server_credential
+sign-release-pq-backup  disposition: None  approved: None  role: release_signer
+ssh-host-ed25519-dr  disposition: None  approved: None  role: host_key
+ssh-user-ca-ed-vendor  disposition: None  approved: None  role: user_ca
+archive-wrap-hybrid-edge  disposition: None  approved: None  role: wrapping_key
+tls-api-2027-b  disposition: None  approved: None  role: server_credential
+sign-release-pq-c  disposition: None  approved: None  role: release_signer
+ssh-host-ed25519-c  disposition: None  approved: None  role: host_key
+ssh-user-ca-ed-c  disposition: None  approved: None  role: user_ca
+archive-wrap-hybrid-c  disposition: None  approved: None  role: wrapping_key
+
+--- Compatibility ---
+Traceback (most recent call last):
+  File "/app/inspect_details.py", line 13, in <module>
+    print(pkg['id'], 'from:', pkg['from_version'], 'to:', pkg['to_version'])
+                              ~~~^^^^^^^^^^^^^^^^
+KeyError: 'from_version'
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 -c "import json; mats=json.load(open('/opt/crypto-case/case/materials.json'))['materials']; print('MAT KEYS:', mats[0].keys()); comp=json.load(open('/opt/crypto-case/case/compatibility.json'))['packages']; print('COMP KEYS:', comp[0].keys())"
+[?2004lMAT KEYS: dict_keys(['algorithms', 'approved', 'disposition', 'expires', 'id', 'role', 'source', 'status', 'surface'])
+COMP KEYS: dict_keys(['approved', 'channel', 'from', 'id', 'image_digest', 'release_time', 'to'])
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/dump_mats_compat.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> mats = json.load(open('/opt/crypto-case/case/materials.json'))['materials']
+[?2004l[?2004h> for m in mats:
+[?2004l[?2004h>     print(m['id'], m.get('approved'), m.get('disposition'), m.get('source'), m.get('metadata', {}), m.get('custody_domain'))
+[?2004l[?2004h> 
+[?2004l[?2004h> comp = json.load(open('/opt/crypto-case/case/compatibility.json'))['packages']
+[?2004l[?2004h> print('--- Packages ---')
+[?2004l[?2004h> for p in comp:
+[?2004l[?2004h>     print(p['id'], p['from'], p.get('approved'))
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/dump_mats_compat.py
+[?2004ltls-root-2019 transition_only retire_at_completion legacy-ca {} None
+tls-api-2024 transition_only retire_at_completion legacy-ca {} None
+tls-root-2027 final None offline-vault {} None
+tls-api-2027 final None offline-vault {} vault-a
+tls-root-lab lab_only None engineering-lab {} None
+tls-api-pq-lab lab_only None engineering-lab {} None
+sign-release-rsa transition_only retire_at_completion hsm-prod-1 {} None
+sign-release-ed final None offline-vault {} vault-a
+sign-release-pq final None offline-vault {} vault-b
+sign-release-pq-lab lab_only None engineering-lab {} None
+ssh-host-rsa1024 transition_only retire_at_completion bastion-local {} None
+ssh-user-ca-rsa transition_only retire_at_completion legacy-ca {} None
+ssh-host-ed25519 final None offline-vault {} vault-a
+ssh-user-ca-ed final None offline-vault {} vault-b
+ssh-host-p256-lab lab_only None engineering-lab {} None
+archive-wrap-rsa transition_only retire_at_completion legacy-kms {} None
+archive-wrap-hybrid final None offline-vault {} vault-b
+archive-wrap-pq-lab lab_only None engineering-lab {} None
+tls-root-2027-analytics final None offline-vault {} None
+tls-api-2027-analytics final None offline-vault {} None
+sign-release-pq-backup final None offline-vault {} vault-a
+ssh-host-ed25519-dr final None offline-vault {} None
+ssh-user-ca-ed-vendor final None offline-vault {} None
+archive-wrap-hybrid-edge final None offline-vault {} None
+tls-api-2027-b final None offline-vault {} vault-b
+sign-release-pq-c final None offline-vault {} vault-c
+ssh-host-ed25519-c final None offline-vault {} vault-c
+ssh-user-ca-ed-c final None offline-vault {} vault-c
+archive-wrap-hybrid-c final None offline-vault {} vault-c
+--- Packages ---
+upgrade-gw-5.4 gw-4.8 True
+upgrade-gw-north-6.2 gw-4.8 True
+upgrade-export-2.5 export-2.1 True
+upgrade-export-3.0 export-2.1 True
+upgrade-boot-v2.5 boot-v2 True
+upgrade-boot-v3 boot-v2 True
+upgrade-ssh-8.4 ssh-7.2 True
+upgrade-ssh-9.6 ssh-7.2 True
+upgrade-restore-1.8 restore-1.5 True
+upgrade-restore-2.0 restore-1.5 True
+upgrade-gw-lab-7.0 gw-4.8 False
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/dump_all.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> 
+[?2004l[?2004h> mats = json.load(open('/opt/crypto-case/case/materials.json'))['materials']
+[?2004l[?2004h> for m in mats:
+[?2004l[?2004h>     print(json.dumps(m))
+[?2004l[?2004h> 
+[?2004l[?2004h> print('--- Packages ---')
+[?2004l[?2004h> comp = json.load(open('/opt/crypto-case/case/compatibility.json'))['packages']
+[?2004l[?2004h> for p in comp:
+[?2004l[?2004h>     print(json.dumps(p))
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/dump_all.py > /app/all_details.txt
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat /app/all_details.txt
+[?2004l{"algorithms": ["RSA_2048_SHA256"], "approved": "transition_only", "disposition": "retire_at_completion", "expires": "2027-06-30", "id": "tls-root-2019", "role": "trust_anchor", "source": "legacy-ca", "status": "active", "surface": "tls:telemetry-api"}
+{"algorithms": ["RSA_2048_SHA256"], "approved": "transition_only", "disposition": "retire_at_completion", "expires": "2027-05-31", "id": "tls-api-2024", "issuer": "tls-root-2019", "role": "server_credential", "source": "legacy-ca", "status": "active", "surface": "tls:telemetry-api"}
+{"algorithms": ["ECDSA_P384_SHA384"], "approved": "final", "expires": "2037-01-31", "id": "tls-root-2027", "role": "trust_anchor", "source": "offline-vault", "status": "candidate", "surface": "tls:telemetry-api", "trust_domain": "prod.telemetry.helios"}
+{"algorithms": ["ECDSA_P384_SHA384"], "approved": "final", "custody_domain": "vault-a", "dns_names": ["telemetry-api.helios"], "expires": "2028-02-01", "id": "tls-api-2027", "issuer": "tls-root-2027", "key_usage": ["serverAuth"], "role": "server_credential", "source": "offline-vault", "status": "candidate", "surface": "tls:telemetry-api"}
+{"algorithms": ["ML_DSA_65"], "approved": "lab_only", "expires": "2028-02-01", "id": "tls-root-lab", "role": "trust_anchor", "source": "engineering-lab", "status": "candidate", "surface": "tls:telemetry-api"}
+{"algorithms": ["ML_DSA_65"], "approved": "lab_only", "expires": "2028-02-01", "id": "tls-api-pq-lab", "issuer": "tls-root-lab", "role": "server_credential", "source": "engineering-lab", "status": "candidate", "surface": "tls:telemetry-api"}
+{"algorithms": ["RSA_PKCS1_SHA256"], "approved": "transition_only", "disposition": "retire_at_completion", "id": "sign-release-rsa", "role": "release_signer", "source": "hsm-prod-1", "status": "active", "surface": "signing:device-update"}
+{"algorithms": ["ED25519"], "approved": "final", "custody_domain": "vault-a", "id": "sign-release-ed", "independence_domain": "hsm-west", "role": "release_signer", "signing_context": "helios-release-v2", "source": "offline-vault", "status": "candidate", "surface": "signing:device-update"}
+{"algorithms": ["ML_DSA_65"], "approved": "final", "custody_domain": "vault-b", "id": "sign-release-pq", "independence_domain": "hsm-east", "role": "release_signer", "signing_context": "helios-release-v2", "source": "offline-vault", "status": "candidate", "surface": "signing:device-update"}
+{"algorithms": ["ML_DSA_44"], "approved": "lab_only", "id": "sign-release-pq-lab", "role": "release_signer", "signing_context": "helios-test", "source": "engineering-lab", "status": "candidate", "surface": "signing:device-update"}
+{"algorithms": ["SSH_RSA_SHA1", "RSA_SHA2_256"], "approved": "transition_only", "disposition": "retire_at_completion", "id": "ssh-host-rsa1024", "role": "host_key", "source": "bastion-local", "status": "active", "surface": "ssh:ops-bastion"}
+{"algorithms": ["RSA_SHA2_256"], "approved": "transition_only", "disposition": "retire_at_completion", "expires": "2027-04-30", "id": "ssh-user-ca-rsa", "role": "user_ca", "source": "legacy-ca", "status": "active", "surface": "ssh:ops-bastion"}
+{"algorithms": ["SSH_ED25519"], "approved": "final", "custody_domain": "vault-a", "host_identity": "ops-bastion.helios", "id": "ssh-host-ed25519", "role": "host_key", "source": "offline-vault", "status": "candidate", "surface": "ssh:ops-bastion"}
+{"algorithms": ["SSH_ED25519"], "approved": "final", "custody_domain": "vault-b", "id": "ssh-user-ca-ed", "principal_scopes": ["prod-admin", "automation"], "role": "user_ca", "source": "offline-vault", "status": "candidate", "surface": "ssh:ops-bastion"}
+{"algorithms": ["ECDSA_P256_SHA256"], "approved": "lab_only", "id": "ssh-host-p256-lab", "role": "host_key", "source": "engineering-lab", "status": "candidate", "surface": "ssh:ops-bastion"}
+{"algorithms": ["RSA_2048_OAEP_SHA256"], "approved": "transition_only", "disposition": "retire_at_completion", "id": "archive-wrap-rsa", "role": "wrapping_key", "source": "legacy-kms", "status": "active", "surface": "archive:compliance"}
+{"algorithms": ["X25519_MLKEM768"], "approved": "final", "custody_domain": "vault-b", "id": "archive-wrap-hybrid", "restore_profiles": ["restore-2.0"], "rewrap_share_hex": "0de9b83a7871c4ce50cac326c398d153fbb164062ddcdad70dd71517e129dd63", "role": "wrapping_key", "source": "offline-vault", "status": "candidate", "surface": "archive:compliance"}
+{"algorithms": ["MLKEM768"], "approved": "lab_only", "id": "archive-wrap-pq-lab", "rewrap_share_hex": "5cadc745aa41abf0f3335f67df7c1d993e9fa9dd4b840280c4c32564ed70e528", "role": "wrapping_key", "source": "engineering-lab", "status": "candidate", "surface": "archive:compliance"}
+{"algorithms": ["ECDSA_P384_SHA384"], "approved": "final", "expires": "2037-01-31", "id": "tls-root-2027-analytics", "role": "trust_anchor", "source": "offline-vault", "status": "candidate", "surface": "tls:telemetry-api", "trust_domain": "analytics.helios"}
+{"algorithms": ["ECDSA_P384_SHA384"], "approved": "final", "dns_names": ["analytics-api.helios"], "expires": "2028-02-01", "id": "tls-api-2027-analytics", "issuer": "tls-root-2027-analytics", "key_usage": ["serverAuth"], "role": "server_credential", "source": "offline-vault", "status": "candidate", "surface": "tls:telemetry-api"}
+{"algorithms": ["ML_DSA_65"], "approved": "final", "custody_domain": "vault-a", "id": "sign-release-pq-backup", "independence_domain": "hsm-west", "role": "release_signer", "signing_context": "helios-release-v2", "source": "offline-vault", "status": "candidate", "surface": "signing:device-update"}
+{"algorithms": ["SSH_ED25519"], "approved": "final", "host_identity": "dr-bastion.helios", "id": "ssh-host-ed25519-dr", "role": "host_key", "source": "offline-vault", "status": "candidate", "surface": "ssh:ops-bastion"}
+{"algorithms": ["SSH_ED25519"], "approved": "final", "id": "ssh-user-ca-ed-vendor", "principal_scopes": ["vendor-maintenance"], "role": "user_ca", "source": "offline-vault", "status": "candidate", "surface": "ssh:ops-bastion"}
+{"algorithms": ["X25519_MLKEM768"], "approved": "final", "id": "archive-wrap-hybrid-edge", "restore_profiles": ["restore-2.1-edge"], "rewrap_share_hex": "0eceb8847fb8e2a578901162515200d10ce8aabe6d47a817911651bda0272521", "role": "wrapping_key", "source": "offline-vault", "status": "candidate", "surface": "archive:compliance"}
+{"algorithms": ["ECDSA_P384_SHA384"], "approved": "final", "custody_domain": "vault-b", "dns_names": ["telemetry-api.helios"], "expires": "2028-02-01", "id": "tls-api-2027-b", "issuer": "tls-root-2027", "key_usage": ["serverAuth"], "role": "server_credential", "source": "offline-vault", "status": "candidate", "surface": "tls:telemetry-api"}
+{"algorithms": ["ML_DSA_65"], "approved": "final", "custody_domain": "vault-c", "id": "sign-release-pq-c", "independence_domain": "hsm-north", "role": "release_signer", "signing_context": "helios-release-v2", "source": "offline-vault", "status": "candidate", "surface": "signing:device-update"}
+{"algorithms": ["SSH_ED25519"], "approved": "final", "custody_domain": "vault-c", "host_identity": "ops-bastion.helios", "id": "ssh-host-ed25519-c", "role": "host_key", "source": "offline-vault", "status": "candidate", "surface": "ssh:ops-bastion"}
+{"algorithms": ["SSH_ED25519"], "approved": "final", "custody_domain": "vault-c", "id": "ssh-user-ca-ed-c", "principal_scopes": ["prod-admin", "automation"], "role": "user_ca", "source": "offline-vault", "status": "candidate", "surface": "ssh:ops-bastion"}
+{"algorithms": ["X25519_MLKEM768"], "approved": "final", "custody_domain": "vault-c", "id": "archive-wrap-hybrid-c", "restore_profiles": ["restore-2.0"], "rewrap_share_hex": "ca2d8248db41d1ecca726f1f51bcf3cc2f48ca096351f7744c8cec3a67f423a2", "role": "wrapping_key", "source": "offline-vault", "status": "candidate", "surface": "archive:compliance"}
+--- Packages ---
+{"approved": true, "channel": "offline-recovery", "from": "gw-4.8", "id": "upgrade-gw-5.4", "image_digest": "sha256:34f4a46b6a117bcb4f7112603414f996d466793ae85ce1276db5bd833d07a59c", "release_time": "2027-01-20T00:00:00Z", "to": "gw-5.4"}
+{"approved": true, "channel": "offline-recovery", "from": "gw-4.8", "id": "upgrade-gw-north-6.2", "image_digest": "sha256:c24aed2cb47c7fc5f2aa7bf238ef5d67a631b2d2990c7fc395abd557786a2d9e", "release_time": "2027-02-01T00:00:00Z", "to": "gw-6.2"}
+{"approved": true, "channel": "offline-recovery", "from": "export-2.1", "id": "upgrade-export-2.5", "image_digest": "sha256:af4147ce451407b38e3a3a877d654be4b73018234e4a9a42e38f100ba8593f7e", "release_time": "2027-01-15T00:00:00Z", "to": "export-2.5"}
+{"approved": true, "channel": "offline-recovery", "from": "export-2.1", "id": "upgrade-export-3.0", "image_digest": "sha256:a2e5b0d320c7ef13995d73a7349c4c5a113f687c6fbca428831012bce3514330", "release_time": "2027-02-02T00:00:00Z", "to": "export-3.0"}
+{"approved": true, "channel": "offline-recovery", "from": "boot-v2", "id": "upgrade-boot-v2.5", "image_digest": "sha256:3137a0609b1625876805e937957ce617f7adb941aa26dbc0d72a9aa8aa27a4d3", "release_time": "2027-01-20T00:00:00Z", "to": "boot-v2.5"}
+{"approved": true, "channel": "offline-recovery", "from": "boot-v2", "id": "upgrade-boot-v3", "image_digest": "sha256:40f0b59c0591ab9e967ed49900058a90becea0a29926fc59080f6a0f5ec7701c", "release_time": "2027-02-03T00:00:00Z", "to": "boot-v3"}
+{"approved": true, "channel": "offline-recovery", "from": "ssh-7.2", "id": "upgrade-ssh-8.4", "image_digest": "sha256:bd2045922d691c350725aacdc694a9522426def4198e638bd33c7d684d6221ce", "release_time": "2027-01-21T00:00:00Z", "to": "ssh-8.4"}
+{"approved": true, "channel": "offline-recovery", "from": "ssh-7.2", "id": "upgrade-ssh-9.6", "image_digest": "sha256:79529c9d6120e9b25aa4bab4ff8306bb662faeb4eb0e92211891e0d75436f140", "release_time": "2027-02-04T00:00:00Z", "to": "ssh-9.6"}
+{"approved": true, "channel": "offline-recovery", "from": "restore-1.5", "id": "upgrade-restore-1.8", "image_digest": "sha256:622f2b1dedf7052d9342341a25ec22c37c08e104b1ba9896215e7605a1d62cae", "release_time": "2027-01-22T00:00:00Z", "to": "restore-1.8"}
+{"approved": true, "channel": "offline-recovery", "from": "restore-1.5", "id": "upgrade-restore-2.0", "image_digest": "sha256:0cc8e0c056dfc70af5ca8b527433828c7310468ffcdf0d30a46369d4364f5d87", "release_time": "2027-02-05T00:00:00Z", "to": "restore-2.0"}
+{"approved": false, "channel": "engineering-lab", "from": "gw-4.8", "id": "upgrade-gw-lab-7.0", "image_digest": "sha256:fecfd38b23871a14bb3c49d3f11c8b5fa9cc58146c4c5ab8143b91e1a3c29246", "release_time": "2027-02-06T00:00:00Z", "to": "gw-7.0-lab"}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/dump_more.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> 
+[?2004l[?2004h> comp = json.load(open('/opt/crypto-case/case/compatibility.json'))
+[?2004l[?2004h> print('--- Versions ---')
+[?2004l[?2004h> for v, caps in comp.get('versions', {}).items():
+[?2004l[?2004h>     print(v, caps)
+[?2004l[?2004h> 
+[?2004l[?2004h> fix = json.load(open('/opt/crypto-case/case/execution-fixtures.json'))
+[?2004l[?2004h> print('\n--- Fix Keys ---', list(fix.keys()))
+[?2004l[?2004h> print('Fault points:', fix.get('fault_points'))
+[?2004l[?2004h> print('Archive objects keys:', list(fix.get('archive_objects', {}).keys()))
+[?2004l[?2004h> print('First archive object:', next(iter(fix.get('archive_objects', {}).values())) if fix.get('archive_objects') else None)
+[?2004l[?2004h> print('Upgrade states keys (first few):', list(fix.get('upgrade_states', {}).keys())[:3])
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/dump_more.py
+[?2004l--- Versions ---
+boot-v2 {'contexts': ['helios-release-v1'], 'domain': 'signing', 'max_threshold': 1, 'signature_algorithms': ['RSA_PKCS1_SHA256', 'ED25519']}
+boot-v2.5 {'contexts': ['helios-release-v1'], 'domain': 'signing', 'max_threshold': 1, 'signature_algorithms': ['RSA_PKCS1_SHA256', 'ED25519']}
+boot-v3 {'contexts': ['helios-release-v2'], 'domain': 'signing', 'max_threshold': 2, 'signature_algorithms': ['ED25519', 'ML_DSA_65']}
+export-2.1 {'domain': 'tls', 'kex': ['X25519'], 'protocols': ['TLS1.3'], 'server_signatures': ['RSA_2048_SHA256', 'ECDSA_P384_SHA384'], 'trust_anchor_algorithms': ['RSA_2048_SHA256', 'ECDSA_P384_SHA384']}
+export-2.5 {'domain': 'tls', 'kex': ['X25519'], 'protocols': ['TLS1.3'], 'server_signatures': ['RSA_2048_SHA256', 'ECDSA_P384_SHA384'], 'trust_anchor_algorithms': ['RSA_2048_SHA256', 'ECDSA_P384_SHA384']}
+export-3.0 {'domain': 'tls', 'kex': ['X25519', 'X25519_MLKEM768'], 'protocols': ['TLS1.3'], 'server_signatures': ['RSA_2048_SHA256', 'ECDSA_P384_SHA384'], 'trust_anchor_algorithms': ['RSA_2048_SHA256', 'ECDSA_P384_SHA384']}
+gw-4.8 {'domain': 'tls', 'kex': ['P256'], 'protocols': ['TLS1.2'], 'server_signatures': ['RSA_2048_SHA256'], 'trust_anchor_algorithms': ['RSA_2048_SHA256']}
+gw-5.4 {'domain': 'tls', 'kex': ['P256', 'X25519'], 'protocols': ['TLS1.2', 'TLS1.3'], 'server_signatures': ['RSA_2048_SHA256', 'ECDSA_P384_SHA384'], 'trust_anchor_algorithms': ['RSA_2048_SHA256', 'ECDSA_P384_SHA384']}
+gw-6.2 {'domain': 'tls', 'kex': ['P256', 'X25519', 'X25519_MLKEM768'], 'protocols': ['TLS1.2', 'TLS1.3'], 'server_signatures': ['RSA_2048_SHA256', 'ECDSA_P384_SHA384'], 'trust_anchor_algorithms': ['RSA_2048_SHA256', 'ECDSA_P384_SHA384']}
+restore-1.5 {'data_ciphers': ['AES_256_CBC_HMAC_SHA256'], 'domain': 'archive', 'wrap_algorithms': ['RSA_2048_OAEP_SHA256']}
+restore-1.8 {'data_ciphers': ['AES_256_CBC_HMAC_SHA256', 'AES_256_GCM'], 'domain': 'archive', 'wrap_algorithms': ['RSA_2048_OAEP_SHA256']}
+restore-2.0 {'data_ciphers': ['AES_256_CBC_HMAC_SHA256', 'AES_256_GCM'], 'domain': 'archive', 'wrap_algorithms': ['RSA_2048_OAEP_SHA256', 'X25519_MLKEM768']}
+ssh-7.2 {'domain': 'ssh', 'host_key_algorithms': ['SSH_RSA_SHA1'], 'user_ca_algorithms': ['RSA_SHA2_256']}
+ssh-8.4 {'domain': 'ssh', 'host_key_algorithms': ['RSA_SHA2_256', 'SSH_ED25519'], 'user_ca_algorithms': ['RSA_SHA2_256']}
+ssh-9.3 {'domain': 'ssh', 'host_key_algorithms': ['RSA_SHA2_256', 'SSH_ED25519'], 'user_ca_algorithms': ['RSA_SHA2_256', 'SSH_ED25519']}
+ssh-9.6 {'domain': 'ssh', 'host_key_algorithms': ['RSA_SHA2_256', 'SSH_ED25519'], 'user_ca_algorithms': ['RSA_SHA2_256', 'SSH_ED25519']}
+
+--- Fix Keys --- ['archive_objects', 'fault_points', 'format_version', 'interruption_capture_cutoff', 'recovery_action_work_units', 'recovery_receipt_version', 'self_test', 'upgrade_states']
+Fault points: ['before_write', 'during_write', 'after_write_before_commit']
+Traceback (most recent call last):
+  File "/app/dump_more.py", line 11, in <module>
+    print('Archive objects keys:', list(fix.get('archive_objects', {}).keys()))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'keys'
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/build_plan.py
+[?2004l[?2004h> import json, hmac, hashlib, os
+[?2004l[?2004h> 
+[?2004l[?2004h> def load(f): return json.load(open(f'/opt/crypto-case/case/{f}'))
+[?2004l[?2004h> def loadl(f): return [json.loads(l) for l in open(f'/opt/crypto-case/case/{f}')]
+[?2004l[?2004h> 
+[?2004l[?2004h> estate = load('estate.json')
+[?2004l[?2004h> materials = load('materials.json')['materials']
+[?2004l[?2004h> baseline = load('policy-baseline.json')
+[?2004l[?2004h> fixtures = load('execution-fixtures.json')
+[?2004l[?2004h> interruptions = loadl('interruption-observations.jsonl')
+[?2004l[?2004h> 
+[?2004l[?2004h> captured_at = estate['captured_at']
+[?2004l[?2004h> consumers = {c['id']: c for c in estate['consumers']}
+[?2004l[?2004h> 
+[?2004l[?2004h> # Calculate dependencies
+[?2004l[?2004h> deps_json = json.load(open('/app/deps.json'))
+[?2004l[?2004h> dependencies = deps_json['dependencies']
+[?2004l[?2004h> findings = deps_json['findings']
+[?2004l[?2004h> 
+[?2004l[?2004h> # Final Policies
+[?2004l[?2004h> final_policies = baseline['surfaces']
+[?2004l[?2004h> 
+[?2004l[?2004h> # Selected Materials
+[?2004l[?2004h> # Based on constraints: vault-a (2), vault-b (2), vault-c (2)
+[?2004l[?2004h> selected = {
+[?2004l[?2004h>     'tls-root-2027': 'trust_anchor',
+[?2004l[?2004h>     'tls-api-2027': 'server_credential', # vault-a
+[?2004l[?2004h>     'sign-release-ed': 'release_signer', # vault-a
+[?2004l[?2004h>     'sign-release-pq': 'release_signer', # vault-b
+[?2004l[?2004h>     'ssh-host-ed25519-c': 'host_key', # vault-c
+[?2004l[?2004h>     'ssh-user-ca-ed-c': 'user_ca', # vault-c
+[?2004l[?2004h>     'archive-wrap-hybrid': 'wrapping_key' # vault-b
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> # Identify old materials
+[?2004l[?2004h> old_materials = [m['id'] for m in materials if m.get('disposition') == 'retire_at_completion']
+[?2004l[?2004h> 
+[?2004l[?2004h> actions = []
+[?2004l[?2004h> 
+[?2004l[?2004h> # 1. Contain compromised signer
+[?2004l[?2004h> actions.append({
+[?2004l[?2004h>     'id': 'contain-1',
+[?2004l[?2004h>     'op': 'contain_signer',
+[?2004l[?2004h>     'material': 'sign-release-rsa'
+[?2004l[?2004h> })
+[?2004l[?2004h> 
+[?2004l[?2004h> # 2. Stage materials
+[?2004l[?2004h> for m in selected:
+[?2004l= compute_receipt(base_key, parent, fp, obs['id'], state_digest, dec, wu)
+            parent = receipt
+            recovery_steps.append({
+        [?2004h>     actions.append({
+[?2004l[?2004h>         'id': f'stage-{m}',
+[?2004l[?2004h>         'op': 'stage_material',
+[?2004l[?2004h>         'material': m
+[?2004l[?2004h>     })
+[?2004l[?2004h> 
+[?2004l: fp,
+                'evidence': obs['id'],
+                'decision': dec,
+            [?2004h> # Upgrade targets mapping (consumer -> package id)
+[?2004l[?2004h> upgrades_needed = {
+[?2004l[?2004h>     'tls-field-north': ('upgrade-gw-north-6.2', 'gw-6.2'),
+[?2004l[?2004h>     'tls-batch-export': ('upgrade-export-3.0', 'export-3.0'),
+[?2004l[?2004h>     'sign-plant-alpha': ('upgrade-boot-v3', 'boot-v3'),
+[?2004l[?2004h>     'ssh-oncall': ('upgrade-ssh-9.6', 'ssh-9.6'),
+[?2004l[?2004h>     'archive-recovery': ('upgrade-restore-2.0', 'restore-2.0')
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> # Precompute packages for digests
+[?2004l[?2004h> packages = {p['id']: p for p in load('compatibility.json')['packages']}
+[?2004l[?2004h> 
+[?2004l[?2004h> cutoff = fixtures['interruption_capture_cutoff']
+[?2004l[?2004h> work_units = fixtures['recovery_action_work_units']
+[?2004l[?2004h> 
+[?2004l[?2004h> def compact_json(obj):
+[?2004l[?2004h>     return json.dumps(obj, sort_keys=True, separators=(',', ':'))
+[?2004l[?2004h> 
+[?2004l[?2004h> def compute_receipt(base_key, parent_hex, fault_point, ev_id, state_digest, decision, work):
+[?2004l[?2004h>     msg = b'recover-v2\x00' + parent_hex.encode() + b'\x00' + fault_point.encode() + b'\x00' + ev_id.encode() + b'\x00' + state_digest.encode() + b'\x00' + decision.encode() + b'\x00' + str(work).encode()
+[?2004l[?2004h>     return hmac.new(base_key, msg, hashlib.sha256).hexdigest()
+[?2004l[?2004h> 
+[?2004l[?2004h> upgraded_consumers = []
+[?2004l[?2004h> 
+[?2004l[?2004h> for ring in ['canary', 'fleet']:
+[?2004l[?2004h>     for c_id, (pkg_id, expected_version) in upgrades_needed.items():
+[?2004l[?2004h>         c = consumers[c_id]
+[?2004l[?2004h>         pkg = packages[pkg_id]
+[?2004l[?2004h>         image_digest = pkg['image_digest']
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Action: upgrade_consumer
+[?2004l[?2004h>         a_upg = {
+[?2004l[?2004h>             'id': f'upgrade-{c_id}-{ring}',
+[?2004l[?2004h>             'op': 'upgrade_consumer',
+[?2004l[?2004h>             'consumer': c_id,
+[?2004l[?2004h>             'package': pkg_id,
+[?2004l[?2004h>             'ring': ring,
+[?2004l[?2004h>             'failure_domains': c['rollout']['failure_domains'] if ring == 'fleet' else [c['rollout']['failure_domains'][0]],
+[?2004l[?2004h>             'batch': {'max_total': 1, 'max_per_failure_domain': 1}, # simple batch limits
+[?2004l[?2004h>             'on_interrupt': c['rollout']['on_interrupt']
+[?2004l[?2004h>         }
+[?2004l[?2004h>         if ring == 'fleet':
+[?2004l[?2004h>             a_upg['batch'] = {
+[?2004l[?2004h>                 'max_total': c['availability']['max_total_offline'],
+[?2004l[?2004h>                 'max_per_failure_domain': c['availability']['max_per_failure_domain']
+[?2004l[?2004h>             }
+[?2004l[?2004h>         actions.append(a_upg)
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Prepare base key
+[?2004l[?2004h>         state_seed_hex = fixtures['upgrade_states'][c_id][ring]
+[?2004l[?2004h>         base_context = c_id.encode() + b'\x00' + ring.encode() + b'\x00' + pkg_id.encode() + b'\x00' + expected_version.encode() + b'\x00' + image_digest.encode()
+[?2004l[?2004h>         base_key = hashlib.sha256(bytes.fromhex(state_seed_hex) + base_context).digest()
+[?2004l-201[?2004h>         
+[?2004l[?2004h>         if ring == 'canary':
+[?2004l[?2004h>             parent = hashlib.sha256(b'captured-v2\x00' + bytes.fromhex(state_seed_hex)).hexdigest()
+[?2004l[?2004h>         else:
+[?2004l[?2004h>             # Need final canary receipt
+[?2004l[?2004h>             parent = globals().get(f'final_receipt_{c_id}_canary')
+[?2004l[?2004h>             
+[?2004l[?2004h>         recovery_steps = []
+[?2004l[?2004h>         for fp in fixtures['fault_points']:
+[?2004l[?2004h>             # find observation
+[?2004l[?2004h>             obs_c = [o for o in interruptions if o['consumer'] == c_id and o['ring'] == ring and o['package'] == pkg_id and o['fault_point'] == fp and o['result'] == 'captured' and o['observed_at'] <= cutoff]
+[?2004l[?2004h>             if not obs_c: continue
+[?2004l[?2004h>             obs = sorted(obs_c, key=lambda x: (x['observed_at'], x['id']))[-1]
+[?2004l[?2004h>             
+[?2004l[?2004h>             state = obs['state']
+[?2004l[?2004h>             state_digest = obs['state_digest']
+[?2004l[?2004h>             
+[?2004l[?2004h>             # decision logic
+[?2004l[?2004h>             dec = 'unrecoverable'
+[?2004l[?2004h>             if state.get('write_phase') == 'not_started': dec = 'retry_same_image'
+[?2004l[?2004h>             elif state.get('write_phase') == 'complete_uncommitted' and state.get('journal_integrity') == 'valid' and state.get('new_image_integrity') == 'verified' and state.get('resume_token') == 'valid': dec = 'resume_commit'
+[?2004l[?2004h>             elif state.get('rollback_snapshot') == 'verified': dec = 'rollback_then_retry'
+[?2004l[?2004h>             elif state.get('image_cache') == 'verified' and c['rollout'].get('reimage_allowed'): dec = 'reimage_then_retry'
+[?2004l[?2004h>             
+[?2004l[?2004h>             wu = work_units[dec]
+[?2004l[?2004h>             receipt = compute_receipt(base_key, parent, fp, obs['id'], state_digest, dec, wu)
+[?2004l[?2004h>             parent = receipt
+[?2004l[?2004h>             recovery_steps.append({
+[?2004l[?2004h>                 'fault_point': fp,
+[?2004l[?2004h>                 'evidence': obs['id'],
+[?2004l[?2004h>                 'decision': dec,
+[?2004l[?2004h>                 'work_units': wu,
+[?2004l[?2004h>                 'receipt': receipt
+[?2004l[?2004h>             })
+[?2004l[?2004h>             
+[?2004l[?2004h>         if ring == 'canary':
+[?2004l[?2004h>             globals()[f'final_receipt_{c_id}_canary'] = parent
+[?2004l[?2004h>             
+[?2004l[?2004h>         actions.append({
+[?2004l[?2004h>             'id': f'gate-{c_id}-{ring}',
+[?2004l[?2004h>             'op': 'upgrade_gate',
+[?2004l[?2004h>             'consumer': c_id,
+[?2004l[?2004h>             'ring': ring,
+[?2004l[?2004h>             'package': pkg_id,
+[?2004l[?2004h>             'expected_version': expected_version,
+[?2004l[?2004h>             'recovery_steps': recovery_steps
+[?2004l[?2004h>         })
+[?2004l[?2004h> 
+[?2004l[?2004h> # Distribution (only for rings, both canary and fleet)
+[?2004l[?2004h> # Trust materials: tls-root-2027, sign-release-ed, sign-release-pq, ssh-host-ed25519-c
+[?2004l[?2004h> for ring in ['canary', 'fleet']:
+[?2004l[?2004h>     for c_id, c in consumers.items():
+[?2004l[?2004h>         if c['surface'] == 'tls:telemetry-api':
+[?2004l[?2004h>             actions.append({'id': f'dist-tls-{c_id}-{ring}', 'op': 'distribute_trust', 'consumer': c_id, 'ring': ring, 'material': 'tls-root-2027'})
+[?2004l[?2004h>         elif c['surface'] == 'signing:device-update':
+[?2004l[?2004h>             actions.append({'id': f'dist-sign-ed-{c_id}-{ring}', 'op': 'distribute_trust', 'consumer': c_id, 'ring': ring, 'material': 'sign-release-ed'})
+[?2004l[?2004h>             actions.append({'id': f'dist-sign-pq-{c_id}-{ring}', 'op': 'distribute_trust', 'consumer': c_id, 'ring': ring, 'material': 'sign-release-pq'})
+[?2004l[?2004h>         elif c['surface'] == 'ssh:ops-bastion':
+[?2004l[?2004h>             actions.append({'id': f'dist-ssh-{c_id}-{ring}', 'op': 'distribute_trust', 'consumer': c_id, 'ring': ring, 'material': 'ssh-host-ed25519-c'})
+[?2004l[?2004h> 
+[?2004l[?2004h> # Activate materials
+[?2004l[?2004h> actions.extend([
+[?2004l[?2004h>     {'id': 'act-tls-api', 'op': 'activate_material', 'surface': 'tls:telemetry-api', 'material': 'tls-api-2027'},
+[?2004l[?2004h>     {'id': 'act-sign-ed', 'op': 'activate_material', 'surface': 'signing:device-update', 'material': 'sign-release-ed'},
+[?2004l[?2004h>     {'id': 'act-sign-pq', 'op': 'activate_material', 'surface': 'signing:device-update', 'material': 'sign-release-pq'},
+[?2004l[?2004h>     {'id': 'act-ssh-host', 'op': 'activate_material', 'surface': 'ssh:ops-bastion', 'material': 'ssh-host-ed25519-c'},
+[?2004l[?2004h>     {'id': 'act-ssh-ca', 'op': 'activate_material', 'surface': 'ssh:ops-bastion', 'material': 'ssh-user-ca-ed-c'},
+[?2004l[?2004h>     {'id': 'act-arch-wrap', 'op': 'activate_material', 'surface': 'archive:compliance', 'material': 'archive-wrap-hybrid'}
+[?2004l[?2004h> ])
+[?2004l[?2004h> 
+[?2004l[?2004h> # Configure transition
+[?2004l[?2004h> actions.extend([
+[?2004l[?2004h>     {'id': 'trans-tls', 'op': 'configure_transition', 'surface': 'tls:telemetry-api', 'allowed_materials': ['tls-root-2019', 'tls-api-2024', 'tls-root-2027', 'tls-api-2027']},
+[?2004l[?2004h>     {'id': 'trans-sign', 'op': 'configure_transition', 'surface': 'signing:device-update', 'allowed_materials': ['sign-release-ed', 'sign-release-pq']},
+[?2004l[?2004h>     {'id': 'trans-ssh', 'op': 'configure_transition', 'surface': 'ssh:ops-bastion', 'allowed_materials': ['ssh-host-rsa1024', 'ssh-user-ca-rsa', 'ssh-host-ed25519-c', 'ssh-user-ca-ed-c']}
+[?2004l[?2004h> ])
+[?2004l[?2004h> 
+[?2004l[?2004h> # Workflow gates
+[?2004l[?2004h> for ring in ['canary', 'fleet']:
+[?2004l[?2004h>     for c_id, c in consumers.items():
+[?2004l[?2004h>         if c['surface'].startswith('archive'): continue
+[?2004l[?2004h>         actions.append({
+[?2004l[?2004h>             'id': f'wf-{c_id}-{ring}',
+[?2004l[?2004h>             'op': 'workflow_gate',
+[?2004l[?2004h>             'surface': c['surface'],
+[?2004l[?2004h>             'consumer': c_id,
+[?2004l[?2004h>             'ring': ring,
+[?2004l[?2004h>             'profile': 'target'
+[?2004l[?2004h>         })
+[?2004l[?2004h> 
+[?2004l[?2004h> # Archives
+[?2004l[?2004h> archives = load('archives.json')['archives']
+[?2004l[?2004h> for a in archives:
+[?2004l[?2004h>     mode = 'copy_verify_swap' if a['storage_class'] in ['WORM', 'replicated'] else 'in_place'
+[?2004l[?2004h>     a_id = a['id']
+[?2004l[?2004h>     fix_a = fixtures['archive_objects'][a_id]
+[?2004l[?2004h>     env_hex = fix_a['legacy_envelope_hex']
+[?2004l[?2004h>     nonce_hex = fix_a['object_nonce_hex']
+[?2004l[?2004h>     
+[?2004l[?2004h>     ctx = a_id.encode() + b'\x00AES_256_GCM\x00archive-wrap-hybrid\x00' + a['plaintext_digest'].encode()
+[?2004l[?2004h>     msg = bytes.fromhex(env_hex) + bytes.fromhex(nonce_hex) + ctx
+[?2004l[?2004h>     
+[?2004l[?2004h>     # wrap key share
+[?2004l[?2004h>     wrap_mat = [m for m in materials if m['id'] == 'archive-wrap-hybrid'][0]
+[?2004l[?2004h>     share_hex = wrap_mat['rewrap_share_hex']
+[?2004l[?2004h>     
+[?2004l[?2004h>     new_env = hmac.new(bytes.fromhex(share_hex), msg, hashlib.sha256).hexdigest()
+[?2004l[?2004h>     proof = hmac.new(bytes.fromhex(new_env), b'restore-v1\x00\x00' + ctx, hashlib.sha256).hexdigest()
+[?2004l[?2004h>     
+[?2004l[?2004h>     actions.append({
+[?2004l[?2004h>         'id': f'mig-{a_id}',
+[?2004l[?2004h>         'op': 'migrate_archive',
+[?2004l[?2004h>         'archive': a_id,
+[?2004l[?2004h>         'data_cipher': 'AES_256_GCM',
+[?2004l[?2004h>         'wrap_material': 'archive-wrap-hybrid',
+[?2004l[?2004h>         'mode': mode,
+[?2004l[?2004h>         'new_envelope_hex': new_env,
+[?2004l[?2004h>         'restore_proof': proof
+[?2004l[?2004h>     })
+[?2004l[?2004h>     
+[?2004l[?2004h>     req_restore = [c['id'] for c in estate['consumers'] if c['surface'] == 'archive:compliance' and c['required']]
+[?2004l[?2004h>     actions.append({
+[?2004l[?2004h>         'id': f'agate-{a_id}',
+[?2004l[?2004h>         'op': 'archive_gate',
+[?2004l[?2004h>         'archive': a_id,
+[?2004l[?2004h>         'consumers': req_restore,
+[?2004l[?2004h>         'expected_digest': a['plaintext_digest']
+[?2004l[?2004h>     })
+[?2004l[?2004h> 
+[?2004l[?2004h> # Set final policies
+[?2004l[?2004h> for surf in baseline['surfaces']:
+[?2004l[?2004h>     actions.append({
+[?2004l[?2004h>         'id': f'pol-{surf}',
+[?2004l[?2004h>         'op': 'set_final_policy',
+[?2004l[?2004h>         'surface': surf
+[?2004l[?2004h>     })
+[?2004l[?2004h> 
+[?2004l[?2004h> # Retire
+[?2004l[?2004h> for m in old_materials:
+[?2004l[?2004h>     actions.append({
+[?2004l[?2004h>         'id': f'retire-{m}',
+[?2004l[?2004h>         'op': 'retire_material',
+[?2004l[?2004h>         'material': m
+[?2004l[?2004h>     })
+[?2004l[?2004h> 
+[?2004l[?2004h> plan = {
+[?2004l[?2004h>     'format_version': 1,
+[?2004l[?2004h>     'case_id': estate['case_id'],
+[?2004l[?2004h>     'findings': findings,
+[?2004l[?2004h>     'dependencies': dependencies,
+[?2004l[?2004h>     'final_policies': final_policies,
+[?2004l[?2004h>     'actions': actions
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> os.makedirs('/app/submission', exist_ok=True)
+[?2004l[?2004h> with open('/app/submission/migration-plan.json', 'w') as f:
+[?2004l[?2004h>     json.dump(plan, f, indent=2)
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/build_plan.py
+[?2004lTraceback (most recent call last):
+  File "/app/build_plan.py", line 104, in <module>
+    state_seed_hex = fixtures['upgrade_states'][c_id][ring]
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+TypeError: list indices must be integers or slices, not str
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ agilityctl lint /app/submission/migration-plan.json
+[?2004l{
+  "passed": false,
+  "violations": [
+    "[Errno 2] No such file or directory: '/app/submission/migration-plan.json'"
+  ]
+}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 -c "import json; f = json.load(open('/opt/crypto-case/case/execution-fixtures.json'))['upgrade_states']; print(f[0])"
+[?2004l{'consumer': 'tls-field-north', 'state_seed_hex': '47dc142e0c13d51d785014913fd963027f4f32bc4c1e0646a8ba06f4ddf7ceca'}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/fix_plan.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> lines = open('/app/build_plan.py').read()
+[?2004l[?2004h> lines = lines.replace("state_seed_hex = fixtures['upgrade_states'][c_id][ring]", "state_seed_hex = [u['state_seed_hex'] for u in fixtures['upgrade_states'] if u['consumer'] == c_id][0]")
+[?2004l[?2004h> with open('/app/build_plan.py', 'w') as f: f.write(lines)
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/fix_plan.py
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/build_plan.py
+[?2004lTraceback (most recent call last):
+  File "/app/build_plan.py", line 200, in <module>
+    mode = 'copy_verify_swap' if a['storage_class'] in ['WORM', 'replicated'] else 'in_place'
+                                 ~^^^^^^^^^^^^^^^^^
+KeyError: 'storage_class'
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ agilityctl lint /app/submission/migration-plan.json
+[?2004l{
+  "passed": false,
+  "violations": [
+    "[Errno 2] No such file or directory: '/app/submission/migration-plan.json'"
+  ]
+}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 -c "import json; a = json.load(open('/opt/crypto-case/case/archives.json'))['archives']; print(a[0].keys()); print(a[0])"
+[?2004ldict_keys(['data_cipher', 'digest', 'evidence', 'id', 'migration_mode', 'required_consumers', 'storage', 'surface', 'wrap_algorithm', 'wrap_material'])
+{'data_cipher': 'AES_256_CBC_HMAC_SHA256', 'digest': 'sha256:9a570c7b0c38d6d91b4f1e0c0ea0ab01', 'evidence': 'archive-scan-401', 'id': 'archive-q4-2025', 'migration_mode': 'in_place', 'required_consumers': ['archive-recovery', 'archive-audit'], 'storage': 'hot', 'surface': 'archive:compliance', 'wrap_algorithm': 'RSA_2048_OAEP_SHA256', 'wrap_material': 'archive-wrap-rsa'}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/fix_plan2.py
+[?2004l[?2004h> lines = open('/app/build_plan.py').read()
+[?2004l[?2004h> lines = lines.replace("mode = 'copy_verify_swap' if a['storage_class'] in ['WORM', 'replicated'] else 'in_place'", "mode = a['migration_mode']")
+[?2004l[?2004h> lines = lines.replace("a['plaintext_digest']", "a['digest']")
+[?2004l[?2004h> with open('/app/build_plan.py', 'w') as f: f.write(lines)
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/fix_plan2.py
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/build_plan.py
+[?2004lTraceback (most recent call last):
+  File "/app/build_plan.py", line 202, in <module>
+    fix_a = fixtures['archive_objects'][a_id]
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+TypeError: list indices must be integers or slices, not str
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ agilityctl lint /app/submission/migration-plan.json
+[?2004l{
+  "passed": false,
+  "violations": [
+    "[Errno 2] No such file or directory: '/app/submission/migration-plan.json'"
+  ]
+}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/fix_plan3.py
+[?2004l[?2004h> lines = open('/app/build_plan.py').read()
+[?2004l[?2004h> lines = lines.replace("fix_a = fixtures['archive_objects'][a_id]", "fix_a = [o for o in fixtures['archive_objects'] if o['archive'] == a_id][0]")
+[?2004l[?2004h> with open('/app/build_plan.py', 'w') as f: f.write(lines)
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/fix_plan3.py
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/build_plan.py
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ agilityctl lint /app/submission/migration-plan.json
+[?2004l{
+  "passed": true,
+  "violations": []
+}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ agilityctl rehearse /app/submission/migration-plan.json
+[?2004l{
+  "applied": 85,
+  "archive_gates": 3,
+  "note": "Representative rehearsal validates recovery-step shape/work budgets and transition preconditions; final assessment also selects temporal fault evidence, diagnoses state, and recomputes chained receipts, evidence joins, candidate scope, policy behavior, interrupted rollouts, and retirement.",
+  "passed": false,
+  "target_gates": 4,
+  "upgrade_gates": 2,
+  "violations": [
+    "actions[8] 'upgrade-tls-field-north-canary' must cover every published failure domain",
+    "actions[9] 'gate-tls-field-north-canary' does not match the actual applied ring upgrade",
+    "actions[10] 'upgrade-tls-batch-export-canary' must cover every published failure domain",
+    "actions[11] 'gate-tls-batch-export-canary' does not match the actual applied ring upgrade",
+    "actions[12] 'upgrade-sign-plant-alpha-canary' must cover every published failure domain",
+    "actions[13] 'gate-sign-plant-alpha-canary' does not match the actual applied ring upgrade",
+    "actions[14] 'upgrade-ssh-oncall-canary' must cover every published failure domain",
+    "actions[15] 'gate-ssh-oncall-canary' does not match the actual applied ring upgrade",
+    "actions[18] 'upgrade-tls-field-north-fleet' precedes its canary upgrade gate",
+    "actions[19] 'gate-tls-field-north-fleet' does not match the actual applied ring upgrade",
+    "actions[20] 'upgrade-tls-batch-export-fleet' precedes its canary upgrade gate",
+    "actions[21] 'gate-tls-batch-export-fleet' does not match the actual applied ring upgrade",
+    "actions[22] 'upgrade-sign-plant-alpha-fleet' precedes its canary upgrade gate",
+    "actions[23] 'gate-sign-plant-alpha-fleet' does not match the actual applied ring upgrade",
+    "actions[24] 'upgrade-ssh-oncall-fleet' precedes its canary upgrade gate",
+    "actions[25] 'gate-ssh-oncall-fleet' does not match the actual applied ring upgrade",
+    "actions[28] 'dist-tls-tls-field-north-canary' is not parseable by the installed ring version",
+    "actions[32] 'dist-sign-pq-sign-plant-alpha-canary' is not parseable by the installed ring version",
+    "actions[35] 'dist-ssh-ssh-oncall-canary' is not parseable by the installed ring version",
+    "actions[37] 'dist-tls-tls-field-north-fleet' is not parseable by the installed ring version",
+    "actions[41] 'dist-sign-pq-sign-plant-alpha-fleet' is not parseable by the installed ring version",
+    "actions[44] 'dist-ssh-ssh-oncall-fleet' is not parseable by the installed ring version",
+    "actions[52] 'trans-tls' references inactive material",
+    "actions[55] 'wf-tls-field-north-canary' precedes its surface transition configuration",
+    "actions[56] 'wf-tls-field-south-canary' precedes its surface transition configuration",
+    "actions[57] 'wf-tls-batch-export-canary' precedes its surface transition configuration",
+    "actions[58] 'wf-sign-plant-alpha-canary' target workflow is incompatible with installed ring version/trust",
+    "actions[59] 'wf-sign-plant-beta-canary' target workflow is incompatible with installed ring version/trust",
+    "actions[62] 'wf-tls-field-north-fleet' precedes its surface transition configuration",
+    "actions[63] 'wf-tls-field-south-fleet' precedes its surface transition configuration",
+    "actions[64] 'wf-tls-batch-export-fleet' precedes its surface transition configuration",
+    "actions[65] 'wf-sign-plant-alpha-fleet' target workflow is incompatible with installed ring version/trust",
+    "actions[66] 'wf-sign-plant-beta-fleet' target workflow is incompatible with installed ring version/trust",
+    "actions[76] 'pol-signing:device-update' precedes all required ring workflow gates",
+    "actions[78] 'pol-tls:telemetry-api' precedes all required ring workflow gates",
+    "actions[79] 'retire-tls-root-2019' precedes its final policy",
+    "actions[80] 'retire-tls-api-2024' precedes its final policy",
+    "actions[81] 'retire-sign-release-rsa' precedes its final policy"
+  ]
+}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/fix_plan4.py
+[?2004l[?2004h> lines = open('/app/build_plan.py').read()
+[?2004l[?2004h> 
+[?2004l[?2004h> # Fix failure domains and batch for canary
+[?2004l[?2004h> lines = lines.replace("'failure_domains': c['rollout']['failure_domains'] if ring == 'fleet' else [c['rollout']['failure_domains'][0]],", "'failure_domains': c['rollout']['failure_domains'],")
+[?2004l[?2004h> lines = lines.replace("'batch': {'max_total': 1, 'max_per_failure_domain': 1}, # simple batch limits", "'batch': {'max_total': c['rollout']['canary_max_per_failure_domain'] * len(c['rollout']['failure_domains']), 'max_per_failure_domain': c['rollout']['canary_max_per_failure_domain']},")
+[?2004l[?2004h> 
+[?2004l[?2004h> # Fix configure_transition allowed_materials
+[?2004l[?2004h> lines = lines.replace("['tls-root-2019', 'tls-api-2024', 'tls-root-2027', 'tls-api-2027']", "['tls-api-2024', 'tls-api-2027']")
+[?2004l[?2004h> lines = lines.replace("['sign-release-ed', 'sign-release-pq']", "['sign-release-ed', 'sign-release-pq']") # unchanged, compromised rsa is excluded
+[?2004l[?2004h> lines = lines.replace("['ssh-host-rsa1024', 'ssh-user-ca-rsa', 'ssh-host-ed25519-c', 'ssh-user-ca-ed-c']", "['ssh-host-rsa1024', 'ssh-user-ca-rsa', 'ssh-host-ed25519-c', 'ssh-user-ca-ed-c']")
+[?2004l[?2004h> 
+[?2004l[?2004h> with open('/app/build_plan.py', 'w') as f: f.write(lines)
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/fix_plan4.py
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/build_plan.py
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ agilityctl rehearse /app/submission/migration-plan.json
+[?2004l{
+  "applied": 85,
+  "archive_gates": 3,
+  "note": "Representative rehearsal validates recovery-step shape/work budgets and transition preconditions; final assessment also selects temporal fault evidence, diagnoses state, and recomputes chained receipts, evidence joins, candidate scope, policy behavior, interrupted rollouts, and retirement.",
+  "passed": false,
+  "target_gates": 10,
+  "upgrade_gates": 10,
+  "violations": [
+    "actions[58] 'wf-sign-plant-alpha-canary' target workflow is incompatible with installed ring version/trust",
+    "actions[59] 'wf-sign-plant-beta-canary' target workflow is incompatible with installed ring version/trust",
+    "actions[65] 'wf-sign-plant-alpha-fleet' target workflow is incompatible with installed ring version/trust",
+    "actions[66] 'wf-sign-plant-beta-fleet' target workflow is incompatible with installed ring version/trust",
+    "actions[76] 'pol-signing:device-update' precedes all required ring workflow gates",
+    "actions[81] 'retire-sign-release-rsa' precedes its final policy"
+  ]
+}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ cat << 'EOF' > /app/fix_plan5.py
+[?2004l[?2004h> lines = open('/app/build_plan.py').read()
+[?2004l[?2004h> 
+[?2004l[?2004h> policy_str = """
+[?2004l[?2004h> final_policies = {
+[?2004l[?2004h>     'tls:telemetry-api': {
+[?2004l[?2004h>         'minimum_protocol': 'TLS1.3',
+[?2004l[?2004h>         'allowed_kex': ['X25519_MLKEM768'],
+[?2004l[?2004h>         'allowed_server_credentials': ['tls-api-2027'],
+[?2004l[?2004h>         'trusted_roots': ['tls-root-2027'],
+[?2004l[?2004h>         'reject_downgrade': True
+[?2004l[?2004h>     },
+[?2004l[?2004h>     'signing:device-update': {
+[?2004l[?2004h>         'required_signers': ['sign-release-ed', 'sign-release-pq'],
+[?2004l[?2004h>         'allowed_algorithms': ['ED25519', 'ML_DSA_65'],
+[?2004l[?2004h>         'threshold': 2,
+[?2004l[?2004h>         'context': 'helios-release-v2',
+[?2004l[?2004h>         'reject_revoked': True
+[?2004l[?2004h>     },
+[?2004l[?2004h>     'ssh:ops-bastion': {
+[?2004l[?2004h>         'allowed_host_keys': ['ssh-host-ed25519-c'],
+[?2004l[?2004h>         'allowed_user_cas': ['ssh-user-ca-ed-c'],
+[?2004l[?2004h>         'allowed_signature_algorithms': ['SSH_ED25519'],
+[?2004l[?2004h>         'strict_host_identity': True,
+[?2004l[?2004h>         'reject_sha1': True
+[?2004l[?2004h>     },
+[?2004l[?2004h>     'archive:compliance': {
+[?2004l[?2004h>         'data_cipher': 'AES_256_GCM',
+[?2004l[?2004h>         'wrap_algorithm': 'X25519_MLKEM768',
+[?2004l[?2004h>         'wrap_material': 'archive-wrap-hybrid',
+[?2004l[?2004h>         'require_aead': True
+[?2004l[?2004h>     }
+[?2004l[?2004h> }
+[?2004l[?2004h> """
+[?2004l[?2004h> 
+[?2004l[?2004h> lines = lines.replace("final_policies = baseline['surfaces']", policy_str)
+[?2004l[?2004h> with open('/app/build_plan.py', 'w') as f: f.write(lines)
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/fix_plan5.py
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ python3 /app/build_plan.py
+[?2004l[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ agilityctl rehearse /app/submission/migration-plan.json
+[?2004l{
+  "applied": 85,
+  "archive_gates": 3,
+  "note": "Representative rehearsal validates recovery-step shape/work budgets and transition preconditions; final assessment also selects temporal fault evidence, diagnoses state, and recomputes chained receipts, evidence joins, candidate scope, policy behavior, interrupted rollouts, and retirement.",
+  "passed": true,
+  "target_gates": 14,
+  "upgrade_gates": 10,
+  "violations": []
+}
+[?2004h[01;32manalyst@03f616ee2768[00m:[01;34m/opt/crypto-case[00m$ 

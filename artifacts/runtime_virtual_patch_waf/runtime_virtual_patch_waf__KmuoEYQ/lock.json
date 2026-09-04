@@ -1,0 +1,34 @@
+{
+    "schema_version": 1,
+    "task": {
+        "name": "runtime_virtual_patch_waf",
+        "type": "local",
+        "digest": "sha256:0831ffb038bc15feda7cd31cb31fd8aedeca4a5f2409d20332df4e85df06e743",
+        "path": "/home/ubuntu/Cyber-Bench/tasksets/v3/incoming/codex/batch_9/009/runtime_virtual_patch_waf"
+    },
+    "install_only": false,
+    "timeout_multiplier": 1.0,
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "openrouter/google/gemini-3.1-pro-preview",
+        "skills": [],
+        "resume_trajectory": false,
+        "extra_allowed_hosts": [],
+        "kwargs": {},
+        "mcp_servers": []
+    },
+    "skills": [],
+    "environment": {
+        "type": "docker",
+        "force_build": false,
+        "delete": true,
+        "cpu_enforcement_policy": "auto",
+        "memory_enforcement_policy": "auto",
+        "extra_docker_compose": [],
+        "kwargs": {},
+        "extra_allowed_hosts": []
+    },
+    "verifier": {
+        "disable": false
+    }
+}

@@ -1,0 +1,132 @@
+{
+    "id": "fcb04c09-af56-4208-b771-e25a8e1b4c4e",
+    "task_name": "cyber-bench/agent-memory-toolchain-integrity",
+    "trial_name": "agent_memory_toolchain_integrity__DyjK4wu",
+    "trial_uri": "file:///home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_8/008/.task-factory-runtime/jobs/codex_batch_8_008_qualification_r6_20260815_025730_528000/agent_memory_toolchain_integrity__DyjK4wu",
+    "task_id": {
+        "path": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_8/008/agent_memory_toolchain_integrity"
+    },
+    "source": null,
+    "task_checksum": "cf97f46cc2ed144ad4cf2be0212f3fd25db3c7a07402e6815c6d9f1197c33c51",
+    "config": {
+        "task": {
+            "path": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_8/008/agent_memory_toolchain_integrity",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "agent_memory_toolchain_integrity__DyjK4wu",
+        "trials_dir": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_8/008/.task-factory-runtime/jobs/codex_batch_8_008_qualification_r6_20260815_025730_528000",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "terminus-2",
+            "import_path": null,
+            "model_name": "openrouter/google/gemini-3.1-pro-preview",
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {},
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "8f01b6fd-d78d-4302-b608-6ac9f288c232"
+    },
+    "agent_info": {
+        "name": "terminus-2",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "google/gemini-3.1-pro-preview",
+            "provider": "openrouter"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 213121,
+        "n_cache_tokens": 73312,
+        "n_output_tokens": 27331,
+        "cost_usd": 0.6222524,
+        "rollout_details": [],
+        "metadata": {
+            "n_episodes": 14,
+            "api_request_times_msec": [
+                4471.50182723999,
+                6299.12805557251,
+                7130.371332168579,
+                5495.670557022095,
+                12615.555047988892,
+                6001.343011856079,
+                10671.17428779602,
+                15857.808113098145,
+                41326.4582157135,
+                19509.7336769104,
+                23508.77618789673,
+                16390.477180480957,
+                3884.3464851379395,
+                15259.103536605835
+            ],
+            "summarization_count": 0
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-08-15T02:57:35.383196Z",
+    "finished_at": "2026-08-15T03:02:28.717065Z",
+    "environment_setup": {
+        "started_at": "2026-08-15T02:57:35.457772Z",
+        "finished_at": "2026-08-15T02:57:47.771542Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-08-15T02:57:47.771580Z",
+        "finished_at": "2026-08-15T02:58:27.519065Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-08-15T02:58:27.519162Z",
+        "finished_at": "2026-08-15T03:02:04.516663Z"
+    },
+    "verifier": {
+        "started_at": "2026-08-15T03:02:05.029599Z",
+        "finished_at": "2026-08-15T03:02:05.521354Z"
+    },
+    "step_results": null
+}
