@@ -1,0 +1,739 @@
+{
+  "adversarial_scenarios": {
+    "archive_aead_hybrid_restore_accepted": true,
+    "archive_legacy_wrap_rejected": true,
+    "archive_modified_ciphertext_rejected": true,
+    "archive_wrong_restore_profile_rejected": true,
+    "classical_only_kex_rejected": true,
+    "custody_domain_capacity_enforced": false,
+    "dual_independent_release_accepted": true,
+    "legacy_certificate_rejected": true,
+    "old_context_rejected": true,
+    "revoked_signer_replay_rejected": true,
+    "same_domain_threshold_rejected": true,
+    "scoped_material_selection": false,
+    "single_signature_rejected": true,
+    "ssh_compliant_session_accepted": true,
+    "ssh_sha1_rejected": true,
+    "ssh_wrong_host_identity_rejected": true,
+    "ssh_wrong_principal_ca_rejected": true,
+    "stale_and_unbound_evidence_excluded": false,
+    "tls12_downgrade_rejected": true,
+    "tls_compliant_hybrid_handshake": true,
+    "wrong_trust_domain_certificate_rejected": true
+  },
+  "diagnostics": [
+    "dependencies do not match the temporal active-subject evidence join and archives",
+    "combined final private keys exceed a custody-domain capacity",
+    "action 15 'act-0016' strands a required consumer ring or permits a contained signer",
+    "action 17 'act-0018' has invalid/inactive transition material",
+    "action 21 'act-0022' target workflow cannot complete",
+    "action 23 'act-0024' target workflow cannot complete",
+    "action 27 'act-0028' target workflow cannot complete",
+    "action 32 'act-0033' precedes its surface transition configuration",
+    "action 35 'act-0036' precedes its surface transition configuration",
+    "action 39 'act-0040' is unsupported by the installed ring",
+    "action 40 'act-0041' target workflow cannot complete",
+    "action 42 'act-0043' is unsupported by the installed ring",
+    "action 43 'act-0044' target workflow cannot complete",
+    "action 46 'act-0047' is unsupported by the installed ring",
+    "action 47 'act-0048' is not a valid target ring gate",
+    "action 48 'act-0049' is unsupported by the installed ring",
+    "action 49 'act-0050' is not a valid target ring gate",
+    "action 53 'act-0054' target workflow cannot complete",
+    "action 55 'act-0056' target workflow cannot complete",
+    "action 59 'act-0060' target workflow cannot complete",
+    "action 64 'act-0065' precedes its surface transition configuration",
+    "action 67 'act-0068' precedes its surface transition configuration",
+    "action 71 'act-0072' is unsupported by the installed ring",
+    "action 72 'act-0073' target workflow cannot complete",
+    "action 74 'act-0075' is unsupported by the installed ring",
+    "action 75 'act-0076' target workflow cannot complete",
+    "action 78 'act-0079' is unsupported by the installed ring",
+    "action 79 'act-0080' is not a valid target ring gate",
+    "action 80 'act-0081' is unsupported by the installed ring",
+    "action 81 'act-0082' is not a valid target ring gate",
+    "action 88 'act-0089' has no valid final policy",
+    "action 89 'act-0090' has no valid final policy",
+    "action 90 'act-0091' has no valid final policy",
+    "action 91 'act-0092' has no valid final policy",
+    "action 92 'act-0093' retires out-of-scope, active, premature, or duplicate material",
+    "action 93 'act-0094' retires out-of-scope, active, premature, or duplicate material",
+    "action 94 'act-0095' retires out-of-scope, active, premature, or duplicate material",
+    "action 95 'act-0096' retires out-of-scope, active, premature, or duplicate material",
+    "action 96 'act-0097' retires out-of-scope, active, premature, or duplicate material",
+    "action 97 'act-0098' retires out-of-scope, active, premature, or duplicate material",
+    "both rings of every required workflow were not gated",
+    "completion retirement is incomplete",
+    "not every surface reached final policy",
+    "scenario failed: stale_and_unbound_evidence_excluded",
+    "scenario failed: scoped_material_selection",
+    "scenario failed: custody_domain_capacity_enforced"
+  ],
+  "diagnostics_count": 46,
+  "diagnostics_truncated": false,
+  "dimensions": {
+    "archive_migration": true,
+    "case_binding": true,
+    "compatibility_and_ring_gates": false,
+    "effective_inventory": false,
+    "evidence_scope": true,
+    "final_state": false,
+    "interruption_recovery": true,
+    "key_lifecycle": false,
+    "policy_design": false,
+    "signer_containment": true,
+    "transition_safety": false
+  },
+  "metrics": {
+    "migration_coverage": {
+      "archive_gates": {
+        "completed": 3,
+        "rate": 1.0,
+        "required": 3,
+        "unexpected": 0
+      },
+      "final_surfaces": {
+        "completed": 0,
+        "rate": 0.0,
+        "required": 4,
+        "unexpected": 0
+      },
+      "interruption_scenarios": {
+        "completed": 30,
+        "rate": 1.0,
+        "required": 30,
+        "unexpected": 0
+      },
+      "recovery_health_chains": {
+        "completed": 10,
+        "rate": 1.0,
+        "required": 10,
+        "unexpected": 0
+      },
+      "retirement": {
+        "completed": 0,
+        "rate": 0.0,
+        "required": 6,
+        "unexpected": 0
+      },
+      "signer_containment": {
+        "completed": 1,
+        "rate": 1.0,
+        "required": 1,
+        "unexpected": 0
+      },
+      "upgrade_gates": {
+        "completed": 10,
+        "rate": 1.0,
+        "required": 10,
+        "unexpected": 0
+      },
+      "workflow_gates": {
+        "completed": 0,
+        "rate": 0.0,
+        "required": 14,
+        "unexpected": 0
+      }
+    },
+    "policy_scenarios": {
+      "archives": {
+        "evaluated": 4,
+        "passed": 4,
+        "rate": 1.0,
+        "required": 4
+      },
+      "inventory_and_custody": {
+        "evaluated": 3,
+        "passed": 0,
+        "rate": 0.0,
+        "required": 3
+      },
+      "signing": {
+        "evaluated": 5,
+        "passed": 5,
+        "rate": 1.0,
+        "required": 5
+      },
+      "ssh": {
+        "evaluated": 4,
+        "passed": 4,
+        "rate": 1.0,
+        "required": 4
+      },
+      "tls": {
+        "evaluated": 5,
+        "passed": 5,
+        "rate": 1.0,
+        "required": 5
+      }
+    },
+    "strict_completion": false
+  },
+  "processed_actions": 98,
+  "reward": 0.0,
+  "scenario_groups": {
+    "archive_decryption_integrity_and_rewrap": true,
+    "custody_scope_and_signer_containment": true,
+    "failure_domain_interruption_and_transition_order": false,
+    "temporal_effective_dependency_inventory": false,
+    "tls_signing_ssh_downgrade_resistance": false,
+    "trust_rotation_and_final_retirement": false
+  },
+  "solved_service_ids": [],
+  "state_summary": {
+    "archive_gates": 3,
+    "contained": [
+      "sign-release-rsa"
+    ],
+    "final_surfaces": [],
+    "interruption_scenarios": 30,
+    "recovery_health_chains": 10,
+    "retired": [],
+    "staged": [
+      "archive-wrap-hybrid-c",
+      "sign-release-ed",
+      "sign-release-pq",
+      "ssh-host-ed25519",
+      "ssh-user-ca-ed-c",
+      "tls-api-2027",
+      "tls-root-2027"
+    ],
+    "upgrade_gates": 10,
+    "workflow_gates": 0
+  },
+  "task_mode": "defensive",
+  "transition_history": [
+    {
+      "applied": true,
+      "id": "act-0001",
+      "op": "contain_signer"
+    },
+    {
+      "applied": true,
+      "id": "act-0002",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0003",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0004",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0005",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0006",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0007",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0008",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0009",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0010",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0011",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0012",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0013",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0014",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-0015",
+      "op": "configure_transition"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 15 'act-0016' strands a required consumer ring or permits a contained signer",
+      "id": "act-0016",
+      "op": "configure_transition"
+    },
+    {
+      "applied": true,
+      "id": "act-0017",
+      "op": "configure_transition"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 17 'act-0018' has invalid/inactive transition material",
+      "id": "act-0018",
+      "op": "configure_transition"
+    },
+    {
+      "applied": true,
+      "id": "act-0019",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0020",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0021",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 21 'act-0022' target workflow cannot complete",
+      "id": "act-0022",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0023",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 23 'act-0024' target workflow cannot complete",
+      "id": "act-0024",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0025",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0026",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0027",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 27 'act-0028' target workflow cannot complete",
+      "id": "act-0028",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0029",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0030",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0031",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0032",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 32 'act-0033' precedes its surface transition configuration",
+      "id": "act-0033",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0034",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0035",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 35 'act-0036' precedes its surface transition configuration",
+      "id": "act-0036",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0037",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0038",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0039",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 39 'act-0040' is unsupported by the installed ring",
+      "id": "act-0040",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 40 'act-0041' target workflow cannot complete",
+      "id": "act-0041",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0042",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 42 'act-0043' is unsupported by the installed ring",
+      "id": "act-0043",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 43 'act-0044' target workflow cannot complete",
+      "id": "act-0044",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0045",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0046",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 46 'act-0047' is unsupported by the installed ring",
+      "id": "act-0047",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 47 'act-0048' is not a valid target ring gate",
+      "id": "act-0048",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 48 'act-0049' is unsupported by the installed ring",
+      "id": "act-0049",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 49 'act-0050' is not a valid target ring gate",
+      "id": "act-0050",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0051",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0052",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0053",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 53 'act-0054' target workflow cannot complete",
+      "id": "act-0054",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0055",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 55 'act-0056' target workflow cannot complete",
+      "id": "act-0056",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0057",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0058",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0059",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 59 'act-0060' target workflow cannot complete",
+      "id": "act-0060",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0061",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0062",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0063",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0064",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 64 'act-0065' precedes its surface transition configuration",
+      "id": "act-0065",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0066",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-0067",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 67 'act-0068' precedes its surface transition configuration",
+      "id": "act-0068",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0069",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0070",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0071",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 71 'act-0072' is unsupported by the installed ring",
+      "id": "act-0072",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 72 'act-0073' target workflow cannot complete",
+      "id": "act-0073",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0074",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 74 'act-0075' is unsupported by the installed ring",
+      "id": "act-0075",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 75 'act-0076' target workflow cannot complete",
+      "id": "act-0076",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0077",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-0078",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 78 'act-0079' is unsupported by the installed ring",
+      "id": "act-0079",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 79 'act-0080' is not a valid target ring gate",
+      "id": "act-0080",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 80 'act-0081' is unsupported by the installed ring",
+      "id": "act-0081",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 81 'act-0082' is not a valid target ring gate",
+      "id": "act-0082",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0083",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": true,
+      "id": "act-0084",
+      "op": "archive_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0085",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": true,
+      "id": "act-0086",
+      "op": "archive_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-0087",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": true,
+      "id": "act-0088",
+      "op": "archive_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 88 'act-0089' has no valid final policy",
+      "id": "act-0089",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 89 'act-0090' has no valid final policy",
+      "id": "act-0090",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 90 'act-0091' has no valid final policy",
+      "id": "act-0091",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 91 'act-0092' has no valid final policy",
+      "id": "act-0092",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 92 'act-0093' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0093",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 93 'act-0094' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0094",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 94 'act-0095' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0095",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 95 'act-0096' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0096",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 96 'act-0097' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0097",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 97 'act-0098' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-0098",
+      "op": "retire_material"
+    }
+  ],
+  "unsolved_service_ids": [
+    "cryptographic_agility_pqc_migration"
+  ]
+}

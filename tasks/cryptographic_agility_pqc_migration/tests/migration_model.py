@@ -320,7 +320,19 @@ def simulate(plan,root):
  if state["retired"]!=retire_expected: errors.append("completion retirement is incomplete")
  if not final_ok: errors.append("not every surface reached final policy")
  dimensions.update({"signer_containment":containment,"compatibility_and_ring_gates":compatibility,"interruption_recovery":interruption_ok,"transition_safety":transition_safe,"archive_migration":archive_ok,"key_lifecycle":lifecycle,"final_state":final_ok})
- return {"passed":not errors and all(dimensions.values()),"errors":errors,"history":history,"dimensions":dimensions,"state_summary":{"contained":sorted(state["contained"]),"staged":sorted(state["staged"]),"upgrade_gates":len(state["upgrade_gates"]),"recovery_health_chains":len(state["upgrade_chain"]),"workflow_gates":len(state["gates"]),"interruption_scenarios":len(state["interruptions"]),"archive_gates":len(state["archive_gates"]),"final_surfaces":sorted(state["final"]),"retired":sorted(state["retired"])}}
+ expected_interruptions={(cid,r,f) for cid,r in expected_up for f in case["execution"]["fault_points"]}
+ coverage={}
+ for name,actual,required in (
+  ("signer_containment",state["contained"],scope),
+  ("upgrade_gates",state["upgrade_gates"],expected_up),
+  ("recovery_health_chains",set(state["upgrade_chain"]),expected_up),
+  ("workflow_gates",state["gates"],required_gates),
+  ("interruption_scenarios",state["interruptions"],expected_interruptions),
+  ("archive_gates",state["archive_gates"],set(archives)),
+  ("final_surfaces",state["final"],set(case["surfaces"])),
+  ("retirement",state["retired"],retire_expected)):
+  coverage[name]={"completed":len(actual & required),"required":len(required),"unexpected":len(actual-required),"rate":len(actual & required)/len(required) if required else None}
+ return {"passed":not errors and all(dimensions.values()),"errors":errors,"history":history,"dimensions":dimensions,"coverage":coverage,"state_summary":{"contained":sorted(state["contained"]),"staged":sorted(state["staged"]),"upgrade_gates":len(state["upgrade_gates"]),"recovery_health_chains":len(state["upgrade_chain"]),"workflow_gates":len(state["gates"]),"interruption_scenarios":len(state["interruptions"]),"archive_gates":len(state["archive_gates"]),"final_surfaces":sorted(state["final"]),"retired":sorted(state["retired"])}}
 def eval_tls(p,protocol,kex,cred,root,case): return p.get("reject_downgrade") is True and protocol==p.get("minimum_protocol") and kex in p.get("allowed_kex",[]) and cred in p.get("allowed_server_credentials",[]) and root in p.get("trusted_roots",[]) and case["materials"].get(cred,{}).get("issuer")==root
 def eval_sign(p,ids,algs,context,revoked,case):
  domains={case["materials"].get(x,{}).get("independence_domain") for x in ids}

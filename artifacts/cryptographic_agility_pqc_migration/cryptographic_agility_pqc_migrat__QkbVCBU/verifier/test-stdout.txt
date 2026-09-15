@@ -1,0 +1,628 @@
+{
+  "adversarial_scenarios": {
+    "archive_aead_hybrid_restore_accepted": true,
+    "archive_legacy_wrap_rejected": true,
+    "archive_modified_ciphertext_rejected": true,
+    "archive_wrong_restore_profile_rejected": true,
+    "classical_only_kex_rejected": true,
+    "custody_domain_capacity_enforced": true,
+    "dual_independent_release_accepted": true,
+    "legacy_certificate_rejected": true,
+    "old_context_rejected": true,
+    "revoked_signer_replay_rejected": true,
+    "same_domain_threshold_rejected": true,
+    "scoped_material_selection": true,
+    "single_signature_rejected": true,
+    "ssh_compliant_session_accepted": true,
+    "ssh_sha1_rejected": true,
+    "ssh_wrong_host_identity_rejected": true,
+    "ssh_wrong_principal_ca_rejected": true,
+    "stale_and_unbound_evidence_excluded": true,
+    "tls12_downgrade_rejected": true,
+    "tls_compliant_hybrid_handshake": true,
+    "wrong_trust_domain_certificate_rejected": true
+  },
+  "diagnostics": [
+    "action 44 'act-45' strands a required consumer ring or permits a contained signer",
+    "action 67 'act-68' precedes its surface transition configuration",
+    "action 68 'act-69' precedes its surface transition configuration",
+    "action 69 'act-70' precedes its surface transition configuration",
+    "action 70 'act-71' precedes its surface transition configuration",
+    "action 79 'act-80' precedes every required ring gate",
+    "action 84 'act-85' retires out-of-scope, active, premature, or duplicate material",
+    "action 85 'act-86' retires out-of-scope, active, premature, or duplicate material",
+    "both rings of every required workflow were not gated",
+    "completion retirement is incomplete",
+    "not every surface reached final policy"
+  ],
+  "diagnostics_count": 11,
+  "diagnostics_truncated": false,
+  "dimensions": {
+    "archive_migration": true,
+    "case_binding": true,
+    "compatibility_and_ring_gates": false,
+    "effective_inventory": true,
+    "evidence_scope": true,
+    "final_state": false,
+    "interruption_recovery": true,
+    "key_lifecycle": false,
+    "policy_design": true,
+    "signer_containment": true,
+    "transition_safety": false
+  },
+  "metrics": {
+    "migration_coverage": {
+      "archive_gates": {
+        "completed": 3,
+        "rate": 1.0,
+        "required": 3,
+        "unexpected": 0
+      },
+      "final_surfaces": {
+        "completed": 3,
+        "rate": 0.75,
+        "required": 4,
+        "unexpected": 0
+      },
+      "interruption_scenarios": {
+        "completed": 30,
+        "rate": 1.0,
+        "required": 30,
+        "unexpected": 0
+      },
+      "recovery_health_chains": {
+        "completed": 10,
+        "rate": 1.0,
+        "required": 10,
+        "unexpected": 0
+      },
+      "retirement": {
+        "completed": 4,
+        "rate": 0.6666666666666666,
+        "required": 6,
+        "unexpected": 0
+      },
+      "signer_containment": {
+        "completed": 1,
+        "rate": 1.0,
+        "required": 1,
+        "unexpected": 0
+      },
+      "upgrade_gates": {
+        "completed": 10,
+        "rate": 1.0,
+        "required": 10,
+        "unexpected": 0
+      },
+      "workflow_gates": {
+        "completed": 10,
+        "rate": 0.7142857142857143,
+        "required": 14,
+        "unexpected": 0
+      }
+    },
+    "policy_scenarios": {
+      "archives": {
+        "evaluated": 4,
+        "passed": 4,
+        "rate": 1.0,
+        "required": 4
+      },
+      "inventory_and_custody": {
+        "evaluated": 3,
+        "passed": 3,
+        "rate": 1.0,
+        "required": 3
+      },
+      "signing": {
+        "evaluated": 5,
+        "passed": 5,
+        "rate": 1.0,
+        "required": 5
+      },
+      "ssh": {
+        "evaluated": 4,
+        "passed": 4,
+        "rate": 1.0,
+        "required": 4
+      },
+      "tls": {
+        "evaluated": 5,
+        "passed": 5,
+        "rate": 1.0,
+        "required": 5
+      }
+    },
+    "strict_completion": false
+  },
+  "processed_actions": 87,
+  "reward": 0.0,
+  "scenario_groups": {
+    "archive_decryption_integrity_and_rewrap": true,
+    "custody_scope_and_signer_containment": true,
+    "failure_domain_interruption_and_transition_order": false,
+    "temporal_effective_dependency_inventory": true,
+    "tls_signing_ssh_downgrade_resistance": false,
+    "trust_rotation_and_final_retirement": false
+  },
+  "solved_service_ids": [],
+  "state_summary": {
+    "archive_gates": 3,
+    "contained": [
+      "sign-release-rsa"
+    ],
+    "final_surfaces": [
+      "archive:compliance",
+      "signing:device-update",
+      "tls:telemetry-api"
+    ],
+    "interruption_scenarios": 30,
+    "recovery_health_chains": 10,
+    "retired": [
+      "archive-wrap-rsa",
+      "sign-release-rsa",
+      "tls-api-2024",
+      "tls-root-2019"
+    ],
+    "staged": [
+      "archive-wrap-hybrid-c",
+      "sign-release-ed",
+      "sign-release-pq",
+      "ssh-host-ed25519-c",
+      "ssh-user-ca-ed",
+      "tls-api-2027",
+      "tls-root-2027"
+    ],
+    "upgrade_gates": 10,
+    "workflow_gates": 10
+  },
+  "task_mode": "defensive",
+  "transition_history": [
+    {
+      "applied": true,
+      "id": "act-1",
+      "op": "contain_signer"
+    },
+    {
+      "applied": true,
+      "id": "act-2",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-3",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-4",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-5",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-6",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-7",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-8",
+      "op": "stage_material"
+    },
+    {
+      "applied": true,
+      "id": "act-9",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-10",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-11",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-12",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-13",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-14",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-15",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-16",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-17",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-18",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-19",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-20",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-21",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-22",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-23",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-24",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-25",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-26",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-27",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-28",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-29",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-30",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-31",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-32",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-33",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-34",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-35",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-36",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-37",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-38",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-39",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-40",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-41",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-42",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-43",
+      "op": "configure_transition"
+    },
+    {
+      "applied": true,
+      "id": "act-44",
+      "op": "configure_transition"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 44 'act-45' strands a required consumer ring or permits a contained signer",
+      "id": "act-45",
+      "op": "configure_transition"
+    },
+    {
+      "applied": true,
+      "id": "act-46",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-47",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-48",
+      "op": "upgrade_consumer"
+    },
+    {
+      "applied": true,
+      "id": "act-49",
+      "op": "upgrade_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-50",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-51",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-52",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-53",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-54",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-55",
+      "op": "distribute_trust"
+    },
+    {
+      "applied": true,
+      "id": "act-56",
+      "op": "activate_material"
+    },
+    {
+      "applied": true,
+      "id": "act-57",
+      "op": "configure_transition"
+    },
+    {
+      "applied": true,
+      "id": "act-58",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-59",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-60",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-61",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-62",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-63",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-64",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-65",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-66",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-67",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 67 'act-68' precedes its surface transition configuration",
+      "id": "act-68",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 68 'act-69' precedes its surface transition configuration",
+      "id": "act-69",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 69 'act-70' precedes its surface transition configuration",
+      "id": "act-70",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 70 'act-71' precedes its surface transition configuration",
+      "id": "act-71",
+      "op": "workflow_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-72",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": true,
+      "id": "act-73",
+      "op": "archive_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-74",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": true,
+      "id": "act-75",
+      "op": "archive_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-76",
+      "op": "migrate_archive"
+    },
+    {
+      "applied": true,
+      "id": "act-77",
+      "op": "archive_gate"
+    },
+    {
+      "applied": true,
+      "id": "act-78",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": true,
+      "id": "act-79",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 79 'act-80' precedes every required ring gate",
+      "id": "act-80",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": true,
+      "id": "act-81",
+      "op": "set_final_policy"
+    },
+    {
+      "applied": true,
+      "id": "act-82",
+      "op": "retire_material"
+    },
+    {
+      "applied": true,
+      "id": "act-83",
+      "op": "retire_material"
+    },
+    {
+      "applied": true,
+      "id": "act-84",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 84 'act-85' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-85",
+      "op": "retire_material"
+    },
+    {
+      "applied": false,
+      "diagnostic": "action 85 'act-86' retires out-of-scope, active, premature, or duplicate material",
+      "id": "act-86",
+      "op": "retire_material"
+    },
+    {
+      "applied": true,
+      "id": "act-87",
+      "op": "retire_material"
+    }
+  ],
+  "unsolved_service_ids": [
+    "cryptographic_agility_pqc_migration"
+  ]
+}

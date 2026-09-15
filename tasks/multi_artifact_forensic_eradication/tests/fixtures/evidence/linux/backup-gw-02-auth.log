@@ -1,0 +1,4 @@
+2025-04-17T08:40:03Z backup-gw-02 sshd[910]: Accepted publickey for opsadmin from 10.24.1.11 port 44002 ssh2: ED25519 SHA256:f0nRq8M0P4KxZ3TSxq1U7vWlYVzwQbQzdN0cP6q2Y9A
+2025-04-17T09:18:20Z backup-gw-02 sshd[1438]: Accepted publickey for backupsvc from 10.24.8.17 port 51812 ssh2: ED25519 SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M
+2025-04-17T09:18:21Z backup-gw-02 sshd[1438]: pam_unix(sshd:session): session opened for user backupsvc by (uid=0)
+2025-04-17T09:55:01Z backup-gw-02 sshd[1700]: Accepted publickey for opsadmin from 10.24.1.11 port 44119 ssh2: ED25519 SHA256:f0nRq8M0P4KxZ3TSxq1U7vWlYVzwQbQzdN0cP6q2Y9A

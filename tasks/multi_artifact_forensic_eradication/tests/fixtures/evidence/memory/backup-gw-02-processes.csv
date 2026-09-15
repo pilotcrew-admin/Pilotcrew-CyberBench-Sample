@@ -1,0 +1,4 @@
+pid,ppid,start_time_utc,user,image,command_line,sha256
+1,0,2025-04-17T07:00:00Z,root,systemd,/sbin/init,32b1e0c0d0d1740aa0f011c866f75f1967202255d649fc42ce81a5df7881ab23
+4412,1,2025-04-17T09:20:12Z,backupsvc,python3,/usr/bin/python3 /opt/cache/cert_sync.py --relay,74f740bc25ef325f87c3d1db53c6f8bee500f7d5270e15857df24ac7a5b86e82
+2280,1,2025-04-17T07:02:31Z,root,vendor-inventory,/usr/local/bin/vendor-inventory --daemon,9a02b89bc7d921bb7899da21a523c8aa1064a3d9029ce46b5003190b4ceea11d

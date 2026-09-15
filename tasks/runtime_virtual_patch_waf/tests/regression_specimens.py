@@ -1286,7 +1286,19 @@ def grade(policy, workdir, name):
     )
     if completed.returncode != 0:
         raise RuntimeError(f"verifier crashed for {name}: {completed.stderr or completed.stdout}")
-    return json.loads((log_dir / "details.json").read_text())
+    details = json.loads((log_dir / "details.json").read_text())
+    assert details["error_count"] == sum(details["error_counts_by_area"].values())
+    assert details["reported_error_count"] == len(details["errors"])
+    assert details["errors_truncated"] == (details["error_count"] > len(details["errors"]))
+    for domain, total_key in (("attack_protection", "attack_cases"), ("benign_compatibility", "benign_cases")):
+        metric = details["metrics"][domain]
+        assert metric["total"] == details[total_key]
+        assert metric["passed"] + metric["failed"] + metric["not_evaluated"] == metric["total"]
+        assert metric["evaluated"] <= metric["attempted"] <= metric["total"]
+        for breakdown in ("by_family", "by_carrier"):
+            for key in ("total", "attempted", "evaluated", "passed", "failed", "not_evaluated"):
+                assert sum(row[key] for row in metric[breakdown].values()) == metric[key]
+    return details
 
 
 def main():

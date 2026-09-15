@@ -1,0 +1,106 @@
+{
+  "captured_at": "2025-04-17T10:05:00Z",
+  "assets": [
+    {
+      "host": "acct-ws-04",
+      "ip": "10.24.8.17",
+      "role": "finance workstation",
+      "expected_services": [
+        "ledger-client"
+      ]
+    },
+    {
+      "host": "backup-gw-02",
+      "ip": "10.24.5.20",
+      "role": "backup gateway",
+      "expected_services": [
+        "nightly-backup"
+      ]
+    },
+    {
+      "host": "vault-prx-03",
+      "ip": "10.24.9.31",
+      "role": "archive indexing proxy",
+      "expected_services": [
+        "archive-transfer",
+        "vault-health"
+      ]
+    },
+    {
+      "host": "report-db-01",
+      "ip": "10.24.5.31",
+      "role": "report database",
+      "expected_services": [
+        "reporting-api"
+      ]
+    }
+  ],
+  "approved_external_destinations": [
+    {
+      "ip": "192.0.2.44",
+      "owner": "Northwind inventory partner",
+      "service": "vendor-inventory",
+      "port": 443
+    },
+    {
+      "ip": "203.0.113.88",
+      "owner": "Contoso archive monitor",
+      "service": "vault-health",
+      "port": 443
+    }
+  ],
+  "approved_ssh_keys": [
+    {
+      "host": "backup-gw-02",
+      "principal": "opsadmin",
+      "fingerprint": "SHA256:f0nRq8M0P4KxZ3TSxq1U7vWlYVzwQbQzdN0cP6q2Y9A",
+      "comment": "ops@vault"
+    },
+    {
+      "host": "vault-prx-03",
+      "principal": "archive-admin",
+      "fingerprint": "SHA256:Vn5Rx1Tq8Ka3Lc7Ym2Wp9Hs4Df6Bj0ZuEe3Ni8Go1Cs",
+      "comment": "archive-admin@corp"
+    }
+  ],
+  "service_accounts": [
+    {
+      "principal": "CORP\\backupsvc",
+      "services": [
+        "nightly-backup"
+      ],
+      "credential_version": 7
+    },
+    {
+      "principal": "CORP\\vaultsync",
+      "services": [
+        "archive-transfer"
+      ],
+      "credential_version": 2
+    },
+    {
+      "principal": "CORP\\svc_reporting",
+      "services": [
+        "reporting-api"
+      ],
+      "credential_version": 4
+    }
+  ],
+  "approved_startup": [
+    {
+      "host": "acct-ws-04",
+      "id": "TASK-44",
+      "purpose": "Finance month-end export"
+    },
+    {
+      "host": "backup-gw-02",
+      "id": "TIMER-12",
+      "purpose": "approved vendor inventory sync"
+    },
+    {
+      "host": "vault-prx-03",
+      "id": "UNIT-92",
+      "purpose": "approved archive health exporter"
+    }
+  ]
+}

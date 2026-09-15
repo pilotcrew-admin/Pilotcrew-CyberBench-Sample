@@ -1,23 +1,23 @@
 {
     "schema_version": 2,
-    "created_at": "2026-08-15T04:15:05.854168Z",
+    "created_at": "2026-09-10T05:15:06.712463Z",
     "harbor": {
         "version": "0.20.0",
         "is_editable": false
     },
-    "n_concurrent_trials": 3,
+    "n_concurrent_trials": 5,
     "retry": {
         "max_retries": 0,
         "exclude_exceptions": [
-            "AgentAuthenticationError",
-            "AgentTimeoutError",
-            "VerifierTimeoutError",
-            "RewardFileEmptyError",
-            "VerifierOutputParseError",
             "ModelNotFoundError",
             "ApiUsageLimitError",
             "RewardFileNotFoundError",
-            "AgentSafetyRefusalError"
+            "AgentSafetyRefusalError",
+            "VerifierTimeoutError",
+            "AgentAuthenticationError",
+            "VerifierOutputParseError",
+            "AgentTimeoutError",
+            "RewardFileEmptyError"
         ],
         "wait_multiplier": 1.0,
         "min_wait_sec": 1.0,
@@ -29,8 +29,9 @@
             "task": {
                 "name": "multi_artifact_forensic_eradication",
                 "type": "local",
-                "digest": "sha256:bc5f7e938be2f057e41681e6044d907bf1e8a46decf434644e620e537e37fe6c",
-                "path": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_8/007/multi_artifact_forensic_eradication"
+                "digest": "sha256:6c76115df10f8cbcb96061741ed325f1e3c8618b683a8725349a91d3ec1cc929",
+                "source": "tasks",
+                "path": "tasksets/v3/tasks/multi_artifact_forensic_eradication"
             },
             "install_only": false,
             "timeout_multiplier": 1.0,
@@ -63,8 +64,9 @@
             "task": {
                 "name": "multi_artifact_forensic_eradication",
                 "type": "local",
-                "digest": "sha256:bc5f7e938be2f057e41681e6044d907bf1e8a46decf434644e620e537e37fe6c",
-                "path": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_8/007/multi_artifact_forensic_eradication"
+                "digest": "sha256:6c76115df10f8cbcb96061741ed325f1e3c8618b683a8725349a91d3ec1cc929",
+                "source": "tasks",
+                "path": "tasksets/v3/tasks/multi_artifact_forensic_eradication"
             },
             "install_only": false,
             "timeout_multiplier": 1.0,
@@ -97,8 +99,9 @@
             "task": {
                 "name": "multi_artifact_forensic_eradication",
                 "type": "local",
-                "digest": "sha256:bc5f7e938be2f057e41681e6044d907bf1e8a46decf434644e620e537e37fe6c",
-                "path": "/home/ubuntu/worktrees/def_tasks/tasksets/v3/incoming/codex/batch_8/007/multi_artifact_forensic_eradication"
+                "digest": "sha256:6c76115df10f8cbcb96061741ed325f1e3c8618b683a8725349a91d3ec1cc929",
+                "source": "tasks",
+                "path": "tasksets/v3/tasks/multi_artifact_forensic_eradication"
             },
             "install_only": false,
             "timeout_multiplier": 1.0,

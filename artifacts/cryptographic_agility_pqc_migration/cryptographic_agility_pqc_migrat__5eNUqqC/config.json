@@ -1,0 +1,13 @@
+{
+    "task": {
+        "path": "tasksets/v3/tasks/cryptographic_agility_pqc_migration",
+        "source": "tasks"
+    },
+    "trial_name": "cryptographic_agility_pqc_migrat__5eNUqqC",
+    "trials_dir": "jobs/2026-09-10__03-51-55",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "openrouter/google/gemini-3.1-pro-preview"
+    },
+    "job_id": "7ede63b5-5576-4b36-a232-96c82d711292"
+}

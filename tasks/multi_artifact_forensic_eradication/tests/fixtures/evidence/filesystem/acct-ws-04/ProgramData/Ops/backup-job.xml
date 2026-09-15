@@ -1,0 +1,1 @@
+<job id="nightly-backup"><principal>CORPackupsvc</principal><target>backup-gw-02</target><credential_ref>vault://finance/backupsvc/v7</credential_ref></job>

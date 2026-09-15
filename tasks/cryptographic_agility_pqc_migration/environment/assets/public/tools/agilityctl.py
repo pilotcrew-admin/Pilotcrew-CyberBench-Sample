@@ -3,6 +3,7 @@
 from __future__ import annotations
 import argparse,json,re
 from pathlib import Path
+from receipt_checks import check_receipts
 
 RINGS=("canary","fleet")
 HEX64=re.compile(r"^[0-9a-f]{64}$")
@@ -83,7 +84,7 @@ def target_gate(surface,cid,ring,state,policy,case):
  return True
 def rehearse(plan,case):
  e=lint(plan)
- if e: return {"passed":False,"violations":e,"applied":0}
+ if e: return rehearsal_result(e,0,0,0,0)
  cons=case["consumers"]; mats=case["materials"]; packages=case["packages"]; archives=case["archives"]
  state={"contained":set(),"staged":set(),"versions":{cid:{r:c["version"] for r in RINGS} for cid,c in cons.items()},
   "trust":{cid:{r:set(c.get("initial_trust",[])) for r in RINGS} for cid,c in cons.items()},"upgraded":{},"upgrade_gates":set(),
@@ -160,17 +161,27 @@ def rehearse(plan,case):
   elif op=="retire_material":
    m=mats.get(a["material"])
    if not m or m["surface"] not in state["final"]: e.append(label+" precedes its final policy")
- return {"passed":not e,"violations":e,"applied":len(plan["actions"]),"upgrade_gates":len(state["upgrade_gates"]),"target_gates":len(state["gates"]),"archive_gates":len(state["archive_gates"]),"note":"Representative rehearsal validates recovery-step shape/work budgets and transition preconditions; final assessment also selects temporal fault evidence, diagnoses state, and recomputes chained receipts, evidence joins, candidate scope, policy behavior, interrupted rollouts, and retirement."}
+ return rehearsal_result(e,len(plan["actions"]),len(state["upgrade_gates"]),len(state["gates"]),len(state["archive_gates"]))
+def rehearsal_result(errors,actions,upgrades,workflows,archives):
+ return {"assessment":"partial_rehearsal","checks_passed":not errors,"complete_migration_verified":False,
+  "violations":errors,"submitted_actions":actions,"upgrade_gates":upgrades,"target_gates":workflows,"archive_gates":archives,
+  "checked":["structure","representative_references_and_ordering","recovery_step_shape_and_work_budgets","representative_transition_preconditions"],
+  "unchecked":["temporal_evidence_selection","recovery_decision_safety","receipt_correctness","effective_dependency_inventory","policy_scope_and_custody","full_workflow_completion","completion_retirement"],
+  "note":"Successful partial checks do not establish task completion. Use agilityctl receipts for submitted receipt encoding; independently validate the remaining documented migration requirements."}
 def evidence(case):
  print(json.dumps({"captured_at":case["estate"]["captured_at"],"consumers":list(case["consumers"].values()),"deployment_events":case["deployments"],"runtime_observations":case["runtime"],"interruption_observations":case["interruptions"],"custody_events":case["incident"]["events"],"archives":list(case["archives"].values())},indent=2,sort_keys=True))
 def main():
  ap=argparse.ArgumentParser(description=__doc__); ap.add_argument("--root",default=str(Path(__file__).resolve().parents[1]),help=argparse.SUPPRESS)
  sub=ap.add_subparsers(dest="command",required=True); sub.add_parser("evidence")
- for name in ("lint","rehearse"): p=sub.add_parser(name); p.add_argument("plan")
+ for name in ("lint","rehearse","receipts"): p=sub.add_parser(name); p.add_argument("plan")
  args=ap.parse_args(); case=load(Path(args.root))
  if args.command=="evidence": evidence(case); return 0
  try: plan=json.loads(Path(args.plan).read_text(encoding="utf-8"))
  except (OSError,json.JSONDecodeError) as exc: print(json.dumps({"passed":False,"violations":[str(exc)]},indent=2)); return 1
- errors=lint(plan); result={"passed":not errors,"violations":errors} if args.command=="lint" else rehearse(plan,case)
- print(json.dumps(result,indent=2,sort_keys=True)); return 0 if result["passed"] else 1
+ errors=lint(plan)
+ if args.command=="lint": result={"assessment":"structure_only","passed":not errors,"complete_migration_verified":False,"violations":errors}
+ elif args.command=="receipts":
+  result=check_receipts(plan,case) if not errors else {"assessment":"receipt_encoding_only","checks_passed":False,"complete_migration_verified":False,"violations":errors}
+ else: result=rehearse(plan,case)
+ print(json.dumps(result,indent=2,sort_keys=True)); return 0 if result.get("checks_passed",result.get("passed",False)) else 1
 if __name__=="__main__": raise SystemExit(main())

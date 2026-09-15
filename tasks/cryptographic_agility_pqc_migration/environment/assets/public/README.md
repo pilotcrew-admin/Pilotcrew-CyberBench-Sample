@@ -39,8 +39,15 @@ Useful commands:
 agilityctl evidence
 agilityctl lint /app/submission/migration-plan.json
 agilityctl rehearse /app/submission/migration-plan.json
+agilityctl receipts /app/submission/migration-plan.json
 ```
 
-The rehearsal checks representative referential and ordering constraints. It does not
+The rehearsal returns `assessment: partial_rehearsal`, `checks_passed`, and explicit
+checked/unchecked categories. `checks_passed` means only those listed checks passed;
+`complete_migration_verified` remains false. It checks representative referential and ordering constraints. It does not
 select material, solve the cross-surface custody allocation, construct the inventory, or
 prove all downgrade and replay scenarios.
+
+`receipts` checks the byte encoding and chaining of the receipts you supply, without
+selecting observations or recovery decisions. A valid receipt can still describe stale
+evidence or an unsafe decision. Neither command establishes complete migration success.

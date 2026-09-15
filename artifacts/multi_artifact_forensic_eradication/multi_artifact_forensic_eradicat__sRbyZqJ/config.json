@@ -1,0 +1,13 @@
+{
+    "task": {
+        "path": "tasksets/v3/tasks/multi_artifact_forensic_eradication",
+        "source": "tasks"
+    },
+    "trial_name": "multi_artifact_forensic_eradicat__sRbyZqJ",
+    "trials_dir": "jobs/2026-09-10__05-15-06",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "openrouter/google/gemini-3.1-pro-preview"
+    },
+    "job_id": "1e64b53d-4762-4282-8b53-3b386097891a"
+}

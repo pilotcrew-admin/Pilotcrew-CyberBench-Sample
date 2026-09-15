@@ -62,3 +62,8 @@ destinations fail closed.
 The guard must apply these rules generically to any schema-conforming snapshot;
 identifiers, names, and array order do not confer authority. The verifier grades
 behavior rather than source text or a particular implementation.
+
+The evaluation varies graph depth, shared parents, object identifiers, collection
+order, and the number and order of allowed and denied requests. A low-risk call
+with a non-null optional approval must resolve that reference to an active
+approval. Missing and inactive optional approvals fail closed.

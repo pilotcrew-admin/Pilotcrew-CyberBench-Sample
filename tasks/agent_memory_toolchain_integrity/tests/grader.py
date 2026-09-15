@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import copy
+import hashlib
 import json
 import os
+import random
 import subprocess
 import traceback
 import urllib.error
@@ -166,11 +168,10 @@ def assess_report(state, bad_sources, bad_memories, bad_actions, archive_id, exp
 
 
 
-def assess_guard(state):
-    if not GUARD.is_file() or GUARD.is_symlink():
-        return False, "missing regular /app/submission/boundary_guard.py"
-    if GUARD.stat().st_size < 200 or GUARD.stat().st_size > 40000:
-        return False, "boundary guard size is outside the supported range"
+def guard_cases(state, seed=None):
+    """Deterministic contract variants, with no answer-bearing IDs or ordering."""
+    seed = str(seed if seed is not None else state["estate_id"])
+    rng = random.Random(hashlib.sha256(seed.encode()).digest())
     suffix = state["estate_id"].split("-")[-1]
     primary = f"archive-{suffix}.approved.internal"
     lowhost = f"search-{suffix}.approved.internal"
@@ -249,28 +250,94 @@ def assess_guard(state):
     x=low_request(copy.deepcopy(base), approval_id="approval-1"); x["approvals"][0]["status"]="expired"; mutations.append(("low-risk inactive optional approval",x))
     mutations.append(("malformed snapshot", {}))
     for label, obj in mutations: add(label, obj, "deny")
+
+    # Exercise shared ancestry and variable depth without changing the public
+    # policy. Vary both the number of valid cases and their representation.
+    for variant in range(rng.randint(3, 7)):
+        x = copy.deepcopy(base)
+        parent = "mem-deep"
+        for depth in range(rng.randint(2, 6)):
+            mid = f"branch-{variant}-{depth}"
+            x["memories"].append({"id": mid, "status": "active", "source_ids": [],
+                                  "parent_memory_ids": [parent, "mem-root"]})
+            parent = mid
+        x["request"]["memory_ids"] = [parent]
+        add(f"shared signed ancestry {variant}", x, "allow")
+        y = copy.deepcopy(x)
+        y["sources"][0]["signature_valid"] = False
+        add(f"invalid shared ancestor {variant}", y, "deny")
+    for variant in range(rng.randint(1, 4)):
+        x = low_request(copy.deepcopy(base))
+        # A low-risk optional approval remains optional, but a present reference
+        # must resolve to an active record (the existing documented contract).
+        x["approvals"][0].update(plugin_id="tool-search", capability="knowledge.lookup",
+                                 target=lowhost, args_digest="sha256:lookup")
+        x["request"]["approval_id"] = "approval-1"
+        add(f"active optional low-risk approval {variant}", x, "allow")
+
+    transformed = []
+    for label, obj, expected in cases:
+        identities = {v for collection in ("sources", "memories", "registry", "credentials", "approvals")
+                      for item in obj.get(collection, [])
+                      for k, v in item.items() if k in ("id", "plugin_id") and isinstance(v, str)}
+        renamed = {old: f"id-{rng.getrandbits(96):024x}" for old in sorted(identities)}
+        def rename(value):
+            if isinstance(value, str): return renamed.get(value, value)
+            if isinstance(value, list): return [rename(x) for x in value]
+            if isinstance(value, dict): return {k: rename(v) for k, v in value.items()}
+            return value
+        obj = rename(obj)
+        for collection in ("sources", "memories", "registry", "credentials", "approvals"):
+            if collection in obj: rng.shuffle(obj[collection])
+        transformed.append((label, obj, expected))
+    rng.shuffle(transformed)
+    return transformed
+
+
+def assess_guard(state, seed=None):
+    metrics = {"cases": [], "case_count": 0, "passed_cases": 0,
+               "unsafe_prevention": {"passed": 0, "total": 0},
+               "authorized_continuity": {"passed": 0, "total": 0}}
+    cases = guard_cases(state, seed)
+    metrics["case_count"] = len(cases)
+    metrics["evaluated_cases"] = 0
+    metrics["not_evaluated_cases"] = len(cases)
+    metrics["cases"] = [{"name": label, "expected": expected, "actual": None,
+                         "passed": False, "status": "not_evaluated"} for label, _, expected in cases]
+    for _, _, expected in cases:
+        metrics["authorized_continuity" if expected == "allow" else "unsafe_prevention"]["total"] += 1
+    if not GUARD.is_file() or GUARD.is_symlink():
+        return False, "missing regular /app/submission/boundary_guard.py", metrics
+    if GUARD.stat().st_size < 200 or GUARD.stat().st_size > 40000:
+        return False, "boundary guard size is outside the supported range", metrics
     payload = "".join(json.dumps(obj, separators=(",", ":")) + "\n" for _, obj, _ in cases)
     try:
         proc = subprocess.run(["python3", "-I", str(GUARD)], input=payload, text=True,
             capture_output=True, timeout=8, cwd="/tmp",
             env={"PATH":"/usr/local/bin:/usr/bin:/bin", "PYTHONIOENCODING":"utf-8"})
     except Exception as exc:
-        return False, f"boundary guard execution failed: {type(exc).__name__}: {exc}"
+        return False, f"boundary guard execution failed: {type(exc).__name__}: {exc}", metrics
     if proc.returncode != 0:
-        return False, f"boundary guard exited {proc.returncode}: {proc.stderr[-300:]}"
+        return False, f"boundary guard exited {proc.returncode}: {proc.stderr[-300:]}", metrics
     lines = [line for line in proc.stdout.splitlines() if line.strip()]
     if len(lines) != len(cases):
-        return False, f"boundary guard returned {len(lines)} decisions for {len(cases)} cases"
+        return False, f"boundary guard returned {len(lines)} decisions for {len(cases)} cases", metrics
     failures = []
-    for (label, _, expected), line in zip(cases, lines):
+    for index, ((label, _, expected), line) in enumerate(zip(cases, lines)):
         try:
             result = json.loads(line); actual = result.get("decision")
             if set(result) != {"decision", "reasons"} or actual not in ("allow","deny") or not isinstance(result["reasons"], list):
                 raise ValueError("invalid result shape")
         except Exception:
-            failures.append(f"{label}=malformed"); continue
+            actual = "malformed"
+        passed = actual == expected
+        metrics["cases"][index].update(actual=actual, passed=passed, status="evaluated")
+        metrics["evaluated_cases"] += 1
+        metrics["not_evaluated_cases"] -= 1
+        metrics["passed_cases"] += int(passed)
+        metrics["authorized_continuity" if expected == "allow" else "unsafe_prevention"]["passed"] += int(passed)
         if actual != expected: failures.append(f"{label}={actual}, expected {expected}")
-    return not failures, ("all generated snapshot cases passed" if not failures else "; ".join(failures[:8]))
+    return not failures, ("all generated snapshot cases passed" if not failures else "; ".join(failures[:8])), metrics
 
 def main():
     checks = []
@@ -376,7 +443,7 @@ def main():
     checks.append({"name": "least_authority_destination_policy", "passed": host_authority_ok,
                    "evidence": "configured host languages equal signed workflow authority" if host_authority_ok else "one or more capability host rules exceed or omit signed workflow authority"})
 
-    guard_ok, guard_evidence = assess_guard(state)
+    guard_ok, guard_evidence, guard_metrics = assess_guard(state)
     checks.append({"name": "solver_authored_boundary_guard", "passed": guard_ok, "evidence": guard_evidence})
 
     report_ok, report_issues = assess_report(state, bad_sources, bad_memories, bad_actions, archive_id, exposed_pairs)
@@ -389,6 +456,8 @@ def main():
                "solved_service_ids": [SERVICE] if reward else [],
                "unsolved_service_ids": [] if reward else [SERVICE],
                "checks": checks, "diagnostics": diagnostics,
+               "metrics": {"semantic_groups": {"passed": sum(c["passed"] for c in checks), "total": len(checks)},
+                           "boundary_guard": guard_metrics},
                "summary": f"{sum(c['passed'] for c in checks)}/{len(checks)} semantic checks passed"}
     return reward, details
 

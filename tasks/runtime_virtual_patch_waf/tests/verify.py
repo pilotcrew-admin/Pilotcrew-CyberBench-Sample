@@ -15,6 +15,8 @@ from email import policy as email_policy
 from email.parser import BytesParser
 from pathlib import Path
 
+from diagnostic_metrics import replay_metrics
+
 from policy_runtime import (
     BACKEND_CONTEXT_PIPELINES,
     backend_pipeline,
@@ -2376,8 +2378,14 @@ def submitted_extra_scheme_attacks(policy):
 
 
 errors = []
+total_error_count = 0
+error_counts_by_area = {}
 checks = {}
 category_counts = {}
+attack_attempted_ids = set()
+benign_attempted_ids = set()
+attack_outcomes = {}
+benign_outcomes = {}
 max_work = 0
 max_benign_elapsed = 0.0
 primary_corpus_seconds = 0.0
@@ -2413,6 +2421,9 @@ published_capture_accounting = {
 
 
 def fail(area, message):
+    global total_error_count
+    total_error_count += 1
+    error_counts_by_area[area] = error_counts_by_area.get(area, 0) + 1
     checks[area] = False
     if len(errors) < 120:
         errors.append(f"{area}: {message}")
@@ -2757,6 +2768,7 @@ if policy and not errors:
     primary_corpus = ReplayCorpus("primary attack-and-benign corpus", PRIMARY_CORPUS_DEADLINE_SECONDS)
     primary_corpus_exhausted = False
     for case_id, req, family, carrier_name in attacks:
+        attack_attempted_ids.add(case_id)
         result, elapsed, primary_corpus_exhausted = guarded_evaluate(
             policy, req, case_id, carrier_name, primary_corpus,
         )
@@ -2765,6 +2777,7 @@ if policy and not errors:
         if result is None:
             continue
         attack_evaluated_cases += 1
+        attack_outcomes[case_id] = result
         max_work = max(max_work, result.get("work", 0))
         category_counts[family] = category_counts.get(family, 0) + int(result.get("decision") == "block")
         if result.get("decision") != "block":
@@ -2809,6 +2822,7 @@ if policy and not errors:
 
     if not primary_corpus_exhausted:
         for case_id, req, family, carrier_name in benign:
+            benign_attempted_ids.add(case_id)
             result, elapsed, primary_corpus_exhausted = guarded_evaluate(
                 policy, req, case_id, carrier_name, primary_corpus,
             )
@@ -2818,6 +2832,7 @@ if policy and not errors:
             if result is None:
                 continue
             benign_evaluated_cases += 1
+            benign_outcomes[case_id] = result
             max_work = max(max_work, result.get("work", 0))
             category_counts[family] = category_counts.get(family, 0) + int(result.get("decision") == "allow")
             witness_provenance = rule_directed_neighbor_provenance.get(case_id)
@@ -3116,6 +3131,11 @@ LOG.mkdir(parents=True, exist_ok=True)
 (LOG / "reward.txt").write_text(str(reward))
 details = {
     "reward": reward,
+    "metrics": {
+        "attack_protection": replay_metrics(attacks, attack_attempted_ids, attack_outcomes, "block"),
+        "benign_compatibility": replay_metrics(benign, benign_attempted_ids, benign_outcomes, "allow"),
+        "contract_checks": checks,
+    },
     "artifact": str(ARTIFACT),
     "checks": checks,
     "documented_carriers": len(CARRIERS),
@@ -3211,7 +3231,10 @@ details = {
     "full_benign_replay_completed_cases": full_benign_replay_completed_cases,
     "full_benign_replay_seconds": round(full_benign_replay_seconds, 6),
     "category_pass_counts": category_counts,
-    "error_count": len(errors),
+    "error_count": total_error_count,
+    "reported_error_count": len(errors),
+    "errors_truncated": total_error_count > len(errors),
+    "error_counts_by_area": error_counts_by_area,
     "errors": errors,
     "summary": ("Policy passed carrier-complete context identification, attack/evasion, over-normalization, causally witnessed neighbor non-interference, compatibility, audit, capacity, and work checks."
                 if reward else "Policy did not satisfy the context-specific runtime virtual-patch contract."),

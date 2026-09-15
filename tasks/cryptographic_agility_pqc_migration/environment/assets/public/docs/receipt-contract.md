@@ -8,6 +8,12 @@ standard meanings, and encoded outputs are lowercase 64-character hexadecimal. P
 stdlib `hashlib` and `hmac` are sufficient. `case/execution-fixtures.json.self_test`
 provides a neutral HMAC test vector for encoding validation.
 
+`agilityctl receipts /app/submission/migration-plan.json` checks the submitted
+archive and upgrade receipt byte contracts and reports the failing action or fault.
+It does not return expected receipts, select the latest evidence, diagnose recovery,
+or establish policy/transition safety. Its `checks_passed` result is limited to
+receipt encoding; inspect the explicit unchecked categories before declaring completion.
+
 ## Archive rewrap and restore
 
 For a `migrate_archive` action, find its object fixture and selected wrapping material.

@@ -1,0 +1,405 @@
+{
+  "checks": [
+    {
+      "evidence": "unsafe quarantined 2/2; benign active 6/6",
+      "name": "selective_source_containment",
+      "passed": true
+    },
+    {
+      "evidence": "unsafe quarantined 4/4; benign active 5/5",
+      "name": "selective_memory_recovery",
+      "passed": true
+    },
+    {
+      "evidence": "exposed rotated=True; unexpected rotations=[]; unrelated active=True",
+      "name": "credential_containment",
+      "passed": true
+    },
+    {
+      "evidence": "affected registration restored=True; unrelated registrations preserved=True",
+      "name": "plugin_integrity",
+      "passed": true
+    },
+    {
+      "evidence": "unsafe cancelled=1/1; legitimate archive rebound=True",
+      "name": "action_containment_and_recovery",
+      "passed": true
+    },
+    {
+      "evidence": "unregistered_clone=deny, redirect_poison_variant=deny, inactive_lineage=deny, approval_replay_changed_args=deny, non_ticket_high_risk_approval=deny, secondary_destination=deny, credential_forward=deny, revoked_credential=deny, unknown_capability=deny",
+      "name": "variant_unsafe_action_prevention",
+      "passed": true
+    },
+    {
+      "evidence": "archive-publication=allow, change-ticket-validation=allow, knowledge-lookup=allow, oncall-notification=allow",
+      "name": "authorized_workflow_continuity",
+      "passed": true
+    },
+    {
+      "evidence": "configured host languages equal signed workflow authority",
+      "name": "least_authority_destination_policy",
+      "passed": true
+    },
+    {
+      "evidence": "shared signed ancestry 0=deny, expected allow; high-risk recursive signed lineage=deny, expected allow; authorized wildcard subdomain=deny, expected allow; shared signed ancestry 1=deny, expected allow; shared signed ancestry 4=deny, expected allow; shared signed ancestry 2=deny, expected allow; shared signed ancestry 3=deny, expected allow; active optional low-risk approval 1=deny, expected allow",
+      "name": "solver_authored_boundary_guard",
+      "passed": false
+    },
+    {
+      "evidence": "semantic causal report valid",
+      "name": "evidence_backed_incident_submission",
+      "passed": true
+    }
+  ],
+  "diagnostics": [],
+  "metrics": {
+    "boundary_guard": {
+      "authorized_continuity": {
+        "passed": 2,
+        "total": 11
+      },
+      "case_count": 46,
+      "cases": [
+        {
+          "actual": "deny",
+          "expected": "allow",
+          "name": "shared signed ancestry 0",
+          "passed": false,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "malformed credential binding",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "allow",
+          "name": "high-risk recursive signed lineage",
+          "passed": false,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "invalid shared ancestor 0",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "allow",
+          "name": "authorized wildcard subdomain",
+          "passed": false,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "malformed snapshot",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "low-risk inactive optional approval",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "allow",
+          "name": "shared signed ancestry 1",
+          "passed": false,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "missing high-risk approval",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "caller capability widening",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "allow",
+          "expected": "allow",
+          "name": "untrusted low-risk data",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "mixed high-risk trust",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "invalid shared ancestor 4",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "allow",
+          "name": "shared signed ancestry 4",
+          "passed": false,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "allow",
+          "name": "shared signed ancestry 2",
+          "passed": false,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "low-risk dangling approval",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "allow",
+          "name": "shared signed ancestry 3",
+          "passed": false,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "allow",
+          "name": "active optional low-risk approval 1",
+          "passed": false,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "invalid shared ancestor 1",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "low-risk missing lineage",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "approval argument replay",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "invalid shared ancestor 2",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "secondary destination",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "missing lineage node",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "raw credential forwarding",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "inactive high-risk approval",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "insufficient credential scope",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "approval tool mismatch",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "non-authoritative catalog",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "unregistered tool",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "allow",
+          "name": "active optional low-risk approval 0",
+          "passed": false,
+          "status": "evaluated"
+        },
+        {
+          "actual": "allow",
+          "expected": "deny",
+          "name": "low-risk lineage cycle",
+          "passed": false,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "wrong credential consumer",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "primary target disagreement",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "invalid signed-root signature",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "inactive memory",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "revoked credential",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "allow",
+          "expected": "allow",
+          "name": "collaborative low-risk data",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "inactive registration",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "inactive root",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "invalid catalog signature",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "duplicate provenance identity",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "invalid shared ancestor 3",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "self-described non-ticket approval",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "low-risk inactive lineage",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "actual": "deny",
+          "expected": "deny",
+          "name": "lineage cycle",
+          "passed": true,
+          "status": "evaluated"
+        }
+      ],
+      "evaluated_cases": 46,
+      "not_evaluated_cases": 0,
+      "passed_cases": 36,
+      "unsafe_prevention": {
+        "passed": 34,
+        "total": 35
+      }
+    },
+    "semantic_groups": {
+      "passed": 9,
+      "total": 10
+    }
+  },
+  "reward": 0,
+  "solved_service_ids": [],
+  "summary": "9/10 semantic checks passed",
+  "unsolved_service_ids": [
+    "agent_memory_toolchain_integrity"
+  ]
+}

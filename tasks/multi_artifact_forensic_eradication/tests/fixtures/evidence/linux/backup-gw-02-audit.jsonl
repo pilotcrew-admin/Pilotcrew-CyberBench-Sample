@@ -1,0 +1,5 @@
+{"record_id":"AUDIT-391","time_utc":"2025-04-17T09:19:44Z","host":"backup-gw-02","auid":"backupsvc","exe":"/usr/bin/install","command":"install -m 700 /tmp/cert_sync.py /opt/cache/cert_sync.py"}
+{"record_id":"AUDIT-392","time_utc":"2025-04-17T09:20:11Z","host":"backup-gw-02","auid":"backupsvc","exe":"/usr/bin/systemctl","command":"systemctl enable --now cert-cache.service"}
+{"record_id":"AUDIT-393","time_utc":"2025-04-17T09:21:08Z","host":"backup-gw-02","auid":"backupsvc","exe":"/usr/bin/sh","command":"sh -c cat /tmp/deploy.pub >> /home/backupsvc/.ssh/authorized_keys","object":"/home/backupsvc/.ssh/authorized_keys"}
+{"record_id":"AUDIT-394","time_utc":"2025-04-17T09:23:41Z","host":"backup-gw-02","auid":"backupsvc","exe":"/usr/bin/ssh","command":"ssh -i /opt/cache/.vault-stage vaultsync@10.24.9.31","principal":"CORP\\vaultsync"}
+{"record_id":"AUDIT-410","time_utc":"2025-04-17T09:40:00Z","host":"backup-gw-02","auid":"root","exe":"/usr/local/bin/vendor-inventory","command":"vendor-inventory --push 192.0.2.44"}

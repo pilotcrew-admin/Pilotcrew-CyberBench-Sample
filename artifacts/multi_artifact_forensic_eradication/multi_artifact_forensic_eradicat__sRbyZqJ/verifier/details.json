@@ -1,0 +1,235 @@
+{
+  "metrics": {
+    "eradication_and_preservation": {
+      "checks": [
+        {
+          "failure_message": "alerted registry startup still enabled",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "alerted PowerShell payload not quarantined",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "backup gateway systemd persistence still enabled",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "backup gateway relay payload not quarantined",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "unauthorized backup gateway key still present",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "vault proxy systemd persistence still enabled",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "vault proxy relay payload not quarantined",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "unauthorized vault proxy key still present",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "managed backup-gateway SSH key was removed",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "managed vault-proxy SSH key was removed",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "legitimate month-end task was disabled",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "legitimate ledger script was quarantined",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "approved inventory timer was disabled",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "approved inventory binary was quarantined",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "approved vault-health service was disabled",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "approved vault-health binary was quarantined",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "clean reporting host was altered",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "incident backupsvc session remains active",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "incident vaultsync session remains active",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "legitimate reporting session was revoked",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "exposed backupsvc credential was not rotated",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "exposed vaultsync credential was not rotated",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "unexposed reporting credential was rotated",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "trusted hostile network indicators are not all blocked",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "an approved partner destination was blocked",
+          "passed": true,
+          "status": "evaluated"
+        }
+      ],
+      "evaluated": 25,
+      "not_evaluated": 0,
+      "passed": 25,
+      "total": 25
+    },
+    "semantic_groups": {
+      "passed": 6,
+      "total": 8
+    },
+    "service_recovery": {
+      "checks": [
+        {
+          "failure_message": "nightly-backup is not running",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "nightly-backup is not rebound to current backupsvc trust",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "archive-transfer is not running",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "archive-transfer is not rebound to current vaultsync trust",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "ledger-client is not restored",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "approved vault-health workflow was disrupted",
+          "passed": true,
+          "status": "evaluated"
+        },
+        {
+          "failure_message": "clean reporting workflow was disrupted",
+          "passed": true,
+          "status": "evaluated"
+        }
+      ],
+      "evaluated": 7,
+      "not_evaluated": 0,
+      "passed": 7,
+      "total": 7
+    },
+    "timeline": {
+      "covered_hops": 2,
+      "events": [
+        {
+          "index": 0,
+          "kind": "initial_execution",
+          "passed": true
+        },
+        {
+          "index": 1,
+          "kind": "credential_access",
+          "passed": true
+        },
+        {
+          "index": 2,
+          "kind": "lateral_access",
+          "passed": true
+        },
+        {
+          "index": 3,
+          "kind": "persistence_activation",
+          "passed": true
+        },
+        {
+          "index": 4,
+          "kind": "lateral_access",
+          "passed": true
+        },
+        {
+          "index": 5,
+          "kind": "persistence_activation",
+          "passed": true
+        }
+      ],
+      "required_hops": 2
+    }
+  },
+  "problems": [
+    "[initial] cited record does not bind host, Office parent, execution, download address, and payload",
+    "[indicators[0]] indicator value does not occur in its selected source record"
+  ],
+  "reward": 0.0,
+  "subscores": {
+    "eradication_and_containment": 1,
+    "indicators": 0,
+    "initial_access": 0,
+    "lateral_movement": 1,
+    "persistence": 1,
+    "scope": 1,
+    "service_recovery": 1,
+    "timeline": 1
+  }
+}

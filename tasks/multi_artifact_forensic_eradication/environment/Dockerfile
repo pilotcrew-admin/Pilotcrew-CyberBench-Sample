@@ -9,5 +9,8 @@ COPY assets/public/README.md /app/README.md
 
 RUN chmod 0755 /usr/local/bin/irctl     && chmod -R a-w /evidence /opt/case/state-template.json     && mkdir -p /case/live /app /logs/agent /logs/verifier     && cp /opt/case/state-template.json /case/live/state.json     && chmod 0777 /case/live /app /logs/agent /logs/verifier     && chmod 0666 /case/live/state.json
 
+RUN useradd --create-home --uid 1000 solver
+USER 1000:1000
+
 WORKDIR /app
 CMD ["sleep", "infinity"]

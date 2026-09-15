@@ -1,0 +1,4 @@
+pid,ppid,user,start_time_utc,exe,command_line,sha256
+1,0,root,2025-04-12T07:00:00Z,/usr/lib/systemd/systemd,/sbin/init,202557e6f798cfce30cf0952bb913f2c5e46d77f489abdc2b35d86e34be83351
+7721,1,root,2025-04-17T09:25:21Z,/usr/local/libexec/.index-cache,/usr/local/libexec/.index-cache --sync,5a1ab623fda7df3cda48fc2d29a914c17ae700b3ceb79589d18bbd111b7f402d
+8090,1,monitor,2025-04-17T09:50:00Z,/usr/local/bin/vault-health,/usr/local/bin/vault-health --push 203.0.113.88,976fa9317978a4fc326b42a008f323e0782222049004c5783eb4e9b805cfbc36

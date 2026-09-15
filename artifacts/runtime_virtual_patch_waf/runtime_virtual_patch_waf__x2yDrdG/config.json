@@ -1,0 +1,13 @@
+{
+    "task": {
+        "path": "tasksets/v3/tasks/runtime_virtual_patch_waf",
+        "source": "tasks"
+    },
+    "trial_name": "runtime_virtual_patch_waf__x2yDrdG",
+    "trials_dir": "jobs/2026-09-10__03-51-55",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "openrouter/google/gemini-3.1-pro-preview"
+    },
+    "job_id": "7ede63b5-5576-4b36-a232-96c82d711292"
+}
