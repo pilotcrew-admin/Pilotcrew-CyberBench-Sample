@@ -30,24 +30,19 @@ absence of defensive-task flag grading conventions.
 
 - `tasks/`: exact copies of the five task packages from `tasksets/v3/tasks`.
 - `artifacts/`: complete aggregate and trial-level Harbor artifacts for the five tasks.
-- `report/Five_Task_Detailed_Report.pdf`: rendered 13-page detailed report.
-- `report/Five_Task_Detailed_Report.md`: text version of the detailed report.
+- [`report/PilotCrew_CyberBench_Five_Task_Detailed_Report.pdf`](report/PilotCrew_CyberBench_Five_Task_Detailed_Report.pdf): rendered 13-page detailed report.
+- [`report/PilotCrew_CyberBench_Five_Task_Detailed_Report.md`](report/PilotCrew_CyberBench_Five_Task_Detailed_Report.md): text version of the detailed report.
 
 ## Running the tasks
 
-Run these commands from the Cyber-Bench repository root. Docker must be
-available, and the repository virtual environment must already be installed.
-
-```bash
-source .venv/bin/activate
-bundle_path=resources/v3-diverse-pass3-zero-sample
-```
+Run these commands from the repository root. Docker must be available, and
+Harbor must be installed in the active environment.
 
 Validate one task with its deterministic oracle and a fresh environment build:
 
 ```bash
 harbor run \
-  --path "$bundle_path/tasks/runtime_virtual_patch_waf" \
+  --path tasks/runtime_virtual_patch_waf \
   --agent oracle \
   --force-build \
   --jobs-dir jobs/v3-diverse-pass3-zero-sample/oracle-single \
@@ -58,7 +53,7 @@ Validate all five tasks with their deterministic oracles:
 
 ```bash
 harbor run \
-  --path "$bundle_path/tasks" \
+  --path tasks \
   --agent oracle \
   --force-build \
   --n-concurrent 2 \
@@ -73,7 +68,7 @@ approved.
 
 ```bash
 harbor run \
-  --path "$bundle_path/tasks/runtime_virtual_patch_waf" \
+  --path tasks/runtime_virtual_patch_waf \
   --agent terminus-2 \
   --model openrouter/<provider>/<model> \
   --env-file .env \
